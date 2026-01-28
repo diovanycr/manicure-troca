@@ -1,25 +1,38 @@
-// Authentication Module
+// 1. Importamos as funções específicas que precisamos
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// Importamos a instância da app que configuraste no firebase-config.js
+import { app } from './firebase-config.js'; 
+
 class AuthManager {
   constructor() {
+    // 2. Inicializamos o serviço de Auth passando a app
+    this.auth = getAuth(app);
     this.currentUser = null;
     this.initAuth();
   }
 
   initAuth() {
-    // Listen for auth state changes
-    firebase.auth().onAuthStateChanged((user) => {
+    // 3. Em vez de firebase.auth().onAuthStateChanged, usamos a função direta
+    onAuthStateChanged(this.auth, (user) => {
       this.currentUser = user;
       this.updateUI();
     });
   }
 
-  // Sign in with OAuth (Google)
   signInWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
     provider.addScope('profile');
     provider.addScope('email');
 
-    firebase.auth().signInWithPopup(provider)
+    // 4. Usamos o signInWithPopup passando a instância do auth
+    signInWithPopup(this.auth, provider)
       .then((result) => {
         console.log('User signed in:', result.user);
         this.currentUser = result.user;
@@ -31,9 +44,8 @@ class AuthManager {
       });
   }
 
-  // Sign out
   signOut() {
-    firebase.auth().signOut()
+    signOut(this.auth)
       .then(() => {
         console.log('User signed out');
         this.currentUser = null;
@@ -44,17 +56,14 @@ class AuthManager {
       });
   }
 
-  // Check if user is authenticated
   isAuthenticated() {
     return this.currentUser !== null;
   }
 
-  // Get current user
   getCurrentUser() {
     return this.currentUser;
   }
 
-  // Update UI based on auth state
   updateUI() {
     const loginBtn = document.getElementById('login-btn');
     const logoutBtn = document.getElementById('logout-btn');
@@ -76,17 +85,14 @@ class AuthManager {
     }
   }
 
-  // Redirect to dashboard
   redirectToDashboard() {
     window.location.href = 'index.html';
   }
 
-  // Redirect to login
   redirectToLogin() {
     window.location.href = 'pages/login.html';
   }
 
-  // Require authentication
   requireAuth() {
     if (!this.isAuthenticated()) {
       this.redirectToLogin();
@@ -94,5 +100,5 @@ class AuthManager {
   }
 }
 
-// Initialize auth manager
-const authManager = new AuthManager();
+// 5. IMPORTANTE: Criamos a instância e tornamos global para o HTML conseguir ver
+window.authManager = new AuthManager();
