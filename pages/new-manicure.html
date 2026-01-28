@@ -6,109 +6,85 @@
   <title>Nova Manicure - Gestão de Manicures</title>
   <link rel="stylesheet" href="../css/style.css">
   <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-hover: #6d28d9;
+      --bg-body: #f8fafc;
+      --text-main: #1e293b;
+      --border: #e2e8f0;
+    }
+
+    body { background-color: var(--bg-body); font-family: sans-serif; color: var(--text-main); }
+
     .container-page {
       max-width: 600px;
       margin: 0 auto;
       padding: 2rem;
     }
 
+    /* BOTÃO VOLTAR BLINDADO */
     .back-link {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      color: #7c3aed; /* Cor primária */
+      color: var(--primary);
       text-decoration: none;
       margin-bottom: 2rem;
       font-weight: 500;
+      transition: color 0.2s;
     }
 
-    .back-link:hover {
-      text-decoration: underline;
-    }
-
-    /* Estilo para garantir que o ícone SVG não quebre */
-    .back-link svg {
-      display: inline-block;
-      vertical-align: middle;
-    }
+    .back-link:hover { color: var(--primary-hover); text-decoration: underline; }
 
     .form-card {
       background: white;
-      border: 1px solid var(--border-color, #e2e8f0);
+      border: 1px solid var(--border);
       border-radius: 0.75rem;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
     }
 
-    .form-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color, #e2e8f0);
-    }
+    .form-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+    .form-header h1 { margin: 0; font-size: 1.5rem; }
+    .form-header p { margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem; }
 
-    .form-header h1 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.5rem;
-    }
-
-    .form-header p {
-      margin: 0;
-      color: #64748b;
-      font-size: 0.875rem;
-    }
-
-    .form-body {
-      padding: 2rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
+    .form-body { padding: 2rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+    
+    .form-group input, .form-group textarea, .form-group select {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--border);
       border-radius: 0.5rem;
       font-size: 1rem;
-      font-family: inherit;
+      box-sizing: border-box;
     }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
     .form-footer {
       padding: 1.5rem;
-      border-top: 1px solid #e2e8f0;
-      background: #f8fafc;
+      background: #f1f5f9;
       display: flex;
       gap: 1rem;
       justify-content: flex-end;
     }
 
-    .form-footer .btn {
-      flex: 1;
-      padding: 0.75rem;
+    .btn {
+      padding: 0.75rem 1.5rem;
       border-radius: 0.5rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
       border: none;
+      transition: all 0.2s;
     }
 
-    .btn-primary { background: #7c3aed; color: white; }
-    .btn-secondary { background: #f1f5f9; color: #475569; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: white; border: 1px solid var(--border); color: #475569; }
 
-    @media (max-width: 768px) {
-      .container-page { padding: 1rem; }
+    @media (max-width: 600px) {
       .form-row { grid-template-columns: 1fr; }
       .form-footer { flex-direction: column; }
     }
@@ -117,11 +93,11 @@
 <body>
   <div class="container-page">
     <a href="../index.html" class="back-link">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="19" y1="12" x2="5" y2="12"></line>
         <polyline points="12 19 5 12 12 5"></polyline>
       </svg>
-      <span>Voltar ao Dashboard</span>
+      Voltar ao Dashboard
     </a>
 
     <div class="form-card">
@@ -132,24 +108,24 @@
 
       <form id="manicure-form" class="form-body">
         <div class="form-group">
-          <label for="name">Nome Completo *</label>
-          <input type="text" id="name" name="name" placeholder="Digite o nome completo" required>
+          <label>Nome Completo *</label>
+          <input type="text" id="name" placeholder="Digite o nome" required>
         </div>
 
         <div class="form-group">
-          <label for="phone">Telefone *</label>
-          <input type="tel" id="phone" name="phone" placeholder="(00) 00000-0000" required>
+          <label>Telefone *</label>
+          <input type="tel" id="phone" placeholder="(00) 00000-0000" required>
         </div>
 
         <div class="form-group">
-          <label for="address">Endereço Completo *</label>
-          <textarea id="address" name="address" rows="3" placeholder="Rua, número, bairro..." required></textarea>
+          <label>Endereço Completo *</label>
+          <textarea id="address" rows="2" placeholder="Rua, número, bairro..." required></textarea>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="plan-type">Tipo de Plano *</label>
-            <select id="plan-type" name="planType" required>
+            <label>Plano *</label>
+            <select id="plan-type" required>
               <option value="">Selecione</option>
               <option value="12">Plano 12</option>
               <option value="15">Plano 15</option>
@@ -158,45 +134,28 @@
           </div>
 
           <div class="form-group">
-            <label for="start-date">Data de Início *</label>
-            <input type="date" id="start-date" name="startDate" required>
+            <label>Data de Início *</label>
+            <input type="date" id="start-date" required>
           </div>
         </div>
       </form>
 
       <div class="form-footer">
-        <button type="button" class="btn btn-secondary" onclick="window.location.href='../index.html'">
-          Cancelar
-        </button>
-        <button type="submit" class="btn btn-primary" form="manicure-form" id="submit-btn">
-          Cadastrar Manicure
-        </button>
+        <button type="button" class="btn btn-secondary" onclick="window.location.href='../index.html'">Cancelar</button>
+        <button type="submit" class="btn btn-primary" form="manicure-form" id="submit-btn">Cadastrar Manicure</button>
       </div>
     </div>
   </div>
 
   <script src="../js/utils.js"></script>
-
   <script type="module">
-    // Importações corrigidas com caminhos relativos para evitar Erro 404
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
 
-    // Garante que o usuário está logado para acessar esta tela
     authManager.requireAuth();
 
-    // Define a data de hoje por padrão
     document.getElementById('start-date').valueAsDate = new Date();
 
-    // Aplica máscara de telefone se a função existir no utils.js
-    const phoneInput = document.getElementById('phone');
-    phoneInput.addEventListener('input', (e) => {
-      if (window.Utils && Utils.formatPhoneInput) {
-        e.target.value = Utils.formatPhoneInput(e.target.value);
-      }
-    });
-
-    // Lógica para salvar no Firebase
     document.getElementById('manicure-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('submit-btn');
@@ -212,16 +171,12 @@
 
       try {
         btn.disabled = true;
-        btn.textContent = 'Gravando...';
-        
-        // Usa o dbManager importado (que usa o firebase-config.js internamente)
+        btn.textContent = 'Salvando...';
         await dbManager.createManicure(data);
-        
-        alert('Sucesso! Manicure cadastrada.');
+        alert('Cadastrada com sucesso!');
         window.location.href = '../index.html';
       } catch (err) {
-        console.error(err);
-        alert('Erro ao salvar: ' + err.message);
+        alert('Erro: ' + err.message);
         btn.disabled = false;
         btn.textContent = 'Cadastrar Manicure';
       }
