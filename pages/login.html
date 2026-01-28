@@ -12,111 +12,77 @@
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+      font-family: 'Inter', sans-serif;
     }
-
     .login-card {
       background: white;
       padding: 3rem;
       border-radius: 1rem;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       max-width: 400px;
-      width: 100%;
+      width: 90%;
       text-align: center;
     }
-
-    .logo {
-      width: 60px;
-      height: 60px;
-      background: white;
-      border-radius: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      margin: 0 auto 1rem;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .login-card h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #1e293b; }
-    .login-card p { color: #64748b; margin-bottom: 2rem; }
-
+    .logo { font-size: 3rem; margin-bottom: 1rem; }
     .btn-login {
       width: 100%;
-      padding: 1rem;
-      font-size: 1rem;
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 0.5rem;
+      padding: 0.8rem;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
       cursor: pointer;
       font-weight: 600;
-      transition: all 0.2s;
+      transition: 0.2s;
     }
-
-    .btn-login:hover { background: #f8fafc; border-color: #cbd5e1; }
-
-    .loading-text {
-      text-align: center;
-      color: #64748b;
-      display: none;
-      margin-top: 1rem;
-    }
-
+    .btn-login:hover { background: #f8fafc; }
+    .loading-text { display: none; margin-top: 1rem; color: #64748b; }
     .loading-text.show { display: block; }
   </style>
 </head>
 <body>
+
   <div class="login-container">
     <div class="login-card">
       <div class="logo">💅</div>
       <h1>Gestão de Manicures</h1>
-      <p>Sistema de Controle de Kits</p>
+      <p>Acesse o sistema</p>
 
-      <button class="btn-login" id="login-btn">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="Google">
-        Fazer Login com Google
+      <button id="login-btn" class="btn-login">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+        Entrar com Google
       </button>
 
-      <div class="loading-text" id="loading-text">
-        <p>Autenticando...</p>
-      </div>
-
-      <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 2rem;">
-        Acesse para gerenciar suas manicures
-      </p>
+      <div id="loading-text" class="loading-text">Autenticando...</div>
     </div>
   </div>
 
   <script type="module">
+    // Importamos a instância do authManager do seu arquivo JS
     import { authManager } from '../js/auth.js';
-    import { auth } from '../config/firebase-config.js';
+    import { auth } from 'https://diovanycr.github.io/manicure-troca/config/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const loginBtn = document.getElementById('login-btn');
-    const loadingText = document.getElementById('loading-text');
+    const btn = document.getElementById('login-btn');
+    const loading = document.getElementById('loading-text');
 
-    // Escuta o clique no botão
-    loginBtn.addEventListener('click', async () => {
-      try {
-        loginBtn.style.display = 'none';
-        loadingText.classList.add('show');
-        await authManager.signInWithGoogle();
-      } catch (error) {
-        loginBtn.style.display = 'flex';
-        loadingText.classList.remove('show');
-        alert("Erro ao fazer login: " + error.message);
-      }
+    // Escuta o clique
+    btn.addEventListener('click', async () => {
+      btn.style.display = 'none';
+      loading.classList.add('show');
+      await authManager.signInWithGoogle();
     });
 
-    // Se já estiver logado, redireciona automaticamente
+    // Monitora o estado para redirecionar caso já esteja logado
     onAuthStateChanged(auth, (user) => {
       if (user) {
         window.location.href = '../index.html';
       }
     });
   </script>
+
 </body>
 </html>
