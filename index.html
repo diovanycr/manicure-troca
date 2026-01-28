@@ -123,19 +123,22 @@
   <script src="js/utils.js"></script>
   
   <script type="module">
-    // Importação dos módulos JS para comunicação correta
+    // Caminhos corrigidos para a estrutura que o GitHub Pages está buscando
     import { authManager } from './js/auth.js';
     import { dbManager } from './js/database.js';
 
-    // Gerenciamento do botão de Sair
-    document.getElementById('logout-btn').addEventListener('click', () => {
-        authManager.signOut();
-    });
+    // Gerenciamento do Logout
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            authManager.signOut();
+        });
+    }
 
-    // Verificação de Autenticação
+    // Proteção de Rota
     authManager.requireAuth();
 
-    // Lógica Principal do Dashboard
+    // Carregamento de Dados
     async function loadDashboard() {
       try {
         if (window.Utils) Utils.showLoading();
@@ -151,7 +154,6 @@
         document.getElementById('alerts-count').textContent = alerts.length;
         document.getElementById('active-plans').textContent = activeCount;
 
-        // Renderização de Alertas Próximos
         if (alerts.length > 0) {
           document.getElementById('alerts-section').style.display = 'block';
           const alertsList = document.getElementById('alerts-list');
@@ -169,7 +171,6 @@
           `).join('');
         }
 
-        // Renderização das Últimas Manicures
         const recentManicures = manicures.slice(0, 5);
         const recentList = document.getElementById('recent-manicures');
         
@@ -192,20 +193,16 @@
 
         if (window.Utils) Utils.hideLoading();
       } catch (error) {
-        console.error('Dashboard Error:', error);
-        if (window.Utils) {
-            Utils.hideLoading();
-            if (typeof Utils.showToast === 'function') Utils.showToast('Erro ao carregar dados', 'danger');
-        }
+        console.error('Erro no Dashboard:', error);
+        if (window.Utils) Utils.hideLoading();
       }
     }
 
-    // Carregamento inicial
+    // Inicialização
     document.addEventListener('DOMContentLoaded', () => {
       setTimeout(loadDashboard, 500);
     });
 
-    // Atualização em tempo real (a cada 30 segundos)
     setInterval(loadDashboard, 30000);
   </script>
 </body>
