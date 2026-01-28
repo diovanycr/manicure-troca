@@ -6,35 +6,122 @@
   <title>Nova Manicure - Gestão de Manicures</title>
   <link rel="stylesheet" href="../css/style.css">
   <style>
-    .container-page { max-width: 600px; margin: 0 auto; padding: 2rem; }
-    .back-link { 
-      display: inline-flex; 
-      align-items: center; 
-      gap: 0.5rem; 
-      color: var(--primary); 
-      text-decoration: none; 
-      margin-bottom: 2rem; 
-      font-weight: 500; 
+    .container-page {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
     }
-    .back-link:hover { text-decoration: underline; }
-    .form-card { background: white; border: 1px solid var(--border-color); border-radius: 0.75rem; box-shadow: var(--shadow-sm); }
-    .form-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); }
-    .form-header h1 { margin: 0 0 0.5rem 0; font-size: 1.5rem; }
-    .form-header p { margin: 0; color: var(--text-secondary); font-size: 0.875rem; }
-    .form-body { padding: 2rem; }
-    .form-group { margin-bottom: 1.5rem; }
-    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem; font-size: 1rem; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .form-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; gap: 1rem; justify-content: flex-end; }
-    .form-footer .btn { flex: 1; }
-    @media (max-width: 768px) { .container-page { padding: 1rem; } .form-row { grid-template-columns: 1fr; } .form-footer { flex-direction: column; } }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #7c3aed; /* Cor primária */
+      text-decoration: none;
+      margin-bottom: 2rem;
+      font-weight: 500;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Estilo para garantir que o ícone SVG não quebre */
+    .back-link svg {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .form-card {
+      background: white;
+      border: 1px solid var(--border-color, #e2e8f0);
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .form-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color, #e2e8f0);
+    }
+
+    .form-header h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+    }
+
+    .form-header p {
+      margin: 0;
+      color: #64748b;
+      font-size: 0.875rem;
+    }
+
+    .form-body {
+      padding: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-footer {
+      padding: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+
+    .form-footer .btn {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary { background: #7c3aed; color: white; }
+    .btn-secondary { background: #f1f5f9; color: #475569; }
+
+    @media (max-width: 768px) {
+      .container-page { padding: 1rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .form-footer { flex-direction: column; }
+    }
   </style>
 </head>
 <body>
   <div class="container-page">
     <a href="../index.html" class="back-link">
-      <span style="font-size: 1.2rem; line-height: 1;">&#8592;</span> Voltar ao Dashboard
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>Voltar ao Dashboard</span>
     </a>
 
     <div class="form-card">
@@ -91,23 +178,25 @@
   <script src="../js/utils.js"></script>
 
   <script type="module">
+    // Importações corrigidas com caminhos relativos para evitar Erro 404
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
 
-    // Proteção de Rota
+    // Garante que o usuário está logado para acessar esta tela
     authManager.requireAuth();
 
-    // Inicia data de hoje
+    // Define a data de hoje por padrão
     document.getElementById('start-date').valueAsDate = new Date();
 
-    // Máscara de Telefone
-    document.getElementById('phone').addEventListener('input', (e) => {
+    // Aplica máscara de telefone se a função existir no utils.js
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', (e) => {
       if (window.Utils && Utils.formatPhoneInput) {
         e.target.value = Utils.formatPhoneInput(e.target.value);
       }
     });
 
-    // Submissão do Formulário
+    // Lógica para salvar no Firebase
     document.getElementById('manicure-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('submit-btn');
@@ -123,8 +212,9 @@
 
       try {
         btn.disabled = true;
-        btn.textContent = 'Salvando...';
+        btn.textContent = 'Gravando...';
         
+        // Usa o dbManager importado (que usa o firebase-config.js internamente)
         await dbManager.createManicure(data);
         
         alert('Sucesso! Manicure cadastrada.');
