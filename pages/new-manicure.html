@@ -81,19 +81,19 @@
   <script src="../js/utils.js"></script>
 
   <script type="module">
-    // Importamos os gerentes que já estão configurados para usar o firebase-config.js
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
 
-    // 1. Protege a página (redireciona se não houver login)
+    // 1. Verifica autenticação assim que o módulo carrega
     authManager.requireAuth();
 
-    // 2. Configura a data de hoje como padrão no input
+    // 2. Configurações iniciais da UI
     document.getElementById('start-date').valueAsDate = new Date();
 
-    // 3. Máscara de telefone usando o Utils (se disponível)
+    // 3. Máscara de telefone
     const phoneInput = document.getElementById('phone');
     phoneInput.addEventListener('input', (e) => {
+      // Usa a função do utils.js carregado acima
       if (window.Utils && Utils.formatPhoneInput) {
         e.target.value = Utils.formatPhoneInput(e.target.value);
       }
@@ -104,39 +104,28 @@
       e.preventDefault();
       const submitBtn = document.getElementById('submit-btn');
 
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const address = document.getElementById('address').value.trim();
-      const planType = document.getElementById('plan-type').value;
-      const startDateInput = document.getElementById('start-date').value;
-
-      if (!name || !phone || !address || !planType || !startDateInput) {
-        alert('Por favor, preencha todos os campos obrigatórios.');
-        return;
-      }
+      const data = {
+        name: document.getElementById('name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        planType: document.getElementById('plan-type').value,
+        startDate: new Date(document.getElementById('start-date').value).getTime(),
+        status: 'active',
+        createdAt: Date.now()
+      };
 
       try {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Cadastrando...';
 
-        const startDateTimestamp = new Date(startDateInput).getTime();
-
-        // Criamos o objeto da manicure
-        // O dbManager cuidará de enviar para a pasta correta do usuário logado
-        await dbManager.createManicure({
-          name,
-          phone,
-          address,
-          planType,
-          startDate: startDateTimestamp,
-          status: 'active'
-        });
+        // Chama o banco através do dbManager importado
+        await dbManager.createManicure(data);
 
         alert('Manicure cadastrada com sucesso!');
         window.location.href = '../index.html';
 
       } catch (error) {
-        console.error('Erro ao cadastrar:', error);
+        console.error('Erro:', error);
         alert('Erro ao cadastrar: ' + error.message);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Cadastrar Manicure';
