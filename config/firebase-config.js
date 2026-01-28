@@ -1,5 +1,9 @@
-// Firebase Configuration
-// Replace with your Firebase project credentials
+// Importamos as funções necessárias diretamente das bibliotecas do Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
   authDomain: "parceiro-be3e9.firebaseapp.com",
@@ -10,17 +14,21 @@ const firebaseConfig = {
   appId: "1:619982778395:web:25c141958b7c06da02c8be"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+// Inicializa o Firebase
+export const app = initializeApp(firebaseConfig);
 
-// Get references to Firebase services
-const db = firebase.database();
-const auth = firebase.auth();
-const storage = firebase.storage();
+// Inicializa os serviços
+export const db = getDatabase(app);
+export const auth = getAuth(app);
+export const storage = getStorage(app);
 
-// Export for use in other modules
+// Exporta para o objeto window para manter compatibilidade com seus outros scripts
 window.firebaseServices = {
   db,
   auth,
-  storage
+  storage,
+  app
 };
+
+// Também exportamos individualmente para usar com 'import' em outros arquivos
+export default firebaseConfig;
