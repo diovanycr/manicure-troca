@@ -27,7 +27,6 @@
       padding: 2rem;
     }
 
-    /* BOTÃO VOLTAR SIMPLIFICADO E BLINDADO */
     .back-link {
       display: inline-flex;
       align-items: center;
@@ -40,7 +39,7 @@
       transition: all 0.2s ease;
       padding: 8px 12px;
       border-radius: 8px;
-      background: #f1f5f9; /* Fundo leve para parecer um botão */
+      background: #f1f5f9;
     }
 
     .back-link:hover { 
@@ -95,6 +94,7 @@
 
     .btn-primary { background: var(--primary); color: white; }
     .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
     .btn-secondary { background: white; border: 1px solid var(--border); color: #475569; }
 
     @media (max-width: 600px) {
@@ -119,44 +119,46 @@
         <p>Cadastre uma nova profissional no sistema</p>
       </div>
 
-      <form id="manicure-form" class="form-body">
-        <div class="form-group">
-          <label>Nome Completo *</label>
-          <input type="text" id="name" placeholder="Digite o nome" required>
-        </div>
-
-        <div class="form-group">
-          <label>Telefone *</label>
-          <input type="tel" id="phone" placeholder="(00) 00000-0000" required>
-        </div>
-
-        <div class="form-group">
-          <label>Endereço Completo *</label>
-          <textarea id="address" rows="2" placeholder="Rua, número, bairro..." required></textarea>
-        </div>
-
-        <div class="form-row">
+      <form id="manicure-form">
+        <div class="form-body">
           <div class="form-group">
-            <label>Plano *</label>
-            <select id="plan-type" required>
-              <option value="">Selecione</option>
-              <option value="12">Plano 12</option>
-              <option value="15">Plano 15</option>
-              <option value="18">Plano 18</option>
-            </select>
+            <label>Nome Completo *</label>
+            <input type="text" id="name" placeholder="Digite o nome" required>
           </div>
 
           <div class="form-group">
-            <label>Data de Início *</label>
-            <input type="date" id="start-date" required>
+            <label>Telefone *</label>
+            <input type="tel" id="phone" placeholder="(00) 00000-0000" required>
           </div>
+
+          <div class="form-group">
+            <label>Endereço Completo *</label>
+            <textarea id="address" rows="2" placeholder="Rua, número, bairro..." required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Plano *</label>
+              <select id="plan-type" required>
+                <option value="">Selecione</option>
+                <option value="12">Plano 12</option>
+                <option value="15">Plano 15</option>
+                <option value="18">Plano 18</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Data de Início *</label>
+              <input type="date" id="start-date" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.location.href='../index.html'">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Cadastrar Manicure</button>
         </div>
       </form>
-
-      <div class="form-footer">
-        <button type="button" class="btn btn-secondary" onclick="window.location.href='../index.html'">Cancelar</button>
-        <button type="submit" class="btn btn-primary" form="manicure-form" id="submit-btn">Cadastrar Manicure</button>
-      </div>
     </div>
   </div>
 
@@ -171,28 +173,40 @@
     // Data de hoje automática
     document.getElementById('start-date').valueAsDate = new Date();
 
-    // Lógica do formulário
-    document.getElementById('manicure-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('submit-btn');
+    const form = document.getElementById('manicure-form');
+    const btn = document.getElementById('submit-btn');
 
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
       const data = {
         name: document.getElementById('name').value.trim(),
         phone: document.getElementById('phone').value.trim(),
         address: document.getElementById('address').value.trim(),
         planType: document.getElementById('plan-type').value,
-        startDate: new Date(document.getElementById('start-date').value).getTime(),
-        status: 'active'
+        startDate: document.getElementById('start-date').value, // Mantendo string YYYY-MM-DD para o DB
+        status: 'active',
+        createdAt: new Date().toISOString()
       };
 
       try {
         btn.disabled = true;
         btn.textContent = 'Salvando...';
-        await dbManager.createManicure(data);
+
+        // Tenta usar createManicure ou addManicure (dependendo da sua exportação no database.js)
+        const saveFunction = dbManager.createManicure || dbManager.addManicure;
+        
+        if (!saveFunction) {
+          throw new Error("Função de salvamento não encontrada no dbManager.");
+        }
+
+        await saveFunction.call(dbManager, data);
+        
         alert('Cadastrada com sucesso!');
         window.location.href = '../index.html';
       } catch (err) {
-        alert('Erro: ' + err.message);
+        console.error("Erro ao salvar:", err);
+        alert('Erro ao salvar: ' + err.message);
         btn.disabled = false;
         btn.textContent = 'Cadastrar Manicure';
       }
