@@ -14,8 +14,8 @@ import {
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// CORREÇÃO AQUI: Saindo da pasta 'js' e entrando na pasta 'config'
-import { auth } from '../config/firebase-config.js'; 
+// IMPORTANTE: Caminho absoluto para evitar erro 404 em qualquer página
+import { auth } from 'https://diovanycr.github.io/manicure-troca/config/firebase-config.js'; 
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 class DatabaseManager {
@@ -30,15 +30,17 @@ class DatabaseManager {
     onAuthStateChanged(auth, (user) => {
       this.userId = user ? user.uid : null;
       this.authInitialized = true;
+      console.log("Sistema de Autenticação:", this.userId ? "Usuário Identificado" : "Aguardando Login");
     });
   }
 
+  // Função que segura a execução até o Firebase confirmar quem é o usuário
   async _waitForUser() {
     if (this.userId) return this.userId;
     
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        if (!this.userId) reject(new Error('Tempo de autenticação esgotado. Verifique sua conexão.'));
+        if (!this.userId) reject(new Error('Falha na autenticação: Tempo esgotado.'));
       }, 5000);
 
       const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -52,32 +54,44 @@ class DatabaseManager {
     });
   }
 
-  async createManicure(data) {
-    const uid = await this._waitForUser();
-    const manicuresRef = ref(this.db, `users/${uid}/manicures`);
-    const newManicureRef = push(manicuresRef);
-    
-    const manicureData = {
-      id: newManicureRef.key,
-      ...data,
-      createdAt: serverTimestamp(),
-      status: 'active'
-    };
+  // ===== OPERAÇÕES DE MANICURE =====
 
-    await set(newManicureRef, manicureData);
-    return manicureData;
+  async createManicure(data) {
+    try {
+      const uid = await this._waitForUser();
+      const manicuresRef = ref(this.db, `users/${uid}/manicures`);
+      const newManicureRef = push(manicuresRef);
+      
+      const manicureData = {
+        id: newManicureRef.key,
+        ...data,
+        createdAt: serverTimestamp(),
+        status: 'active'
+      };
+
+      await set(newManicureRef, manicureData);
+      return manicureData;
+    } catch (error) {
+      console.error("Erro ao salvar no Firebase:", error);
+      throw error;
+    }
   }
 
   async getAllManicures() {
-    const uid = await this._waitForUser();
-    const manicuresRef = ref(this.db, `users/${uid}/manicures`);
-    const snapshot = await get(manicuresRef);
-    
-    const manicures = [];
-    snapshot.forEach((child) => {
-      manicures.push(child.val());
-    });
-    return manicures;
+    try {
+      const uid = await this._waitForUser();
+      const manicuresRef = ref(this.db, `users/${uid}/manicures`);
+      const snapshot = await get(manicuresRef);
+      
+      const manicures = [];
+      snapshot.forEach((child) => {
+        manicures.push(child.val());
+      });
+      return manicures;
+    } catch (error) {
+      console.error("Erro ao buscar manicures:", error);
+      return [];
+    }
   }
 
   async getManicureById(manicureId) {
@@ -102,12 +116,7 @@ class DatabaseManager {
     await remove(manicureRef);
   }
 
-  async toggleManicureStatus(manicureId) {
-    const manicure = await this.getManicureById(manicureId);
-    const newStatus = manicure.status === 'active' ? 'inactive' : 'active';
-    await this.updateManicure(manicureId, { status: newStatus });
-    return newStatus;
-  }
+  // ===== ESCUTA EM TEMPO REAL =====
 
   onManicuresChange(callback) {
     this._waitForUser().then(uid => {
@@ -119,7 +128,7 @@ class DatabaseManager {
         });
         callback(manicures);
       });
-    });
+    }).catch(err => console.error("Erro no listener:", err));
   }
 }
 
