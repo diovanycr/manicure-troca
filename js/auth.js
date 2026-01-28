@@ -1,4 +1,4 @@
-// 1. Importamos as funções específicas que precisamos
+// 1. Importamos as funções necessárias do Firebase SDK
 import { 
   getAuth, 
   onAuthStateChanged, 
@@ -7,19 +7,17 @@ import {
   signOut 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Importamos a instância da app que configuraste no firebase-config.js
+// Importamos a instância da app (Certifique-se que o caminho está correto)
 import { app } from './firebase-config.js'; 
 
 class AuthManager {
   constructor() {
-    // 2. Inicializamos o serviço de Auth passando a app
     this.auth = getAuth(app);
     this.currentUser = null;
     this.initAuth();
   }
 
   initAuth() {
-    // 3. Em vez de firebase.auth().onAuthStateChanged, usamos a função direta
     onAuthStateChanged(this.auth, (user) => {
       this.currentUser = user;
       this.updateUI();
@@ -31,28 +29,25 @@ class AuthManager {
     provider.addScope('profile');
     provider.addScope('email');
 
-    // 4. Usamos o signInWithPopup passando a instância do auth
-    signInWithPopup(this.auth, provider)
+    return signInWithPopup(this.auth, provider)
       .then((result) => {
-        console.log('User signed in:', result.user);
         this.currentUser = result.user;
         this.redirectToDashboard();
       })
       .catch((error) => {
-        console.error('Error signing in:', error);
+        console.error('Erro ao entrar:', error);
         alert('Erro ao fazer login: ' + error.message);
       });
   }
 
   signOut() {
-    signOut(this.auth)
+    return signOut(this.auth)
       .then(() => {
-        console.log('User signed out');
         this.currentUser = null;
         this.redirectToLogin();
       })
       .catch((error) => {
-        console.error('Error signing out:', error);
+        console.error('Erro ao sair:', error);
       });
   }
 
@@ -60,45 +55,43 @@ class AuthManager {
     return this.currentUser !== null;
   }
 
-  getCurrentUser() {
-    return this.currentUser;
-  }
-
   updateUI() {
-    const loginBtn = document.getElementById('login-btn');
-    const logoutBtn = document.getElementById('logout-btn');
     const userInfo = document.getElementById('user-info');
 
-    if (this.isAuthenticated()) {
-      if (loginBtn) loginBtn.style.display = 'none';
-      if (logoutBtn) logoutBtn.style.display = 'block';
+    if (this.currentUser) {
       if (userInfo) {
         userInfo.innerHTML = `
-          <span>${this.currentUser.displayName || this.currentUser.email}</span>
-          <img src="${this.currentUser.photoURL || 'assets/default-avatar.png'}" alt="Avatar" class="avatar">
+          <div class="user-profile">
+            <img src="${this.currentUser.photoURL || 'https://via.placeholder.com/40'}" alt="Avatar" class="avatar">
+            <div class="user-info">
+              <p class="name">${this.currentUser.displayName || 'Usuário'}</p>
+              <p class="email">${this.currentUser.email}</p>
+            </div>
+          </div>
         `;
       }
-    } else {
-      if (loginBtn) loginBtn.style.display = 'block';
-      if (logoutBtn) logoutBtn.style.display = 'none';
-      if (userInfo) userInfo.innerHTML = '';
     }
   }
 
   redirectToDashboard() {
-    window.location.href = 'index.html';
+    // Se estiver na pasta pages/, o caminho é '../index.html'
+    // Se estiver na raiz, é 'index.html'
+    window.location.href = window.location.pathname.includes('pages/') ? '../index.html' : 'index.html';
   }
 
   redirectToLogin() {
-    window.location.href = 'pages/login.html';
+    window.location.href = window.location.pathname.includes('pages/') ? 'login.html' : 'pages/login.html';
   }
 
   requireAuth() {
-    if (!this.isAuthenticated()) {
-      this.redirectToLogin();
-    }
+    // Verificação via observador para evitar redirecionamento falso antes do Firebase carregar
+    onAuthStateChanged(this.auth, (user) => {
+      if (!user) {
+        this.redirectToLogin();
+      }
+    });
   }
 }
 
-// 5. IMPORTANTE: Criamos a instância e tornamos global para o HTML conseguir ver
-window.authManager = new AuthManager();
+// exportamos a instância para o index.html conseguir importar
+export const authManager = new AuthManager();
