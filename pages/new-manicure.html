@@ -6,111 +6,21 @@
   <title>Nova Manicure - Gestão de Manicures</title>
   <link rel="stylesheet" href="../css/style.css">
   <style>
-    .container-page {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--primary);
-      text-decoration: none;
-      margin-bottom: 2rem;
-      font-weight: 500;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
-    }
-
-    .form-card {
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: 0.75rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .form-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .form-header h1 {
-      margin: 0 0 0.5rem 0;
-    }
-
-    .form-header p {
-      margin: 0;
-      color: var(--text-secondary);
-      font-size: 0.875rem;
-    }
-
-    .form-body {
-      padding: 2rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid var(--border-color);
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      font-family: inherit;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    .form-footer {
-      padding: 1.5rem;
-      border-top: 1px solid var(--border-color);
-      background: var(--bg-secondary);
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-    }
-
-    .form-footer .btn {
-      flex: 1;
-    }
-
-    @media (max-width: 768px) {
-      .container-page {
-        padding: 1rem;
-      }
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-      .form-footer {
-        flex-direction: column;
-      }
-    }
+    .container-page { max-width: 600px; margin: 0 auto; padding: 2rem; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); text-decoration: none; margin-bottom: 2rem; font-weight: 500; }
+    .back-link:hover { text-decoration: underline; }
+    .form-card { background: white; border: 1px solid var(--border-color); border-radius: 0.75rem; box-shadow: var(--shadow-sm); }
+    .form-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); }
+    .form-header h1 { margin: 0 0 0.5rem 0; }
+    .form-header p { margin: 0; color: var(--text-secondary); font-size: 0.875rem; }
+    .form-body { padding: 2rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem; font-size: 1rem; font-family: inherit; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; gap: 1rem; justify-content: flex-end; }
+    .form-footer .btn { flex: 1; }
+    @media (max-width: 768px) { .container-page { padding: 1rem; } .form-row { grid-template-columns: 1fr; } .form-footer { flex-direction: column; } }
   </style>
 </head>
 <body>
@@ -136,7 +46,7 @@
 
         <div class="form-group">
           <label for="address">Endereço Completo *</label>
-          <textarea id="address" name="address" placeholder="Rua, número, bairro, cidade..." required></textarea>
+          <textarea id="address" name="address" placeholder="Rua, número, bairro..." required></textarea>
         </div>
 
         <div class="form-row">
@@ -169,49 +79,56 @@
   </div>
 
   <script src="../js/utils.js"></script>
+
   <script type="module">
+    // Importamos os gerentes que já estão configurados para usar o firebase-config.js
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
 
-    // Proteção de rota
+    // 1. Protege a página (redireciona se não houver login)
     authManager.requireAuth();
 
-    // Data padrão hoje
+    // 2. Configura a data de hoje como padrão no input
     document.getElementById('start-date').valueAsDate = new Date();
 
-    // Máscara de telefone simples
-    document.getElementById('phone').addEventListener('input', (e) => {
-      let value = e.target.value.replace(/\D/g, '');
-      if (value.length > 11) value = value.slice(0, 11);
-      if (value.length > 2) value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
-      if (value.length > 9) value = `${value.slice(0, 10)}-${value.slice(10)}`;
-      e.target.value = value;
+    // 3. Máscara de telefone usando o Utils (se disponível)
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', (e) => {
+      if (window.Utils && Utils.formatPhoneInput) {
+        e.target.value = Utils.formatPhoneInput(e.target.value);
+      }
     });
 
-    // Envio do formulário
+    // 4. Lógica de submissão do formulário
     document.getElementById('manicure-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
       const submitBtn = document.getElementById('submit-btn');
-      const formData = {
-        name: document.getElementById('name').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        address: document.getElementById('address').value.trim(),
-        planType: document.getElementById('plan-type').value,
-        startDate: document.getElementById('start-date').value
-      };
+
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const planType = document.getElementById('plan-type').value;
+      const startDateInput = document.getElementById('start-date').value;
+
+      if (!name || !phone || !address || !planType || !startDateInput) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
+      }
 
       try {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Salvando...';
+        submitBtn.textContent = 'Cadastrando...';
 
-        // Lógica de cálculo de troca (assumindo que o utils.js lidará com isso no futuro)
-        const nextExchange = new Date(formData.startDate);
-        nextExchange.setDate(nextExchange.getDate() + 15); // Exemplo de 15 dias
+        const startDateTimestamp = new Date(startDateInput).getTime();
 
+        // Criamos o objeto da manicure
+        // O dbManager cuidará de enviar para a pasta correta do usuário logado
         await dbManager.createManicure({
-          ...formData,
-          nextExchangeDate: nextExchange.toISOString(),
+          name,
+          phone,
+          address,
+          planType,
+          startDate: startDateTimestamp,
           status: 'active'
         });
 
@@ -219,7 +136,7 @@
         window.location.href = '../index.html';
 
       } catch (error) {
-        console.error('Erro:', error);
+        console.error('Erro ao cadastrar:', error);
         alert('Erro ao cadastrar: ' + error.message);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Cadastrar Manicure';
