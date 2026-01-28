@@ -104,29 +104,23 @@
       .container-page {
         padding: 1rem;
       }
-
       .form-row {
         grid-template-columns: 1fr;
       }
-
       .form-footer {
         flex-direction: column;
-      }
-
-      .form-footer .btn {
-        width: 100%;
       }
     }
   </style>
 </head>
 <body>
   <div class="container-page">
-    <a href="../index.html" class="back-link">? Voltar</a>
+    <a href="../index.html" class="back-link">← Voltar ao Dashboard</a>
 
     <div class="form-card">
       <div class="form-header">
         <h1>Nova Manicure</h1>
-        <p>Cadastre uma nova manicure no sistema</p>
+        <p>Cadastre uma nova profissional no sistema</p>
       </div>
 
       <form id="manicure-form" class="form-body">
@@ -142,14 +136,14 @@
 
         <div class="form-group">
           <label for="address">Endereço Completo *</label>
-          <textarea id="address" name="address" placeholder="Rua, número, bairro, cidade, estado" required></textarea>
+          <textarea id="address" name="address" placeholder="Rua, número, bairro, cidade..." required></textarea>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="plan-type">Tipo de Plano *</label>
             <select id="plan-type" name="planType" required>
-              <option value="">Selecione um plano</option>
+              <option value="">Selecione</option>
               <option value="12">Plano 12</option>
               <option value="15">Plano 15</option>
               <option value="18">Plano 18</option>
@@ -174,75 +168,59 @@
     </div>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
-
-  <!-- Config -->
-  <script src="../config/firebase-config.js"></script>
-
-  <!-- Scripts -->
   <script src="../js/utils.js"></script>
-  <script src="../js/auth.js"></script>
-  <script src="../js/database.js"></script>
+  <script type="module">
+    import { authManager } from '../js/auth.js';
+    import { dbManager } from '../js/database.js';
 
-  <script>
-    // Require authentication
+    // Proteção de rota
     authManager.requireAuth();
 
-    // Set today's date as default
+    // Data padrão hoje
     document.getElementById('start-date').valueAsDate = new Date();
 
-    // Format phone input
+    // Máscara de telefone simples
     document.getElementById('phone').addEventListener('input', (e) => {
-      e.target.value = Utils.formatPhoneInput(e.target.value);
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 11) value = value.slice(0, 11);
+      if (value.length > 2) value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+      if (value.length > 9) value = `${value.slice(0, 10)}-${value.slice(10)}`;
+      e.target.value = value;
     });
 
-    // Handle form submission
+    // Envio do formulário
     document.getElementById('manicure-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const address = document.getElementById('address').value.trim();
-      const planType = document.getElementById('plan-type').value;
-      const startDate = new Date(document.getElementById('start-date').value).getTime();
-
-      // Validate
-      if (!name || !phone || !address || !planType) {
-        Utils.showToast('Preencha todos os campos obrigatórios', 'warning');
-        return;
-      }
+      
+      const submitBtn = document.getElementById('submit-btn');
+      const formData = {
+        name: document.getElementById('name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        planType: document.getElementById('plan-type').value,
+        startDate: document.getElementById('start-date').value
+      };
 
       try {
-        const submitBtn = document.getElementById('submit-btn');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Cadastrando...';
+        submitBtn.textContent = 'Salvando...';
 
-        // Calculate next exchange date
-        const nextExchangeDate = Utils.calculateNextExchangeDate(startDate);
+        // Lógica de cálculo de troca (assumindo que o utils.js lidará com isso no futuro)
+        const nextExchange = new Date(formData.startDate);
+        nextExchange.setDate(nextExchange.getDate() + 15); // Exemplo de 15 dias
 
-        // Create manicure
-        const manicure = await dbManager.createManicure({
-          name,
-          phone,
-          address,
-          planType,
-          startDate,
-          nextExchangeDate,
-          isDueSoon: Utils.isDueSoon(nextExchangeDate),
-          lastExchangeDate: null
+        await dbManager.createManicure({
+          ...formData,
+          nextExchangeDate: nextExchange.toISOString(),
+          status: 'active'
         });
 
-        Utils.showToast('Manicure cadastrada com sucesso!', 'success');
-        setTimeout(() => {
-          window.location.href = `manicure-details.html?id=${manicure.id}`;
-        }, 1000);
+        alert('Manicure cadastrada com sucesso!');
+        window.location.href = '../index.html';
+
       } catch (error) {
-        console.error('Error creating manicure:', error);
-        Utils.showToast('Erro ao cadastrar manicure: ' + error.message, 'danger');
+        console.error('Erro:', error);
+        alert('Erro ao cadastrar: ' + error.message);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Cadastrar Manicure';
       }
