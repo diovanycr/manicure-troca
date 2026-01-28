@@ -123,19 +123,19 @@
   <script src="js/utils.js"></script>
   
   <script type="module">
-    // Importação dos módulos JS
+    // Importação dos módulos JS para comunicação correta
     import { authManager } from './js/auth.js';
     import { dbManager } from './js/database.js';
 
-    // Event Listener para Logout (necessário para scripts type="module")
+    // Gerenciamento do botão de Sair
     document.getElementById('logout-btn').addEventListener('click', () => {
         authManager.signOut();
     });
 
-    // Proteção de Rota
+    // Verificação de Autenticação
     authManager.requireAuth();
 
-    // Lógica do Dashboard
+    // Lógica Principal do Dashboard
     async function loadDashboard() {
       try {
         if (window.Utils) Utils.showLoading();
@@ -146,13 +146,12 @@
         const inactiveCount = manicures.filter(m => m.status === 'inactive').length;
         const alerts = Utils.getAlerts(manicures);
 
-        // Atualiza a interface
         document.getElementById('total-manicures').textContent = manicures.length;
         document.getElementById('total-desc').textContent = `${activeCount} ativas, ${inactiveCount} inativas`;
         document.getElementById('alerts-count').textContent = alerts.length;
         document.getElementById('active-plans').textContent = activeCount;
 
-        // Renderiza Alertas
+        // Renderização de Alertas Próximos
         if (alerts.length > 0) {
           document.getElementById('alerts-section').style.display = 'block';
           const alertsList = document.getElementById('alerts-list');
@@ -170,7 +169,7 @@
           `).join('');
         }
 
-        // Renderiza Recentes
+        // Renderização das Últimas Manicures
         const recentManicures = manicures.slice(0, 5);
         const recentList = document.getElementById('recent-manicures');
         
@@ -193,7 +192,7 @@
 
         if (window.Utils) Utils.hideLoading();
       } catch (error) {
-        console.error('Erro ao carregar dashboard:', error);
+        console.error('Dashboard Error:', error);
         if (window.Utils) {
             Utils.hideLoading();
             if (typeof Utils.showToast === 'function') Utils.showToast('Erro ao carregar dados', 'danger');
@@ -201,12 +200,12 @@
       }
     }
 
-    // Inicialização ao carregar a página
+    // Carregamento inicial
     document.addEventListener('DOMContentLoaded', () => {
       setTimeout(loadDashboard, 500);
     });
 
-    // Atualização automática (30 seg)
+    // Atualização em tempo real (a cada 30 segundos)
     setInterval(loadDashboard, 30000);
   </script>
 </body>
