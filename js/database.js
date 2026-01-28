@@ -14,7 +14,8 @@ import {
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-import { auth } from '../firebase-config.js';
+// CORREÇÃO AQUI: Saindo da pasta 'js' e entrando na pasta 'config'
+import { auth } from '../config/firebase-config.js'; 
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 class DatabaseManager {
@@ -32,7 +33,6 @@ class DatabaseManager {
     });
   }
 
-  // Função interna para garantir que o código espere o login ser reconhecido
   async _waitForUser() {
     if (this.userId) return this.userId;
     
@@ -52,11 +52,8 @@ class DatabaseManager {
     });
   }
 
-  // ===== MANICURES OPERATIONS =====
-
   async createManicure(data) {
     const uid = await this._waitForUser();
-
     const manicuresRef = ref(this.db, `users/${uid}/manicures`);
     const newManicureRef = push(manicuresRef);
     
@@ -111,8 +108,6 @@ class DatabaseManager {
     await this.updateManicure(manicureId, { status: newStatus });
     return newStatus;
   }
-
-  // ===== REAL-TIME LISTENERS =====
 
   onManicuresChange(callback) {
     this._waitForUser().then(uid => {
