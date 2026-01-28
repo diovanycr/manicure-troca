@@ -7,12 +7,12 @@ import {
   signOut 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Importamos a instância da app (Certifique-se que o caminho está correto)
-import { app } from './firebase-config.js'; 
+// CORREÇÃO: Usando caminho absoluto para o config
+import { auth as firebaseAuth } from 'https://diovanycr.github.io/manicure-troca/config/firebase-config.js'; 
 
 class AuthManager {
   constructor() {
-    this.auth = getAuth(app);
+    this.auth = firebaseAuth;
     this.currentUser = null;
     this.initAuth();
   }
@@ -57,34 +57,29 @@ class AuthManager {
 
   updateUI() {
     const userInfo = document.getElementById('user-info');
-
-    if (this.currentUser) {
-      if (userInfo) {
-        userInfo.innerHTML = `
-          <div class="user-profile">
-            <img src="${this.currentUser.photoURL || 'https://via.placeholder.com/40'}" alt="Avatar" class="avatar">
-            <div class="user-info">
-              <p class="name">${this.currentUser.displayName || 'Usuário'}</p>
-              <p class="email">${this.currentUser.email}</p>
-            </div>
+    if (this.currentUser && userInfo) {
+      userInfo.innerHTML = `
+        <div class="user-profile">
+          <img src="${this.currentUser.photoURL || 'https://via.placeholder.com/40'}" alt="Avatar" class="avatar">
+          <div class="user-info">
+            <p class="name">${this.currentUser.displayName || 'Usuário'}</p>
+            <p class="email">${this.currentUser.email}</p>
           </div>
-        `;
-      }
+        </div>
+      `;
     }
   }
 
+  // CORREÇÃO: Links absolutos para o GitHub Pages não se perder
   redirectToDashboard() {
-    // Se estiver na pasta pages/, o caminho é '../index.html'
-    // Se estiver na raiz, é 'index.html'
-    window.location.href = window.location.pathname.includes('pages/') ? '../index.html' : 'index.html';
+    window.location.href = 'https://diovanycr.github.io/manicure-troca/index.html';
   }
 
   redirectToLogin() {
-    window.location.href = window.location.pathname.includes('pages/') ? 'login.html' : 'pages/login.html';
+    window.location.href = 'https://diovanycr.github.io/manicure-troca/pages/login.html';
   }
 
   requireAuth() {
-    // Verificação via observador para evitar redirecionamento falso antes do Firebase carregar
     onAuthStateChanged(this.auth, (user) => {
       if (!user) {
         this.redirectToLogin();
@@ -93,5 +88,5 @@ class AuthManager {
   }
 }
 
-// exportamos a instância para o index.html conseguir importar
+// exportamos a instância
 export const authManager = new AuthManager();
