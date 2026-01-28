@@ -7,11 +7,19 @@
   <link rel="stylesheet" href="../css/style.css">
   <style>
     .container-page { max-width: 600px; margin: 0 auto; padding: 2rem; }
-    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); text-decoration: none; margin-bottom: 2rem; font-weight: 500; }
+    .back-link { 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+      color: var(--primary); 
+      text-decoration: none; 
+      margin-bottom: 2rem; 
+      font-weight: 500; 
+    }
     .back-link:hover { text-decoration: underline; }
     .form-card { background: white; border: 1px solid var(--border-color); border-radius: 0.75rem; box-shadow: var(--shadow-sm); }
     .form-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); }
-    .form-header h1 { margin: 0 0 0.5rem 0; }
+    .form-header h1 { margin: 0 0 0.5rem 0; font-size: 1.5rem; }
     .form-header p { margin: 0; color: var(--text-secondary); font-size: 0.875rem; }
     .form-body { padding: 2rem; }
     .form-group { margin-bottom: 1.5rem; }
@@ -25,7 +33,9 @@
 </head>
 <body>
   <div class="container-page">
-    <a href="../index.html" class="back-link">&larr; Voltar ao Dashboard</a>
+    <a href="../index.html" class="back-link">
+      <span style="font-size: 1.2rem; line-height: 1;">&#8592;</span> Voltar ao Dashboard
+    </a>
 
     <div class="form-card">
       <div class="form-header">
@@ -46,7 +56,7 @@
 
         <div class="form-group">
           <label for="address">Endereço Completo *</label>
-          <textarea id="address" name="address" placeholder="Rua, número, bairro..." required></textarea>
+          <textarea id="address" name="address" rows="3" placeholder="Rua, número, bairro..." required></textarea>
         </div>
 
         <div class="form-row">
@@ -81,28 +91,26 @@
   <script src="../js/utils.js"></script>
 
   <script type="module">
-    // Importamos os arquivos JS modernos (Módulos ES6)
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
 
-    // Proteção de rota
+    // Proteção de Rota
     authManager.requireAuth();
 
-    // Data de hoje como padrão
+    // Inicia data de hoje
     document.getElementById('start-date').valueAsDate = new Date();
 
-    // Máscara de telefone
-    const phoneInput = document.getElementById('phone');
-    phoneInput.addEventListener('input', (e) => {
+    // Máscara de Telefone
+    document.getElementById('phone').addEventListener('input', (e) => {
       if (window.Utils && Utils.formatPhoneInput) {
         e.target.value = Utils.formatPhoneInput(e.target.value);
       }
     });
 
-    // Envio do formulário
+    // Submissão do Formulário
     document.getElementById('manicure-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const submitBtn = document.getElementById('submit-btn');
+      const btn = document.getElementById('submit-btn');
 
       const data = {
         name: document.getElementById('name').value.trim(),
@@ -114,19 +122,18 @@
       };
 
       try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Gravando...';
-
+        btn.disabled = true;
+        btn.textContent = 'Salvando...';
+        
         await dbManager.createManicure(data);
-
-        alert('Manicure salva com sucesso!');
+        
+        alert('Sucesso! Manicure cadastrada.');
         window.location.href = '../index.html';
-
-      } catch (error) {
-        console.error(error);
-        alert('Erro ao salvar: ' + error.message);
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Cadastrar Manicure';
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao salvar: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Cadastrar Manicure';
       }
     });
   </script>
