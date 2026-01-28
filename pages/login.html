@@ -21,120 +21,100 @@
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       max-width: 400px;
       width: 100%;
-    }
-
-    .login-header {
       text-align: center;
-      margin-bottom: 2rem;
     }
 
     .logo {
       width: 60px;
       height: 60px;
-      background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+      background: white;
       border-radius: 0.75rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-size: 1.5rem;
+      font-size: 2rem;
       margin: 0 auto 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
-    .login-card h1 {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .login-card p {
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-    }
+    .login-card h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #1e293b; }
+    .login-card p { color: #64748b; margin-bottom: 2rem; }
 
     .btn-login {
       width: 100%;
       padding: 1rem;
       font-size: 1rem;
-      margin-bottom: 1rem;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
     }
 
-    .divider {
-      text-align: center;
-      margin: 2rem 0;
-      color: var(--text-secondary);
-      font-size: 0.875rem;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: '';
-      display: inline-block;
-      width: 40%;
-      height: 1px;
-      background-color: var(--border-color);
-      vertical-align: middle;
-      margin: 0 0.5rem;
-    }
+    .btn-login:hover { background: #f8fafc; border-color: #cbd5e1; }
 
     .loading-text {
       text-align: center;
-      color: var(--text-secondary);
+      color: #64748b;
       display: none;
+      margin-top: 1rem;
     }
 
-    .loading-text.show {
-      display: block;
-    }
+    .loading-text.show { display: block; }
   </style>
 </head>
 <body>
   <div class="login-container">
     <div class="login-card">
-      <div class="login-header">
-        <div class="logo">??</div>
-        <h1>Gestão de Manicures</h1>
-        <p>Sistema de Controle de Kits</p>
-      </div>
+      <div class="logo">💅</div>
+      <h1>Gestão de Manicures</h1>
+      <p>Sistema de Controle de Kits</p>
 
-      <button class="btn btn-primary btn-login" id="login-btn" onclick="authManager.signInWithGoogle()">
-        <span>??</span>
-        <span>Fazer Login com Google</span>
+      <button class="btn-login" id="login-btn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="Google">
+        Fazer Login com Google
       </button>
 
-      <div class="divider">ou</div>
-
       <div class="loading-text" id="loading-text">
-        <p>Redirecionando...</p>
+        <p>Autenticando...</p>
       </div>
 
-      <p class="text-small text-muted" style="text-align: center; margin-top: 2rem;">
-        Faça login para acessar o sistema de gestão de manicures
+      <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 2rem;">
+        Acesse para gerenciar suas manicures
       </p>
     </div>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
+  <script type="module">
+    import { authManager } from '../js/auth.js';
+    import { auth } from '../config/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  <!-- Config -->
-  <script src="../config/firebase-config.js"></script>
+    const loginBtn = document.getElementById('login-btn');
+    const loadingText = document.getElementById('loading-text');
 
-  <!-- Scripts -->
-  <script src="../js/utils.js"></script>
-  <script src="../js/auth.js"></script>
+    // Escuta o clique no botão
+    loginBtn.addEventListener('click', async () => {
+      try {
+        loginBtn.style.display = 'none';
+        loadingText.classList.add('show');
+        await authManager.signInWithGoogle();
+      } catch (error) {
+        loginBtn.style.display = 'flex';
+        loadingText.classList.remove('show');
+        alert("Erro ao fazer login: " + error.message);
+      }
+    });
 
-  <script>
-    // Redirect to dashboard if already logged in
-    firebase.auth().onAuthStateChanged((user) => {
+    // Se já estiver logado, redireciona automaticamente
+    onAuthStateChanged(auth, (user) => {
       if (user) {
-        document.getElementById('login-btn').style.display = 'none';
-        document.getElementById('loading-text').classList.add('show');
-        setTimeout(() => {
-          window.location.href = '../index.html';
-        }, 500);
+        window.location.href = '../index.html';
       }
     });
   </script>
