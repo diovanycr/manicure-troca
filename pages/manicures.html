@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manicures - Gestão de Manicures</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 250px;
+      height: 100vh;
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: white;
+      padding: 2rem 1rem;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-logo {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .sidebar-title h2 {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    .sidebar-title p {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin: 0;
+    }
+
+    .nav-menu {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      border-radius: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      right: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      object-fit: cover;
+    }
+
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-info p {
+      margin: 0;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-info .name {
+      font-weight: 600;
+    }
+
+    .user-info .email {
+      opacity: 0.8;
+      font-size: 0.75rem;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 2rem;
+      min-height: 100vh;
+      background: var(--bg-secondary);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .filters-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .filter-group label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .filter-group input,
+    .filter-group select {
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .manicures-card {
+      background: white;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-header h2 {
+      margin: 0 0 0.5rem 0;
+    }
+
+    .card-header p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .manicure-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .manicure-item:hover {
+      background: var(--bg-secondary);
+      border-color: var(--primary);
+    }
+
+    .manicure-info h3 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1rem;
+    }
+
+    .manicure-info p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .manicure-meta {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .badge-success {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .badge-secondary {
+      background-color: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .badge-warning {
+      background-color: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 1rem;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+
+      .header-actions {
+        width: 100%;
+      }
+
+      .header-actions .btn {
+        flex: 1;
+      }
+
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-menu {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .nav-item {
+        margin-bottom: 0;
+      }
+
+      .sidebar-footer {
+        position: static;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">??</div>
+      <div class="sidebar-title">
+        <h2>Gestão Manicures</h2>
+        <p>Controle de Kits</p>
+      </div>
+    </div>
+
+    <nav>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="../index.html" class="nav-link">
+            <span>??</span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="manicures.html" class="nav-link active">
+            <span>??</span>
+            <span>Manicures</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="alerts.html" class="nav-link">
+            <span>??</span>
+            <span>Alertas</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile" id="user-info">
+        <!-- User info will be populated here -->
+      </div>
+      <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" id="logout-btn" onclick="authManager.signOut()">
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="header">
+      <div>
+        <h1>Manicures</h1>
+        <p class="text-muted">Gerencie todas as manicures cadastradas</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="window.location.href='new-manicure.html'">
+          <span>?</span>
+          <span>Nova Manicure</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-card">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="search-input">Buscar</label>
+          <input type="text" id="search-input" placeholder="Nome ou telefone..." onkeyup="filterManicures()">
+        </div>
+
+        <div class="filter-group">
+          <label for="status-filter">Status</label>
+          <select id="status-filter" onchange="filterManicures()">
+            <option value="">Todos</option>
+            <option value="active">Ativas</option>
+            <option value="inactive">Inativas</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="plan-filter">Tipo de Plano</label>
+          <select id="plan-filter" onchange="filterManicures()">
+            <option value="">Todos</option>
+            <option value="12">Plano 12</option>
+            <option value="15">Plano 15</option>
+            <option value="18">Plano 18</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manicures List -->
+    <div class="manicures-card">
+      <div class="card-header">
+        <h2>Resultados (<span id="results-count">0</span>)</h2>
+      </div>
+      <div class="card-body" id="manicures-list">
+        <div class="empty-state">
+          <div class="empty-state-icon">??</div>
+          <p>Nenhuma manicure encontrada</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
+
+  <!-- Config -->
+  <script src="../config/firebase-config.js"></script>
+
+  <!-- Scripts -->
+  <script src="../js/utils.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/database.js"></script>
+
+  <script>
+    // Require authentication
+    authManager.requireAuth();
+
+    let allManicures = [];
+
+    // Load manicures
+    async function loadManicures() {
+      try {
+        allManicures = await dbManager.getAllManicures();
+        filterManicures();
+      } catch (error) {
+        console.error('Error loading manicures:', error);
+        Utils.showToast('Erro ao carregar manicures', 'danger');
+      }
+    }
+
+    // Filter manicures
+    function filterManicures() {
+      const searchQuery = document.getElementById('search-input').value.toLowerCase();
+      const statusFilter = document.getElementById('status-filter').value;
+      const planFilter = document.getElementById('plan-filter').value;
+
+      let filtered = allManicures.filter(m => {
+        const matchesSearch = m.name.toLowerCase().includes(searchQuery) || m.phone.includes(searchQuery);
+        const matchesStatus = !statusFilter || m.status === statusFilter;
+        const matchesPlan = !planFilter || m.planType === planFilter;
+        return matchesSearch && matchesStatus && matchesPlan;
+      });
+
+      displayManicures(filtered);
+    }
+
+    // Display manicures
+    function displayManicures(manicures) {
+      const list = document.getElementById('manicures-list');
+      document.getElementById('results-count').textContent = manicures.length;
+
+      if (manicures.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">??</div>
+            <p>Nenhuma manicure encontrada</p>
+            <button class="btn btn-primary" onclick="window.location.href='new-manicure.html'">
+              Cadastrar Manicure
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = manicures.map(m => `
+        <div class="manicure-item" onclick="window.location.href='manicure-details.html?id=${m.id}'">
+          <div class="manicure-info">
+            <h3>${m.name}</h3>
+            <p>${m.phone} • Plano ${m.planType}</p>
+            <p style="margin-top: 0.5rem;">Próxima troca: ${Utils.formatDate(m.nextExchangeDate)}</p>
+          </div>
+          <div class="manicure-meta">
+            ${m.isDueSoon ? '<span class="badge badge-warning">Troca próxima</span>' : ''}
+            <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}">
+              ${m.status === 'active' ? 'Ativa' : 'Inativa'}
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Load manicures on page load
+    document.addEventListener('DOMContentLoaded', loadManicures);
+  </script>
+</body>
+</html>
