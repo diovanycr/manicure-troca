@@ -123,40 +123,34 @@
   <script src="js/utils.js"></script>
   
   <script type="module">
-    // Importante: Certifique-se que esses arquivos existem dentro da pasta /js/
+    // IMPORTANTE: Adicionamos o caminho relativo absoluto para evitar o 404 no GitHub Pages
     import { authManager } from './js/auth.js';
     import { dbManager } from './js/database.js';
 
-    // Configuração do botão de sair (Event Listener necessário para módulos)
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
+    // Gerenciamento de Logout
+    document.getElementById('logout-btn').addEventListener('click', () => {
         authManager.signOut();
-      });
-    }
+    });
 
-    // Proteção de página: redireciona se não estiver logado
+    // Proteção de Rota
     authManager.requireAuth();
 
-    // Função para carregar os dados do Firebase para a tela
     async function loadDashboard() {
       try {
         if (window.Utils) Utils.showLoading();
         
-        // Busca todas as manicures do Realtime Database
         const manicures = await dbManager.getAllManicures();
 
         const activeCount = manicures.filter(m => m.status === 'active').length;
         const inactiveCount = manicures.filter(m => m.status === 'inactive').length;
-        const alerts = Utils.getAlerts(manicures);
+        const alerts = Utils.getAlerts ? Utils.getAlerts(manicures) : [];
 
-        // Atualiza os contadores na tela
         document.getElementById('total-manicures').textContent = manicures.length;
         document.getElementById('total-desc').textContent = `${activeCount} ativas, ${inactiveCount} inativas`;
         document.getElementById('alerts-count').textContent = alerts.length;
         document.getElementById('active-plans').textContent = activeCount;
 
-        // Se houver alertas de troca de kit, mostra a seção
+        // Renderização de Alertas
         if (alerts.length > 0) {
           document.getElementById('alerts-section').style.display = 'block';
           const alertsList = document.getElementById('alerts-list');
@@ -165,54 +159,41 @@
               <div class="manicure-info">
                 <h3>${alert.name}</h3>
                 <p>${alert.phone} • Plano ${alert.planType}</p>
-                <p style="margin-top: 0.5rem;">Próxima troca: ${Utils.formatDate(alert.nextExchangeDate)}</p>
               </div>
               <div class="manicure-meta">
-                <span class="badge badge-danger">${Utils.calculateDaysUntilExchange(alert.nextExchangeDate)} dia(s)</span>
+                <span class="badge badge-danger">Troca em breve</span>
               </div>
             </div>
           `).join('');
         }
 
-        // Renderiza as 5 manicures mais recentes
-        const recentManicures = manicures.slice(0, 5);
+        // Renderização de Recentes
         const recentList = document.getElementById('recent-manicures');
-        
-        if (recentManicures.length > 0) {
-          recentList.innerHTML = recentManicures.map(manicure => `
-            <div class="manicure-item" onclick="window.location.href='pages/manicure-details.html?id=${manicure.id}'">
+        if (manicures.length > 0) {
+          recentList.innerHTML = manicures.slice(0, 5).map(m => `
+            <div class="manicure-item" onclick="window.location.href='pages/manicure-details.html?id=${m.id}'">
               <div class="manicure-info">
-                <h3>${manicure.name}</h3>
-                <p>${manicure.phone} • Plano ${manicure.planType}</p>
+                <h3>${m.name}</h3>
+                <p>${m.phone} • Plano ${m.planType}</p>
               </div>
-              <div class="manicure-meta">
-                ${manicure.isDueSoon ? '<span class="badge badge-warning">Troca próxima</span>' : ''}
-                <span class="badge ${manicure.status === 'active' ? 'badge-success' : 'badge-secondary'}">
-                  ${manicure.status === 'active' ? 'Ativa' : 'Inativa'}
-                </span>
-              </div>
+              <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}">
+                ${m.status === 'active' ? 'Ativa' : 'Inativa'}
+              </span>
             </div>
           `).join('');
         }
 
         if (window.Utils) Utils.hideLoading();
       } catch (error) {
-        console.error('Erro ao carregar dashboard:', error);
-        if (window.Utils) {
-          Utils.hideLoading();
-          if (typeof Utils.showToast === 'function') Utils.showToast('Erro ao carregar dados', 'danger');
-        }
+        console.error('Erro no Dashboard:', error);
+        if (window.Utils) Utils.hideLoading();
       }
     }
 
-    // Inicializa a carga dos dados
+    // Inicialização
     document.addEventListener('DOMContentLoaded', () => {
-      // Pequeno atraso para garantir que o Firebase Auth inicializou
-      setTimeout(loadDashboard, 600);
+      setTimeout(loadDashboard, 800);
     });
-
-    // Atualiza os dados a cada 30 segundos automaticamente
-    setInterval(loadDashboard, 30000);
   </script>
 </body>
 </html>
