@@ -149,9 +149,6 @@
       margin: 0 auto 1.5rem;
     }
 
-    .modal-content h3 { margin: 0 0 0.5rem; color: #1e293b; }
-    .modal-content p { margin: 0; color: #64748b; }
-
     @media (max-width: 600px) {
       .form-row { grid-template-columns: 1fr; }
       .form-footer { flex-direction: column; }
@@ -227,13 +224,15 @@
     </div>
   </div>
 
-  <script src="../js/utils.js"></script>
   <script type="module">
-    import { authManager } from '../js/auth.js';
-    import { dbManager } from '../js/database.js';
+    // USANDO CAMINHOS ABSOLUTOS PARA EVITAR ERRO 404 NO GITHUB PAGES
+    import { authManager } from 'https://diovanycr.github.io/manicure-troca/js/auth.js';
+    import { dbManager } from 'https://diovanycr.github.io/manicure-troca/js/database.js';
 
+    // Garante que o usuário está logado
     authManager.requireAuth();
 
+    // Define a data de hoje por padrão
     document.getElementById('start-date').valueAsDate = new Date();
 
     const form = document.getElementById('manicure-form');
@@ -257,26 +256,27 @@
         btn.disabled = true;
         btn.textContent = 'Salvando...';
 
+        // Verifica qual função existe no dbManager
         const saveFunction = dbManager.createManicure || dbManager.addManicure;
         
         if (!saveFunction) {
-          throw new Error("Função de salvamento não encontrada.");
+          throw new Error("Sistema de banco de dados não inicializado.");
         }
 
+        // Executa o salvamento
         await saveFunction.call(dbManager, data);
         
-        // Exibe o modal
+        // Exibe o modal de sucesso
         modal.classList.add('active');
 
-        // Aguarda 2 segundos e redireciona
+        // Aguarda 2 segundos exibindo o modal e depois redireciona
         setTimeout(() => {
-          modal.classList.remove('active');
           window.location.href = '../index.html';
         }, 2000);
 
       } catch (err) {
-        console.error("Erro ao salvar:", err);
-        alert('Erro ao salvar: ' + err.message);
+        console.error("Erro ao cadastrar:", err);
+        alert('Erro ao cadastrar: ' + err.message);
         btn.disabled = false;
         btn.textContent = 'Cadastrar Manicure';
       }
