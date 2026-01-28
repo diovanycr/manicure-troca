@@ -16,7 +16,7 @@
     .form-body { padding: 2rem; }
     .form-group { margin-bottom: 1.5rem; }
     .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem; font-size: 1rem; font-family: inherit; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem; font-size: 1rem; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .form-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; gap: 1rem; justify-content: flex-end; }
     .form-footer .btn { flex: 1; }
@@ -25,7 +25,7 @@
 </head>
 <body>
   <div class="container-page">
-    <a href="../index.html" class="back-link">← Voltar ao Dashboard</a>
+    <a href="../index.html" class="back-link">&larr; Voltar ao Dashboard</a>
 
     <div class="form-card">
       <div class="form-header">
@@ -81,25 +81,25 @@
   <script src="../js/utils.js"></script>
 
   <script type="module">
+    // Importamos os arquivos JS modernos (Módulos ES6)
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
 
-    // 1. Verifica autenticação assim que o módulo carrega
+    // Proteção de rota
     authManager.requireAuth();
 
-    // 2. Configurações iniciais da UI
+    // Data de hoje como padrão
     document.getElementById('start-date').valueAsDate = new Date();
 
-    // 3. Máscara de telefone
+    // Máscara de telefone
     const phoneInput = document.getElementById('phone');
     phoneInput.addEventListener('input', (e) => {
-      // Usa a função do utils.js carregado acima
       if (window.Utils && Utils.formatPhoneInput) {
         e.target.value = Utils.formatPhoneInput(e.target.value);
       }
     });
 
-    // 4. Lógica de submissão do formulário
+    // Envio do formulário
     document.getElementById('manicure-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('submit-btn');
@@ -110,23 +110,21 @@
         address: document.getElementById('address').value.trim(),
         planType: document.getElementById('plan-type').value,
         startDate: new Date(document.getElementById('start-date').value).getTime(),
-        status: 'active',
-        createdAt: Date.now()
+        status: 'active'
       };
 
       try {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Cadastrando...';
+        submitBtn.textContent = 'Gravando...';
 
-        // Chama o banco através do dbManager importado
         await dbManager.createManicure(data);
 
-        alert('Manicure cadastrada com sucesso!');
+        alert('Manicure salva com sucesso!');
         window.location.href = '../index.html';
 
       } catch (error) {
-        console.error('Erro:', error);
-        alert('Erro ao cadastrar: ' + error.message);
+        console.error(error);
+        alert('Erro ao salvar: ' + error.message);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Cadastrar Manicure';
       }
