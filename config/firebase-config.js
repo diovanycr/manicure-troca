@@ -1,4 +1,3 @@
-// Importamos as funções necessárias diretamente das bibliotecas do Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
@@ -15,20 +14,15 @@ const firebaseConfig = {
 };
 
 // Inicializa o Firebase
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-// Inicializa os serviços
+// Inicializa e exporta os serviços
 export const db = getDatabase(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+export { app };
 
-// Exporta para o objeto window para manter compatibilidade com seus outros scripts
-window.firebaseServices = {
-  db,
-  auth,
-  storage,
-  app
-};
+// Mantém compatibilidade global se necessário
+window.firebaseServices = { db, auth, storage, app };
 
-// Também exportamos individualmente para usar com 'import' em outros arquivos
 export default firebaseConfig;
