@@ -123,37 +123,40 @@
   <script src="js/utils.js"></script>
   
   <script type="module">
-    // Caminhos corrigidos para a estrutura que o GitHub Pages está buscando
+    // Importante: Certifique-se que esses arquivos existem dentro da pasta /js/
     import { authManager } from './js/auth.js';
     import { dbManager } from './js/database.js';
 
-    // Gerenciamento do Logout
+    // Configuração do botão de sair (Event Listener necessário para módulos)
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            authManager.signOut();
-        });
+      logoutBtn.addEventListener('click', () => {
+        authManager.signOut();
+      });
     }
 
-    // Proteção de Rota
+    // Proteção de página: redireciona se não estiver logado
     authManager.requireAuth();
 
-    // Carregamento de Dados
+    // Função para carregar os dados do Firebase para a tela
     async function loadDashboard() {
       try {
         if (window.Utils) Utils.showLoading();
         
+        // Busca todas as manicures do Realtime Database
         const manicures = await dbManager.getAllManicures();
 
         const activeCount = manicures.filter(m => m.status === 'active').length;
         const inactiveCount = manicures.filter(m => m.status === 'inactive').length;
         const alerts = Utils.getAlerts(manicures);
 
+        // Atualiza os contadores na tela
         document.getElementById('total-manicures').textContent = manicures.length;
         document.getElementById('total-desc').textContent = `${activeCount} ativas, ${inactiveCount} inativas`;
         document.getElementById('alerts-count').textContent = alerts.length;
         document.getElementById('active-plans').textContent = activeCount;
 
+        // Se houver alertas de troca de kit, mostra a seção
         if (alerts.length > 0) {
           document.getElementById('alerts-section').style.display = 'block';
           const alertsList = document.getElementById('alerts-list');
@@ -171,6 +174,7 @@
           `).join('');
         }
 
+        // Renderiza as 5 manicures mais recentes
         const recentManicures = manicures.slice(0, 5);
         const recentList = document.getElementById('recent-manicures');
         
@@ -193,16 +197,21 @@
 
         if (window.Utils) Utils.hideLoading();
       } catch (error) {
-        console.error('Erro no Dashboard:', error);
-        if (window.Utils) Utils.hideLoading();
+        console.error('Erro ao carregar dashboard:', error);
+        if (window.Utils) {
+          Utils.hideLoading();
+          if (typeof Utils.showToast === 'function') Utils.showToast('Erro ao carregar dados', 'danger');
+        }
       }
     }
 
-    // Inicialização
+    // Inicializa a carga dos dados
     document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(loadDashboard, 500);
+      // Pequeno atraso para garantir que o Firebase Auth inicializou
+      setTimeout(loadDashboard, 600);
     });
 
+    // Atualiza os dados a cada 30 segundos automaticamente
     setInterval(loadDashboard, 30000);
   </script>
 </body>
