@@ -279,22 +279,6 @@
       gap: 0.5rem;
     }
 
-    .filter-toggle {
-      background: none;
-      border: none;
-      color: var(--color-primary);
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 0.25rem 0.5rem;
-      border-radius: 6px;
-      transition: var(--transition);
-    }
-
-    .filter-toggle:active {
-      background: rgba(217, 70, 239, 0.1);
-    }
-
     .filters-grid {
       display: grid;
       gap: 1rem;
@@ -338,7 +322,7 @@
       padding-right: 2.5rem;
     }
 
-    /* Results Section */
+    /* Results Header */
     .results-header {
       display: flex;
       justify-content: space-between;
@@ -355,27 +339,6 @@
     .results-count strong {
       color: var(--color-primary);
       font-weight: 700;
-    }
-
-    .sort-btn {
-      background: none;
-      border: 1px solid var(--color-border);
-      color: var(--color-text-muted);
-      font-size: 0.875rem;
-      padding: 0.5rem 0.75rem;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: 'Outfit', sans-serif;
-      transition: var(--transition);
-    }
-
-    .sort-btn:active {
-      background: var(--color-bg);
-      border-color: var(--color-primary);
-      color: var(--color-primary);
     }
 
     /* Manicure List */
@@ -451,6 +414,22 @@
       background: var(--color-text-muted);
     }
 
+    .manicure-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--color-bg);
+    }
+
+    .next-exchange {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
     .manicure-meta {
       display: flex;
       gap: 0.5rem;
@@ -481,11 +460,6 @@
     .badge-secondary {
       background: #e5e7eb;
       color: #4b5563;
-    }
-
-    .badge-primary {
-      background: rgba(217, 70, 239, 0.1);
-      color: var(--color-primary-dark);
     }
 
     /* Buttons */
@@ -812,7 +786,7 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Manicures</h1>
-          <p class="page-subtitle">Lista geral de colaboradoras</p>
+          <p class="page-subtitle">Gerencie todas as manicures cadastradas</p>
         </div>
         <button class="btn btn-primary" onclick="window.location.href='new-manicure.html'" style="display: none;" id="desktop-add-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -942,24 +916,65 @@
     });
   </script>
 
-  <script src="../js/utils.js"></script>
-  <script type="module">
-    import { authManager } from '../js/auth.js';
-    import { dbManager } from '../js/database.js';
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
 
-    authManager.requireAuth();
-    document.getElementById('logout-btn').onclick = () => authManager.signOut();
+  <!-- Config -->
+  <script src="../config/firebase-config.js"></script>
+
+  <!-- Scripts -->
+  <script src="../js/utils.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/database.js"></script>
+
+  <script>
+    // Require authentication
+    if (typeof authManager !== 'undefined') {
+      authManager.requireAuth();
+      document.getElementById('logout-btn').onclick = () => authManager.signOut();
+    }
 
     let allManicures = [];
 
-    async function loadData() {
+    // Utils helper
+    const Utils = window.Utils || {
+      formatDate: (date) => {
+        if (!date) return 'Não definida';
+        return new Date(date).toLocaleDateString('pt-BR');
+      }
+    };
+
+    // Get initials
+    function getInitials(name) {
+      return name
+        .split(' ')
+        .slice(0, 2)
+        .map(n => n[0])
+        .join('')
+        .toUpperCase();
+    }
+
+    // Load manicures
+    async function loadManicures() {
       try {
+        if (typeof dbManager === 'undefined') {
+          console.error('Database manager not loaded');
+          return;
+        }
+
         allManicures = await dbManager.getAllManicures();
-        const user = authManager.currentUser;
-        if(user) document.getElementById('user-info').textContent = user.email;
-        render();
-      } catch (e) { 
-        console.error(e);
+        const user = typeof authManager !== 'undefined' ? authManager.currentUser : null;
+        
+        if (user) {
+          document.getElementById('user-info').textContent = user.email;
+        }
+
+        filterManicures();
+      } catch (error) {
+        console.error('Error loading manicures:', error);
         document.getElementById('manicures-list').innerHTML = `
           <div style="text-align: center; padding: 3rem; color: var(--color-danger); grid-column: 1/-1;">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.3; margin-bottom: 1rem;">
@@ -974,32 +989,29 @@
       }
     }
 
-    function getInitials(name) {
-      return name
-        .split(' ')
-        .slice(0, 2)
-        .map(n => n[0])
-        .join('')
-        .toUpperCase();
-    }
+    // Filter manicures
+    function filterManicures() {
+      const searchQuery = document.getElementById('search-input').value.toLowerCase();
+      const statusFilter = document.getElementById('status-filter').value;
+      const planFilter = document.getElementById('plan-filter').value;
 
-    function render() {
-      const query = document.getElementById('search-input').value.toLowerCase();
-      const status = document.getElementById('status-filter').value;
-      const plan = document.getElementById('plan-filter').value;
-
-      const filtered = allManicures.filter(m => {
-        const matchesSearch = m.name.toLowerCase().includes(query) || m.phone.includes(query);
-        const matchesStatus = !status || m.status === status;
-        const matchesPlan = !plan || String(m.planType) === plan;
+      let filtered = allManicures.filter(m => {
+        const matchesSearch = m.name.toLowerCase().includes(searchQuery) || m.phone.includes(searchQuery);
+        const matchesStatus = !statusFilter || m.status === statusFilter;
+        const matchesPlan = !planFilter || String(m.planType) === planFilter;
         return matchesSearch && matchesStatus && matchesPlan;
       });
 
-      document.getElementById('results-count').textContent = filtered.length;
-      const container = document.getElementById('manicures-list');
+      displayManicures(filtered);
+    }
 
-      if (filtered.length === 0) {
-        container.innerHTML = `
+    // Display manicures
+    function displayManicures(manicures) {
+      const list = document.getElementById('manicures-list');
+      document.getElementById('results-count').textContent = manicures.length;
+
+      if (manicures.length === 0) {
+        list.innerHTML = `
           <div class="empty-state" style="grid-column: 1/-1;">
             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -1021,33 +1033,60 @@
         return;
       }
 
-      container.innerHTML = filtered.map(m => `
-        <div class="manicure-card" onclick="window.location.href='manicure-details.html?id=${m.id}'">
-          <div class="manicure-card-header">
-            <div style="display: flex; align-items: center; flex: 1;">
-              <div class="manicure-avatar">${getInitials(m.name)}</div>
-              <div class="manicure-info">
-                <div class="manicure-name">${m.name}</div>
-                <div class="manicure-details">
-                  <span>${m.phone}</span>
-                  <span class="detail-separator"></span>
-                  <span>Plano ${m.planType}</span>
+      // Check for upcoming exchanges
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      list.innerHTML = manicures.map(m => {
+        let isDueSoon = false;
+        if (m.nextExchangeDate && m.status === 'active') {
+          const exchangeDate = new Date(m.nextExchangeDate);
+          exchangeDate.setHours(0, 0, 0, 0);
+          const diff = Math.ceil((exchangeDate - today) / (1000 * 60 * 60 * 24));
+          isDueSoon = diff <= 2;
+        }
+
+        return `
+          <div class="manicure-card" onclick="window.location.href='manicure-details.html?id=${m.id}'">
+            <div class="manicure-card-header">
+              <div style="display: flex; align-items: center; flex: 1;">
+                <div class="manicure-avatar">${getInitials(m.name)}</div>
+                <div class="manicure-info">
+                  <div class="manicure-name">${m.name}</div>
+                  <div class="manicure-details">
+                    <span>${m.phone}</span>
+                    <span class="detail-separator"></span>
+                    <span>Plano ${m.planType}</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}">
-              ${m.status === 'active' ? 'Ativa' : 'Inativa'}
-            </span>
+            <div class="manicure-footer">
+              <div class="next-exchange">
+                <span>📅</span>
+                <span>${Utils.formatDate(m.nextExchangeDate)}</span>
+              </div>
+              <div class="manicure-meta">
+                ${isDueSoon ? '<span class="badge badge-warning">Troca próxima</span>' : ''}
+                <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}">
+                  ${m.status === 'active' ? 'Ativa' : 'Inativa'}
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
-    document.getElementById('search-input').addEventListener('input', render);
-    document.getElementById('status-filter').addEventListener('change', render);
-    document.getElementById('plan-filter').addEventListener('change', render);
+    // Event listeners
+    document.getElementById('search-input').addEventListener('input', filterManicures);
+    document.getElementById('status-filter').addEventListener('change', filterManicures);
+    document.getElementById('plan-filter').addEventListener('change', filterManicures);
 
-    loadData();
+    // Load on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(loadManicures, 500);
+    });
   </script>
 </body>
 </html>
