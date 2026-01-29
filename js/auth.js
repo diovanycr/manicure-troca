@@ -1,57 +1,52 @@
-// 1. Importamos as funções necessárias do Firebase SDK
-import { 
-  getAuth, 
-  onAuthStateChanged, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
-  signOut 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-// CORREÇÃO: Importando o auth configurado
-import { auth as firebaseAuth } from 'https://diovanycr.github.io/manicure-troca/config/firebase-config.js'; 
+// Authentication Manager (Compat Version)
+// Convertido da API Modular v10 para Compat v9
 
 class AuthManager {
   constructor() {
-    this.auth = firebaseAuth;
+    // Usa o auth global definido em firebase-config.js
+    this.auth = auth;
     this.currentUser = null;
     this.initAuth();
   }
 
   initAuth() {
-    onAuthStateChanged(this.auth, (user) => {
+    // onAuthStateChanged é um método do objeto auth no modo compat
+    this.auth.onAuthStateChanged((user) => {
       this.currentUser = user;
       this.updateUI();
     });
   }
 
   signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
+    // GoogleAuthProvider é uma classe do firebase.auth() no modo compat
+    const provider = new firebase.auth.GoogleAuthProvider();
     
-    // --- NOVIDADE AQUI: FORÇAR SELEÇÃO DE CONTA ---
+    // FORÇAR SELEÇÃO DE CONTA
     provider.setCustomParameters({
       prompt: 'select_account'
     });
-    // ----------------------------------------------
-
+    
     provider.addScope('profile');
     provider.addScope('email');
-
-    return signInWithPopup(this.auth, provider)
+    
+    // signInWithPopup é um método do objeto auth no modo compat
+    return this.auth.signInWithPopup(provider)
       .then((result) => {
         this.currentUser = result.user;
         this.redirectToDashboard();
       })
       .catch((error) => {
         console.error('Erro ao entrar:', error);
-        // Não mostramos alerta se o usuário apenas fechou a janela (cancelled-popup-request)
-        if (error.code !== 'auth/popup-closed-by-user') {
+        // Não mostramos alerta se o usuário apenas fechou a janela
+        if (error.code !== 'auth/popup-closed-by-user' && 
+            error.code !== 'auth/cancelled-popup-request') {
           alert('Erro ao fazer login: ' + error.message);
         }
       });
   }
 
   signOut() {
-    return signOut(this.auth)
+    return this.auth.signOut()
       .then(() => {
         this.currentUser = null;
         this.redirectToLogin();
@@ -89,13 +84,63 @@ class AuthManager {
   }
 
   requireAuth() {
-    onAuthStateChanged(this.auth, (user) => {
+    this.auth.onAuthStateChanged((user) => {
       if (!user) {
         this.redirectToLogin();
       }
     });
   }
+
+  // Métodos adicionais úteis
+  signInWithEmail(email, password) {
+    return this.auth.signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        this.currentUser = userCredential.user;
+        return userCredential.user;
+      })
+      .catch((error) => {
+        console.error('Erro ao fazer login com email:', error);
+        throw error;
+      });
+  }
+
+  signUpWithEmail(email, password) {
+    return this.auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        this.currentUser = userCredential.user;
+        return userCredential.user;
+      })
+      .catch((error) => {
+        console.error('Erro ao criar conta:', error);
+        throw error;
+      });
+  }
+
+  resetPassword(email) {
+    return this.auth.sendPasswordResetEmail(email)
+      .catch((error) => {
+        console.error('Erro ao enviar email de recuperação:', error);
+        throw error;
+      });
+  }
+
+  updateProfile(displayName, photoURL) {
+    const user = this.auth.currentUser;
+    if (user) {
+      return user.updateProfile({
+        displayName: displayName,
+        photoURL: photoURL
+      }).then(() => {
+        this.currentUser = user;
+        this.updateUI();
+      }).catch((error) => {
+        console.error('Erro ao atualizar perfil:', error);
+        throw error;
+      });
+    }
+    return Promise.reject(new Error('Nenhum usuário autenticado'));
+  }
 }
 
-// Exportamos a instância única
-export const authManager = new AuthManager();
+// Cria e exporta a instância única (disponível globalmente)
+const authManager = new AuthManager();
