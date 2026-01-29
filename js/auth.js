@@ -1,74 +1,73 @@
-// Authentication Manager (Compat Version)
-// Convertido da API Modular v10 para Compat v9
+// 1. IMPORTAÇÃO: Agora buscamos as funções do Firebase e a instância 'auth' do seu config
+import { 
+    onAuthStateChanged, 
+    signInWithPopup, 
+    GoogleAuthProvider, 
+    signOut,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    sendPasswordResetEmail,
+    updateProfile 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { auth } from '../config/firebase-config.js';
 
 class AuthManager {
   constructor() {
-    // Usa o auth global definido em firebase-config.js
     this.auth = auth;
     this.currentUser = null;
     this.initAuth();
   }
 
   initAuth() {
-    // onAuthStateChanged é um método do objeto auth no modo compat
-    this.auth.onAuthStateChanged((user) => {
+    // No SDK Modular, usamos a função onAuthStateChanged(auth, callback)
+    onAuthStateChanged(this.auth, (user) => {
       this.currentUser = user;
       this.updateUI();
     });
   }
 
   signInWithGoogle() {
-    // GoogleAuthProvider é uma classe do firebase.auth() no modo compat
-    const provider = new firebase.auth.GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
     
-    // FORÇAR SELEÇÃO DE CONTA
-    provider.setCustomParameters({
-      prompt: 'select_account'
-    });
-    
-    provider.addScope('profile');
-    provider.addScope('email');
-    
-    // signInWithPopup é um método do objeto auth no modo compat
-    return this.auth.signInWithPopup(provider)
+    return signInWithPopup(this.auth, provider)
       .then((result) => {
         this.currentUser = result.user;
         this.redirectToDashboard();
       })
       .catch((error) => {
-        console.error('Erro ao entrar:', error);
-        // Não mostramos alerta se o usuário apenas fechou a janela
-        if (error.code !== 'auth/popup-closed-by-user' && 
-            error.code !== 'auth/cancelled-popup-request') {
+        if (error.code !== 'auth/popup-closed-by-user') {
           alert('Erro ao fazer login: ' + error.message);
         }
       });
   }
 
   signOut() {
-    return this.auth.signOut()
+    return signOut(this.auth)
       .then(() => {
         this.currentUser = null;
         this.redirectToLogin();
-      })
-      .catch((error) => {
-        console.error('Erro ao sair:', error);
       });
   }
 
-  isAuthenticated() {
-    return this.currentUser !== null;
+  requireAuth() {
+    onAuthStateChanged(this.auth, (user) => {
+      if (!user) {
+        this.redirectToLogin();
+      }
+    });
   }
 
   updateUI() {
     const userInfo = document.getElementById('user-info');
     if (this.currentUser && userInfo) {
       userInfo.innerHTML = `
-        <div class="user-profile">
-          <img src="${this.currentUser.photoURL || 'https://via.placeholder.com/40'}" alt="Avatar" class="avatar">
-          <div class="user-info">
-            <p class="name">${this.currentUser.displayName || 'Usuário'}</p>
-            <p class="email">${this.currentUser.email}</p>
+        <div class="user-profile" style="display: flex; align-items: center; gap: 10px;">
+          <img src="${this.currentUser.photoURL || 'https://via.placeholder.com/40'}" alt="Avatar" style="width:32px; height:32px; border-radius:50%;">
+          <div style="line-height: 1.2;">
+            <p style="font-weight:600; font-size: 0.8rem; margin:0;">${this.currentUser.displayName || 'Usuário'}</p>
+            <p style="font-size: 0.7rem; color: #666; margin:0;">${this.currentUser.email}</p>
           </div>
         </div>
       `;
@@ -83,64 +82,15 @@ class AuthManager {
     window.location.href = 'https://diovanycr.github.io/manicure-troca/pages/login.html';
   }
 
-  requireAuth() {
-    this.auth.onAuthStateChanged((user) => {
-      if (!user) {
-        this.redirectToLogin();
-      }
-    });
-  }
-
-  // Métodos adicionais úteis
+  // Outros métodos adaptados para o modo Modular
   signInWithEmail(email, password) {
-    return this.auth.signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        this.currentUser = userCredential.user;
-        return userCredential.user;
-      })
-      .catch((error) => {
-        console.error('Erro ao fazer login com email:', error);
-        throw error;
-      });
+    return signInWithEmailAndPassword(this.auth, email, password);
   }
 
   signUpWithEmail(email, password) {
-    return this.auth.createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        this.currentUser = userCredential.user;
-        return userCredential.user;
-      })
-      .catch((error) => {
-        console.error('Erro ao criar conta:', error);
-        throw error;
-      });
-  }
-
-  resetPassword(email) {
-    return this.auth.sendPasswordResetEmail(email)
-      .catch((error) => {
-        console.error('Erro ao enviar email de recuperação:', error);
-        throw error;
-      });
-  }
-
-  updateProfile(displayName, photoURL) {
-    const user = this.auth.currentUser;
-    if (user) {
-      return user.updateProfile({
-        displayName: displayName,
-        photoURL: photoURL
-      }).then(() => {
-        this.currentUser = user;
-        this.updateUI();
-      }).catch((error) => {
-        console.error('Erro ao atualizar perfil:', error);
-        throw error;
-      });
-    }
-    return Promise.reject(new Error('Nenhum usuário autenticado'));
+    return createUserWithEmailAndPassword(this.auth, email, password);
   }
 }
 
-// Cria e exporta a instância única (disponível globalmente)
-const authManager = new AuthManager();
+// 2. EXPORTAÇÃO: A linha vital para o seu HTML encontrar o authManager
+export const authManager = new AuthManager();
