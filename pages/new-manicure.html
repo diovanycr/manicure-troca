@@ -43,14 +43,12 @@
       min-height: 100vh;
     }
 
-    /* Mobile-First Layout */
     .app-container {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
-    /* Mobile Header */
     .mobile-header {
       position: fixed;
       top: 0;
@@ -91,7 +89,6 @@
       background: rgba(255, 255, 255, 0.1);
     }
 
-    /* Main Content */
     .main-content {
       margin-top: 64px;
       padding: 1.5rem 1rem;
@@ -123,7 +120,6 @@
       font-size: 0.875rem;
     }
 
-    /* Form Card */
     .form-card {
       background: var(--color-surface);
       border-radius: var(--radius);
@@ -219,7 +215,6 @@
       margin-top: 0.375rem;
     }
 
-    /* Info Box */
     .info-box {
       background: linear-gradient(135deg, rgba(217, 70, 239, 0.05), rgba(162, 28, 175, 0.05));
       border: 1px solid rgba(217, 70, 239, 0.2);
@@ -248,7 +243,6 @@
       margin: 0;
     }
 
-    /* Form Footer */
     .form-footer {
       padding: 1.5rem;
       border-top: 1px solid var(--color-border);
@@ -257,7 +251,6 @@
       gap: 1rem;
     }
 
-    /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -301,7 +294,6 @@
       background: var(--color-bg);
     }
 
-    /* Loading Spinner */
     .loading-spinner {
       position: fixed;
       top: 0;
@@ -333,7 +325,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Toast Notification */
     .toast {
       position: fixed;
       bottom: 2rem;
@@ -386,7 +377,6 @@
       color: var(--color-danger);
     }
 
-    /* Tablet Styles */
     @media (min-width: 768px) {
       .mobile-header h1 {
         font-size: 1.5rem;
@@ -410,7 +400,6 @@
       }
     }
 
-    /* Desktop Styles */
     @media (min-width: 1024px) {
       .mobile-header {
         height: auto;
@@ -447,7 +436,6 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Mobile Header -->
     <header class="mobile-header">
       <button class="back-button" onclick="window.location.href='../index.html'">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -458,7 +446,6 @@
       <div style="width: 40px;"></div>
     </header>
 
-    <!-- Main Content -->
     <main class="main-content">
       <div class="page-header" style="display: none;">
         <h1 class="page-title">Nova Manicure</h1>
@@ -545,11 +532,11 @@
                 id="address" 
                 name="address" 
                 class="with-icon"
-                placeholder="Rua, número, bairro, cidade, estado" 
+                placeholder="" 
                 required
               ></textarea>
+              <span style="position: absolute; left: 3rem; top: 2.5rem; color: var(--color-text-muted); font-size: 1rem; pointer-events: none;">Rua, número, bairro, cidade, estado</span>
             </div>
-            <p class="helper-text">Exemplo: Rua das Flores, 123, Centro, São Paulo - SP</p>
           </div>
 
           <div class="form-row">
@@ -560,9 +547,9 @@
               </label>
               <select id="plan-type" name="planType" required>
                 <option value="">Selecione um plano</option>
-                <option value="12">Plano 12 dias</option>
-                <option value="15">Plano 15 dias</option>
-                <option value="18">Plano 18 dias</option>
+                <option value="12">Plano 12</option>
+                <option value="15">Plano 15</option>
+                <option value="18">Plano 18</option>
               </select>
               <p class="helper-text">Intervalo entre trocas de kit</p>
             </div>
@@ -602,12 +589,10 @@
     </main>
   </div>
 
-  <!-- Loading Spinner -->
   <div class="loading-spinner" id="loading-spinner">
     <div class="spinner"></div>
   </div>
 
-  <!-- Toast Container -->
   <div class="toast" id="toast">
     <div class="toast-icon">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -617,27 +602,40 @@
     <div class="toast-message"></div>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
-
-  <!-- Config -->
-  <script src="../config/firebase-config.js"></script>
-
-  <!-- Scripts -->
-  <script src="../js/utils.js"></script>
-  <script src="../js/auth.js"></script>
-  <script src="../js/database.js"></script>
+  <!-- Firebase SDK - Versão Compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
-    // Require authentication
-    if (typeof authManager !== 'undefined') {
-      authManager.requireAuth();
+    // Firebase Config - Substitua com suas credenciais
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Inicializar Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
 
-    // Utils functions
+    const auth = firebase.auth();
+    const database = firebase.database();
+
+    // Check authentication
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        // window.location.href = '../login.html';
+        console.log('Usuário não autenticado');
+      }
+    });
+
+    // Utils
     const Utils = {
       showLoading: () => {
         document.getElementById('loading-spinner').classList.add('show');
@@ -650,14 +648,10 @@
         const toastMessage = toast.querySelector('.toast-message');
         const toastIcon = toast.querySelector('.toast-icon');
         
-        // Update message
         toastMessage.textContent = message;
-        
-        // Update style
         toast.className = 'toast ' + type;
         toastIcon.className = 'toast-icon ' + type;
         
-        // Update icon
         let iconPath = '<polyline points="20 6 9 17 4 12"/>';
         if (type === 'warning') {
           iconPath = '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>';
@@ -666,57 +660,60 @@
         }
         toastIcon.querySelector('svg').innerHTML = iconPath;
         
-        // Show toast
         toast.classList.add('show');
         
-        // Hide after 3 seconds
         setTimeout(() => {
           toast.classList.remove('show');
         }, 3000);
       },
       formatPhoneInput: (value) => {
-        // Remove tudo que não é número
         const numbers = value.replace(/\D/g, '');
         
-        // Aplica a máscara
         if (numbers.length <= 10) {
           return numbers.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3').replace(/-$/, '');
         } else {
           return numbers.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').replace(/-$/, '');
         }
-      },
-      calculateNextExchangeDate: (startDate) => {
-        const planType = parseInt(document.getElementById('plan-type').value);
-        const date = new Date(startDate);
-        date.setDate(date.getDate() + planType);
-        return date.getTime();
-      },
-      isDueSoon: (nextExchangeDate) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const exchangeDate = new Date(nextExchangeDate);
-        exchangeDate.setHours(0, 0, 0, 0);
-        const diff = Math.ceil((exchangeDate - today) / (1000 * 60 * 60 * 24));
-        return diff <= 2;
       }
     };
 
-    // Set today's date as default
+    // Set today's date
     const today = new Date();
     const dateStr = today.toISOString().split('T')[0];
     document.getElementById('start-date').value = dateStr;
 
-    // Format phone input
+    // Format phone
     document.getElementById('phone').addEventListener('input', (e) => {
       const cursorPos = e.target.selectionStart;
       const oldValue = e.target.value;
       const newValue = Utils.formatPhoneInput(e.target.value);
       e.target.value = newValue;
       
-      // Manter o cursor na posição correta
       if (newValue.length > oldValue.length) {
         e.target.setSelectionRange(cursorPos + 1, cursorPos + 1);
       }
+    });
+
+    // Hide address placeholder when typing
+    const addressTextarea = document.getElementById('address');
+    const addressPlaceholder = addressTextarea.nextElementSibling;
+    
+    addressTextarea.addEventListener('input', () => {
+      if (addressTextarea.value.length > 0) {
+        addressPlaceholder.style.display = 'none';
+      } else {
+        addressPlaceholder.style.display = 'block';
+      }
+    });
+
+    addressTextarea.addEventListener('focus', () => {
+      if (addressTextarea.value.length === 0) {
+        addressPlaceholder.style.opacity = '0.5';
+      }
+    });
+
+    addressTextarea.addEventListener('blur', () => {
+      addressPlaceholder.style.opacity = '1';
     });
 
     // Handle form submission
@@ -735,7 +732,7 @@
         return;
       }
 
-      // Validate phone format
+      // Validate phone
       const phoneNumbers = phone.replace(/\D/g, '');
       if (phoneNumbers.length < 10) {
         Utils.showToast('Telefone inválido. Use o formato (00) 00000-0000', 'warning');
@@ -745,35 +742,45 @@
       try {
         const submitBtn = document.getElementById('submit-btn');
         submitBtn.disabled = true;
-        const originalText = submitBtn.querySelector('span').textContent;
         submitBtn.querySelector('span').textContent = 'Cadastrando...';
         Utils.showLoading();
 
-        // Create date at noon to avoid timezone issues
+        // Create date
         const [year, month, day] = startDateValue.split('-');
-        const startDate = new Date(year, month - 1, day, 12, 0, 0).getTime();
-
+        const startDate = new Date(year, month - 1, day, 12, 0, 0);
+        
         // Calculate next exchange date
-        const nextExchangeDate = Utils.calculateNextExchangeDate(startDate);
+        const nextExchangeDate = new Date(startDate);
+        nextExchangeDate.setDate(nextExchangeDate.getDate() + parseInt(planType));
 
-        // Create manicure
-        const manicure = await dbManager.createManicure({
+        // Check if due soon
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const exchangeDateCheck = new Date(nextExchangeDate);
+        exchangeDateCheck.setHours(0, 0, 0, 0);
+        const diff = Math.ceil((exchangeDateCheck - today) / (1000 * 60 * 60 * 24));
+        const isDueSoon = diff <= 2;
+
+        // Save to Firebase
+        const newManicureRef = database.ref('manicures').push();
+        await newManicureRef.set({
           name,
           phone,
           address,
           planType,
-          startDate,
-          nextExchangeDate,
+          startDate: startDate.toISOString(),
+          nextExchangeDate: nextExchangeDate.toISOString(),
           status: 'active',
-          isDueSoon: Utils.isDueSoon(nextExchangeDate),
-          lastExchangeDate: null
+          isDueSoon: isDueSoon,
+          lastExchangeDate: null,
+          createdAt: new Date().toISOString()
         });
 
         Utils.hideLoading();
         Utils.showToast('Manicure cadastrada com sucesso!', 'success');
         
         setTimeout(() => {
-          window.location.href = `manicure-details.html?id=${manicure.id}`;
+          window.location.href = `manicure-details.html?id=${newManicureRef.key}`;
         }, 1000);
       } catch (error) {
         console.error('Error creating manicure:', error);
@@ -786,7 +793,7 @@
       }
     });
 
-    // Show desktop header on larger screens
+    // Show desktop header
     if (window.innerWidth >= 1024) {
       document.querySelector('.page-header').style.display = 'block';
     }
