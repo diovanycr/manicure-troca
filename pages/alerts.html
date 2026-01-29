@@ -7,33 +7,56 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="icon" href="data:,">
   <style>
-    /* Mantive seus estilos originais de Sidebar e Main Content */
-    .sidebar { position: fixed; left: 0; top: 0; width: 250px; height: 100vh; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; padding: 2rem 1rem; overflow-y: auto; z-index: 100; }
-    .sidebar-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-    .sidebar-logo { width: 40px; height: 40px; background: rgba(255, 255, 255, 0.2); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
-    .sidebar-title h2 { font-size: 1.1rem; margin: 0; }
-    .sidebar-title p { font-size: 0.75rem; opacity: 0.8; margin: 0; }
-    .nav-menu { list-style: none; padding: 0; }
-    .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; border-radius: 0.5rem; transition: 0.3s; }
-    .nav-link:hover, .nav-link.active { background: rgba(255, 255, 255, 0.1); color: white; }
-    .sidebar-footer { position: absolute; bottom: 1rem; left: 1rem; right: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-    .main-content { margin-left: 250px; padding: 2rem; min-height: 100vh; background: #f8fafc; }
-    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-    .summary-card { background: white; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; border-left: 4px solid #cbd5e1; }
-    .summary-card.overdue { border-left-color: #ef4444; }
-    .summary-card.upcoming { border-left-color: #f59e0b; }
-    .summary-value { font-size: 2.5rem; font-weight: 700; margin-top: 0.5rem; }
-    .alerts-section { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; margin-bottom: 2rem; }
-    .section-header { padding: 1.5rem; border-bottom: 1px solid #e2e8f0; }
-    .alert-item { padding: 1.5rem; border: 2px solid #f1f5f9; border-radius: 0.5rem; margin: 1.5rem; cursor: pointer; transition: 0.2s; }
-    .alert-item:hover { border-color: #7c3aed; background: #fdfbff; }
-    .badge { padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
-    .badge-danger { background: #fee2e2; color: #ef4444; }
-    .badge-warning { background: #fef3c7; color: #d97706; }
+    /* Layout padrão que você usa nas outras páginas */
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --bg-main: #f8fafc;
+      --border: #e2e8f0;
+    }
+
+    body { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-main); display: flex; }
+
+    /* Sidebar fixa idêntica às outras */
+    .sidebar { width: 260px; height: 100vh; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; position: fixed; display: flex; flex-direction: column; padding: 1.5rem; box-sizing: border-box; }
+    .sidebar-header { display: flex; align-items: center; gap: 12px; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem; }
+    .nav-menu { flex: 1; list-style: none; padding: 0; margin: 0; }
+    .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px; color: rgba(255,255,255,0.8); text-decoration: none; border-radius: 8px; margin-bottom: 8px; transition: 0.3s; }
+    .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
     
+    /* Área de Conteúdo */
+    .main-content { margin-left: 260px; flex: 1; padding: 2.5rem; min-height: 100vh; }
+    .header-page { margin-bottom: 2.5rem; }
+    .header-page h1 { font-size: 1.875rem; color: #1e293b; margin: 0; }
+    .header-page p { color: #64748b; margin-top: 0.5rem; }
+
+    /* Cartões de Resumo */
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+    .stat-card { background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .stat-card.danger { border-left: 4px solid #ef4444; }
+    .stat-card.warning { border-left: 4px solid #f59e0b; }
+    .stat-label { font-size: 0.875rem; color: #64748b; font-weight: 600; text-transform: uppercase; }
+    .stat-value { font-size: 2.25rem; font-weight: 700; color: #1e293b; margin-top: 0.5rem; }
+
+    /* Lista de Alertas */
+    .alerts-container { display: flex; flex-direction: column; gap: 1rem; }
+    .alert-card { background: white; padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; transition: 0.2s; cursor: pointer; }
+    .alert-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-color: var(--primary); }
+    .alert-info h3 { margin: 0; font-size: 1.1rem; color: #1e293b; }
+    .alert-info p { margin: 4px 0 0; color: #64748b; font-size: 0.9rem; }
+    
+    .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+
+    .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; }
+    .btn-logout { width: 100%; background: rgba(255,255,255,0.1); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .btn-logout:hover { background: rgba(255,255,255,0.2); }
+
     @media (max-width: 768px) {
-      .sidebar { width: 100%; height: auto; position: relative; }
-      .main-content { margin-left: 0; }
+      body { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: static; }
+      .main-content { margin-left: 0; padding: 1.5rem; }
     }
   </style>
 </head>
@@ -41,58 +64,44 @@
 
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">📦</div>
-      <div class="sidebar-title">
-        <h2>Gestão Manicures</h2>
-        <p>Controle de Kits</p>
+      <div style="font-size: 1.5rem;">📦</div>
+      <div>
+        <h2 style="margin:0; font-size: 1.1rem;">Gestão Kits</h2>
+        <p style="margin:0; font-size: 0.75rem; opacity: 0.7;">Painel de Controle</p>
       </div>
     </div>
-    <nav>
-      <ul class="nav-menu">
-        <li class="nav-item"><a href="../index.html" class="nav-link"><span>📊</span> Dashboard</a></li>
-        <li class="nav-item"><a href="manicures.html" class="nav-link"><span>👥</span> Manicures</a></li>
-        <li class="nav-item"><a href="alerts.html" class="nav-link active"><span>🔔</span> Alertas</a></li>
-      </ul>
+
+    <nav class="nav-menu">
+      <a href="../index.html" class="nav-link"><span>📊</span> Dashboard</a>
+      <a href="manicures.html" class="nav-link"><span>👥</span> Manicures</a>
+      <a href="alerts.html" class="nav-link active"><span>🔔</span> Alertas</a>
     </nav>
+
     <div class="sidebar-footer">
-      <div id="user-info"></div>
-      <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem; background: rgba(255,255,255,0.1); border:none; color:white; padding: 10px; border-radius:5px; cursor:pointer;" id="logout-btn">Sair</button>
+      <div id="user-display" style="margin-bottom: 1rem; font-size: 0.85rem; opacity: 0.9;"></div>
+      <button class="btn-logout" id="btn-logout">Sair da Conta</button>
     </div>
   </aside>
 
   <main class="main-content">
-    <div class="header">
-      <h1>⚠️ Alertas de Troca de Kit</h1>
-      <p>Manicures com troca pendente ou próxima</p>
-    </div>
+    <header class="header-page">
+      <h1>🔔 Central de Alertas</h1>
+      <p>Acompanhe manicures com trocas pendentes ou próximas do vencimento.</p>
+    </header>
 
     <div class="summary-grid">
-      <div class="summary-card overdue">
-        <div class="summary-title">Trocas Atrasadas</div>
-        <div class="summary-value" id="overdue-count">0</div>
+      <div class="stat-card danger">
+        <div class="stat-label">Trocas Atrasadas</div>
+        <div class="stat-value" id="count-overdue">0</div>
       </div>
-      <div class="summary-card upcoming">
-        <div class="summary-title">Trocas Próximas (Até 5 dias)</div>
-        <div class="summary-value" id="upcoming-count">0</div>
+      <div class="stat-card warning">
+        <div class="stat-label">Próximas (5 dias)</div>
+        <div class="stat-value" id="count-upcoming">0</div>
       </div>
     </div>
 
-    <div id="overdue-section" class="alerts-section" style="display: none;">
-      <div class="section-header"><h2>🚨 Trocas Atrasadas</h2></div>
-      <div class="section-body" id="overdue-list"></div>
-    </div>
-
-    <div id="upcoming-section" class="alerts-section" style="display: none;">
-      <div class="section-header"><h2>⏰ Trocas Próximas</h2></div>
-      <div class="section-body" id="upcoming-list"></div>
-    </div>
-
-    <div id="no-alerts-section" class="alerts-section" style="display: none;">
-      <div class="empty-state" style="text-align: center; padding: 3rem;">
-        <div style="font-size: 3rem;">✅</div>
-        <h3>Tudo em dia!</h3>
-        <p>Nenhuma troca urgente encontrada.</p>
-      </div>
+    <div id="alerts-list" class="alerts-container">
+      <p style="text-align: center; color: #64748b;">Buscando informações no banco de dados...</p>
     </div>
   </main>
 
@@ -101,84 +110,89 @@
     import { dbManager } from '../js/database.js';
     import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // 1. Iniciar proteção e UI do usuário
+    // Proteção de Rota
     authManager.requireAuth();
-    
-    // 2. Configurar Logout
-    document.getElementById('logout-btn').onclick = () => authManager.signOut();
 
-    async function loadAlerts() {
+    // Botão Sair
+    document.getElementById('btn-logout').onclick = () => authManager.signOut();
+
+    async function initAlerts() {
       try {
         const uid = await dbManager._waitForUser();
         const db = getDatabase();
-        const snapshot = await get(ref(db, `users/${uid}/manicures`));
         
+        // Exibir nome do usuário na sidebar (opcional)
+        const user = authManager.currentUser;
+        if(user) document.getElementById('user-display').textContent = user.displayName || user.email;
+
+        const snapshot = await get(ref(db, `users/${uid}/manicures`));
+        const listContainer = document.getElementById('alerts-list');
+        listContainer.innerHTML = '';
+
         if (!snapshot.exists()) {
-          document.getElementById('no-alerts-section').style.display = 'block';
+          listContainer.innerHTML = '<p style="text-align:center; padding: 2rem;">Nenhuma manicure ativa encontrada.</p>';
           return;
         }
 
         const manicures = snapshot.val();
         const hoje = new Date();
-        const overdue = [];
-        const upcoming = [];
+        hoje.setHours(0,0,0,0);
 
-        Object.entries(manicures).forEach(([id, data]) => {
-          if (data.status !== 'active' || !data.nextExchangeDate) return;
+        let overdueCount = 0;
+        let upcomingCount = 0;
+        let htmlContent = '';
 
-          const dataTroca = new Date(data.nextExchangeDate);
+        // Converter objeto em array e ordenar por data
+        const manicuresArr = Object.entries(manicures)
+          .map(([id, data]) => ({ id, ...data }))
+          .filter(m => m.status === 'active' && m.nextExchangeDate)
+          .sort((a, b) => a.nextExchangeDate - b.nextExchangeDate);
+
+        manicuresArr.forEach(m => {
+          const dataTroca = new Date(m.nextExchangeDate);
+          dataTroca.setHours(0,0,0,0);
+          
           const diffTime = dataTroca - hoje;
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-          const item = { id, ...data, diffDays };
+          // Só mostra se estiver atrasado (diff < 0) ou se faltar até 5 dias
+          if (diffDays <= 5) {
+            const isOverdue = diffDays < 0;
+            if (isOverdue) overdueCount++; else upcomingCount++;
 
-          if (diffDays < 0) {
-            overdue.push(item);
-          } else if (diffDays <= 5) { // Alerta para os próximos 5 dias
-            upcoming.push(item);
+            htmlContent += `
+              <div class="alert-card" onclick="window.location.href='manicure-details.html?id=${m.id}'">
+                <div class="alert-info">
+                  <h3>${m.name}</h3>
+                  <p>📍 ${m.address || 'Endereço não informado'}</p>
+                  <p>📅 Próxima troca: <strong>${new Date(m.nextExchangeDate).toLocaleDateString()}</strong></p>
+                </div>
+                <div class="badge ${isOverdue ? 'badge-danger' : 'badge-warning'}">
+                  ${isOverdue ? 'ATRASADO ' + Math.abs(diffDays) + 'D' : 'FALTAM ' + diffDays + ' DIAS'}
+                </div>
+              </div>
+            `;
           }
         });
 
-        // Atualizar Contadores
-        document.getElementById('overdue-count').textContent = overdue.length;
-        document.getElementById('upcoming-count').textContent = upcoming.length;
+        document.getElementById('count-overdue').textContent = overdueCount;
+        document.getElementById('count-upcoming').textContent = upcomingCount;
+        
+        listContainer.innerHTML = htmlContent || `
+          <div style="text-align: center; padding: 3rem; background: white; border-radius: 12px; border: 1px solid var(--border);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+            <h3>Tudo em dia!</h3>
+            <p style="color: #64748b;">Não há trocas pendentes para os próximos 5 dias.</p>
+          </div>
+        `;
 
-        // Renderizar Listas
-        renderList(overdue, 'overdue-list', 'badge-danger');
-        renderList(upcoming, 'upcoming-list', 'badge-warning');
-
-        // Toggle de Seções
-        document.getElementById('overdue-section').style.display = overdue.length ? 'block' : 'none';
-        document.getElementById('upcoming-section').style.display = upcoming.length ? 'block' : 'none';
-        document.getElementById('no-alerts-section').style.display = (!overdue.length && !upcoming.length) ? 'block' : 'none';
-
-      } catch (error) {
-        console.error("Erro ao carregar alertas:", error);
+      } catch (err) {
+        console.error(err);
+        document.getElementById('alerts-list').innerHTML = '<p>Erro ao carregar dados.</p>';
       }
     }
 
-    function renderList(list, containerId, badgeClass) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = list.map(item => `
-        <div class="alert-item" onclick="window.location.href='manicure-details.html?id=${item.id}'">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-              <h3 style="margin:0">${item.name}</h3>
-              <p style="color:#64748b; font-size:0.875rem; margin: 4px 0;">📍 ${item.address || 'Sem endereço'}</p>
-            </div>
-            <span class="badge ${badgeClass}">
-              ${item.diffDays < 0 ? 'Atrasado ' + Math.abs(item.diffDays) + 'd' : 'Faltam ' + item.diffDays + 'd'}
-            </span>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // Inicializar
-    loadAlerts();
-    
-    // Atualizar a cada minuto
-    setInterval(loadAlerts, 60000);
+    initAlerts();
   </script>
 </body>
 </html>
