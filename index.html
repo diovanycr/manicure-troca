@@ -6,73 +6,95 @@
   <title>Dashboard - Gestão de Manicures</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:,">
- <style>
-  /* AJUSTE DE UX MOBILE - RODAPÉ COMPACTO */
-  @media (max-width: 768px) {
-    body { flex-direction: column; }
-    
-    .sidebar { 
-      width: 100%; 
-      height: auto; 
-      position: relative; 
-      padding: 0.8rem 1rem; /* Reduzi o padding geral da barra */
+  <style>
+    /* AJUSTE DE UX GLOBAL E MOBILE */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      
+      .sidebar { 
+        width: 100%; 
+        height: auto; 
+        position: relative; 
+        padding: 0.8rem 1rem;
+        background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      }
+
+      .sidebar-header {
+        margin-bottom: 0.6rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-menu {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .nav-item { flex-shrink: 0; }
+      
+      .nav-link {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+      }
+
+      /* RODAPÉ COMPACTO: E-MAIL PRÓXIMO AO BOTÃO */
+      .sidebar-footer {
+        margin-top: 0.4rem; 
+        padding-top: 0.6rem; 
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 5px; 
+      }
+
+      #user-info { 
+        margin-bottom: 0 !important; 
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 65%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      
+      #logout-btn { 
+        width: auto !important; 
+        margin-top: 0 !important; 
+        padding: 6px 12px !important;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+      }
+
+      /* MELHORIA NOS CARDS DE ESTATÍSTICA NO MOBILE */
+      .main-content { 
+        margin-left: 0; 
+        padding: 1rem; 
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr; /* Um card por linha no mobile para leitura clara */
+        gap: 0.75rem;
+      }
+
+      .header h1 { font-size: 1.5rem; }
+      .header-actions { width: 100%; margin-top: 1rem; }
+      .header-actions .btn-primary { width: 100%; justify-content: center; }
     }
 
-    .sidebar-header {
-      margin-bottom: 0.6rem;
-      padding-bottom: 0.6rem;
+    /* Estilo para garantir que o clique na lista seja amigável */
+    .manicure-item {
+      cursor: pointer;
+      transition: background 0.2s;
     }
-
-    /* Menu lateral no mobile em linha */
-    .nav-menu {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 8px;
+    .manicure-item:active {
+      background-color: #f1f5f9;
     }
-
-    .nav-item { flex-shrink: 0; }
-    
-    .nav-link {
-      padding: 8px 12px;
-      font-size: 0.85rem;
-    }
-
-    /* RODAPÉ AJUSTADO: APROXIMANDO O E-MAIL DO BOTÃO */
-    .sidebar-footer {
-      margin-top: 0.4rem; /* Reduzi o espaço entre o menu e o rodapé */
-      padding-top: 0.6rem; 
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: space-between; /* Mantém um em cada ponta */
-      gap: 5px; /* Reduz o espaço mínimo entre eles */
-    }
-
-    #user-info { 
-      margin-bottom: 0 !important; 
-      font-size: 0.8rem;
-      color: white;
-      max-width: 70%; /* Dá mais espaço para o e-mail aparecer */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    #logout-btn { 
-      width: auto !important; 
-      margin-top: 0 !important; 
-      padding: 6px 12px !important; /* Tamanho original padrão */
-      font-size: 0.75rem;
-      flex-shrink: 0; /* Não deixa o botão encolher */
-    }
-
-    .main-content { 
-      margin-left: 0; 
-      padding: 1.25rem; 
-    }
-  }
-</style>
+  </style>
 </head>
 <body>
   <aside class="sidebar">
@@ -81,13 +103,13 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
       </div>
       <div class="sidebar-title">
-        <h2>Gestão Manicures</h2>
-        <p>Controle de Kits</p>
+        <h2 style="color: white; margin: 0; font-size: 1.1rem;">Gestão Manicures</h2>
+        <p style="color: rgba(255,255,255,0.7); margin: 0; font-size: 0.75rem;">Controle de Kits</p>
       </div>
     </div>
 
     <nav>
-      <ul class="nav-menu">
+      <ul class="nav-menu" style="list-style: none; padding: 0;">
         <li class="nav-item">
           <a href="index.html" class="nav-link active">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -110,16 +132,16 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-profile" id="user-info"></div>
+      <div class="user-profile" id="user-info" style="color: white; font-weight: 500;"></div>
       <button class="btn btn-secondary" id="logout-btn">Sair</button>
     </div>
   </aside>
 
   <main class="main-content">
-    <div class="header">
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
       <div>
-        <h1>Dashboard</h1>
-        <p class="text-muted">Visão geral do sistema</p>
+        <h1 style="margin: 0;">Dashboard</h1>
+        <p class="text-muted" style="margin: 4px 0 0;">Visão geral do sistema</p>
       </div>
       <div class="header-actions">
         <button class="btn btn-primary" onclick="window.location.href='pages/new-manicure.html'">
@@ -129,7 +151,7 @@
       </div>
     </div>
 
-    <div class="stats-grid">
+    <div class="stats-grid" style="margin-top: 1.5rem;">
       <div class="stat-card">
         <div class="stat-card-header">
           <span class="stat-card-title">Total de Manicures</span>
@@ -138,18 +160,18 @@
           </span>
         </div>
         <div class="stat-card-value" id="total-manicures">0</div>
-        <div class="stat-card-desc" id="total-desc">0 ativas, 0 inativas</div>
+        <div class="stat-card-desc" id="total-desc">0 ativas</div>
       </div>
 
       <div class="stat-card">
         <div class="stat-card-header">
-          <span class="stat-card-title">Alertas Pendentes</span>
+          <span class="stat-card-title">Alertas</span>
           <span class="stat-card-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </span>
         </div>
         <div class="stat-card-value" id="alerts-count">0</div>
-        <div class="stat-card-desc">Próximos 2 dias</div>
+        <div class="stat-card-desc">Trocas pendentes</div>
       </div>
 
       <div class="stat-card">
@@ -164,19 +186,19 @@
       </div>
     </div>
 
-    <div id="alerts-section" class="content-section" style="display: none;">
+    <div id="alerts-section" class="content-section" style="display: none; margin-top: 2rem;">
       <div class="section-header">
-        <h2>⚠️ Alertas de Troca</h2>
+        <h2 style="font-size: 1.1rem;">⚠️ Alertas Urgentes</h2>
       </div>
       <div class="section-body" id="alerts-list"></div>
     </div>
 
-    <div class="content-section">
+    <div class="content-section" style="margin-top: 2rem;">
       <div class="section-header">
-        <h2>Manicures Recentes</h2>
+        <h2 style="font-size: 1.1rem;">Manicures Recentes</h2>
       </div>
       <div class="section-body" id="recent-manicures">
-        <p class="text-muted" style="text-align: center; padding: 1rem;">Carregando...</p>
+        <p class="text-muted" style="text-align: center; padding: 2rem;">Carregando dados...</p>
       </div>
     </div>
   </main>
@@ -205,10 +227,13 @@
 
         if (alerts.length > 0) {
           document.getElementById('alerts-section').style.display = 'block';
-          document.getElementById('alerts-list').innerHTML = alerts.map(a => `
-            <div class="manicure-item" onclick="window.location.href='pages/manicure-details.html?id=${a.id}'">
-              <div class="manicure-info"><h3>${a.name}</h3><p>${a.phone}</p></div>
-              <span class="badge badge-danger">Troca</span>
+          document.getElementById('alerts-list').innerHTML = alerts.slice(0, 3).map(a => `
+            <div class="manicure-item" onclick="window.location.href='pages/manicure-details.html?id=${a.id}'" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #eee;">
+              <div class="manicure-info">
+                <h3 style="margin: 0; font-size: 1rem;">${a.name}</h3>
+                <p style="margin: 0; font-size: 0.85rem; color: #64748b;">${a.phone}</p>
+              </div>
+              <span class="badge badge-warning" style="background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;">Troca</span>
             </div>
           `).join('');
         }
@@ -216,17 +241,23 @@
         const recentList = document.getElementById('recent-manicures');
         if (manicures.length > 0) {
           recentList.innerHTML = manicures.slice(0, 5).map(m => `
-            <div class="manicure-item" onclick="window.location.href='pages/manicure-details.html?id=${m.id}'">
-              <div class="manicure-info"><h3>${m.name}</h3><p>${m.phone}</p></div>
-              <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}">
+            <div class="manicure-item" onclick="window.location.href='pages/manicure-details.html?id=${m.id}'" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #eee;">
+              <div class="manicure-info">
+                <h3 style="margin: 0; font-size: 1rem;">${m.name}</h3>
+                <p style="margin: 0; font-size: 0.85rem; color: #64748b;">Plano ${m.planType}</p>
+              </div>
+              <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}" style="padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;">
                 ${m.status === 'active' ? 'Ativa' : 'Inativa'}
               </span>
             </div>
           `).join('');
         } else {
-            recentList.innerHTML = '<p style="text-align:center;">Nenhuma manicure cadastrada.</p>';
+          recentList.innerHTML = '<p style="text-align:center; padding: 2rem; color: #64748b;">Nenhuma manicure cadastrada.</p>';
         }
-      } catch (e) { console.error(e); }
+      } catch (e) { 
+        console.error(e);
+        document.getElementById('recent-manicures').innerHTML = '<p style="color: red; text-align: center;">Erro ao carregar dados.</p>';
+      }
     }
 
     window.onload = loadDashboard;
