@@ -79,12 +79,16 @@ const dbManager = {
             updatedAt: Date.now()
         };
         await set(newRef, data);
-        return data;
+        
+        // CORREÇÃO: Retorna apenas o ID como string
+        return newRef.key;
     },
 
     // Método alternativo compatível com o seu form atual
+    // CORREÇÃO: Agora retorna explicitamente apenas o ID
     async addManicure(data) {
-        return this.createManicure(data);
+        const newId = await this.createManicure(data);
+        return newId; // Retorna apenas a string do ID
     },
 
     async updateManicure(manicureId, updates) {
