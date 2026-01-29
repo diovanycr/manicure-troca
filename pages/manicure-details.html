@@ -3,166 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detalhes da Manicure - Gestão de Manicures</title>
+  <title>Detalhes - Gestão de Manicures</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="icon" href="data:,">
   <style>
-    .container-page { max-width: 900px; margin: 0 auto; padding: 2rem; font-family: 'Inter', sans-serif; }
-    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: #7c3aed; text-decoration: none; margin-bottom: 2rem; font-weight: 600; }
-    
-    .header-card { 
-      background: white; border-radius: 1rem; padding: 2rem; 
-      display: flex; justify-content: space-between; align-items: center;
-      border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-    }
-
-    .header-info h1 { margin: 0; font-size: 1.75rem; color: #1e293b; }
-    .header-info p { margin: 0.25rem 0; color: #64748b; }
-
-    .badge { padding: 0.4rem 1rem; border-radius: 2rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-top: 1rem; display: inline-block; }
-    .badge-success { background: #dcfce7; color: #15803d; }
-    .badge-secondary { background: #f1f5f9; color: #475569; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .card { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; overflow: hidden; }
-    .card-header { padding: 1.25rem; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
-    .card-header h2 { margin: 0; font-size: 1.1rem; color: #1e293b; }
-    .card-body { padding: 1.5rem; }
-
-    .info-group { margin-bottom: 1.25rem; }
-    .info-label { font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem; }
-    .info-value { font-size: 1rem; color: #334155; font-weight: 500; }
-
-    .btn { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
-    .btn-primary { background: #7c3aed; color: white; }
-    .btn-primary:hover { background: #6d28d9; }
-    
-    /* Modal */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; }
-    .modal.show { display: flex; }
-    .modal-content { background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 450px; text-align: center; }
+    .container-page { max-width: 800px; margin: 0 auto; padding: 2rem; font-family: sans-serif; }
+    .back-link { display: block; margin-bottom: 2rem; color: #7c3aed; text-decoration: none; font-weight: bold; }
+    .card { background: white; padding: 2rem; border-radius: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .header-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: bold; }
+    .value { font-size: 1.1rem; color: #1e293b; margin-top: 0.25rem; }
+    .badge { padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.8rem; font-weight: bold; }
+    .active { background: #dcfce7; color: #166534; }
+    .btn-exchange { background: #7c3aed; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: bold; }
+    .btn-exchange:hover { background: #6d28d9; }
   </style>
 </head>
 <body>
 
   <div class="container-page">
-    <a href="../index.html" class="back-link">← Voltar para a Lista</a>
+    <a href="../index.html" class="back-link">← Voltar para Lista</a>
 
-    <div class="header-card">
-      <div class="header-info">
-        <h1 id="manicure-name">Carregando...</h1>
-        <p id="manicure-phone">--</p>
-        <div id="badges-container">
-          <span class="badge badge-secondary" id="plan-badge">Plano -</span>
-          <span class="badge" id="status-badge">-</span>
-        </div>
-      </div>
-      <button class="btn btn-primary" id="btn-open-exchange">🔄 Registrar Troca</button>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-header"><h2>Dados Cadastrais</h2></div>
-        <div class="card-body">
-          <div class="info-group">
-            <div class="info-label">Endereço</div>
-            <div class="info-value" id="info-address">--</div>
-          </div>
-          <div class="info-group">
-            <div class="info-label">Tipo de Plano</div>
-            <div class="info-value" id="info-plan">--</div>
+    <div class="card">
+      <div class="header-flex">
+        <div>
+          <h1 id="det-name">Carregando...</h1>
+          <div style="margin-top: 0.5rem;">
+            <span id="det-status" class="badge">---</span>
           </div>
         </div>
+        <button class="btn-exchange" id="btn-registrar">🔄 Registrar Troca</button>
       </div>
 
-      <div class="card">
-        <div class="card-header"><h2>Status do Kit</h2></div>
-        <div class="card-body">
-          <div class="info-group">
-            <div class="info-label">Próxima Troca (Estimada)</div>
-            <div class="info-value" id="next-exchange">Pendente</div>
-          </div>
-          <p style="font-size: 0.85rem; color: #64748b;">O ciclo padrão é de 28 dias após a última troca registrada.</p>
+      <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 2rem 0;">
+
+      <div class="info-grid">
+        <div>
+          <div class="label">Telefone</div>
+          <div class="value" id="det-phone">---</div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="exchange-modal">
-    <div class="modal-content">
-      <h2>Confirmar Troca?</h2>
-      <p>Você está registrando que um novo kit foi entregue hoje.</p>
-      <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
-        <button class="btn" style="background: #e2e8f0;" id="btn-close-modal">Cancelar</button>
-        <button class="btn btn-primary" id="btn-confirm-exchange">Sim, Registrar</button>
+        <div>
+          <div class="label">Plano</div>
+          <div class="value" id="det-plan">---</div>
+        </div>
+        <div style="grid-column: span 2;">
+          <div class="label">Endereço</div>
+          <div class="value" id="det-address">---</div>
+        </div>
       </div>
     </div>
   </div>
 
   <script type="module">
+    // Importamos os gerenciadores que você já tem
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
     import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // Segurança: Redireciona se não estiver logado
+    // 1. Bloqueia acesso sem login
     authManager.requireAuth();
 
-    // Pega o ID da URL
+    // 2. Pega o ID da URL
     const params = new URLSearchParams(window.location.search);
-    const manicureId = params.get('id');
+    const id = params.get('id');
 
-    if (!manicureId) {
+    if (!id) {
       window.location.href = '../index.html';
     }
 
-    async function loadManicure() {
+    async function carregarPagina() {
       try {
+        // Espera o Firebase autenticar para pegar o UID do usuário
         const uid = await dbManager._waitForUser();
         const db = getDatabase();
-        const manicureRef = ref(db, `users/${uid}/manicures/${manicureId}`);
-        const snapshot = await get(manicureRef);
+        const caminho = `users/${uid}/manicures/${id}`;
+        
+        const snapshot = await get(ref(db, caminho));
 
-        if (!snapshot.exists()) {
+        if (snapshot.exists()) {
+          const m = snapshot.val();
+          document.getElementById('det-name').textContent = m.name;
+          document.getElementById('det-phone').textContent = m.phone;
+          document.getElementById('det-plan').textContent = "Plano " + m.planType;
+          document.getElementById('det-address').textContent = m.address || "Não informado";
+          
+          const statusEl = document.getElementById('det-status');
+          statusEl.textContent = m.status === 'active' ? 'ATIVA' : 'INATIVA';
+          statusEl.classList.add(m.status === 'active' ? 'active' : 'inactive');
+        } else {
           alert("Manicure não encontrada!");
           window.location.href = '../index.html';
-          return;
         }
-
-        const data = snapshot.val();
-
-        // Preenche o cabeçalho
-        document.getElementById('manicure-name').textContent = data.name;
-        document.getElementById('manicure-phone').textContent = data.phone;
-        document.getElementById('plan-badge').textContent = `Plano ${data.planType}`;
-        
-        // Preenche os cards
-        document.getElementById('info-address').textContent = data.address || 'Não informado';
-        document.getElementById('info-plan').textContent = data.planType;
-
-        // Status
-        const statusBadge = document.getElementById('status-badge');
-        statusBadge.textContent = data.status === 'active' ? 'Ativa' : 'Inativa';
-        statusBadge.className = `badge ${data.status === 'active' ? 'badge-success' : 'badge-secondary'}`;
-
-      } catch (error) {
-        console.error("Erro:", error);
+      } catch (erro) {
+        console.error("Erro ao carregar:", erro);
       }
     }
 
-    // Modal Events
-    const modal = document.getElementById('exchange-modal');
-    document.getElementById('btn-open-exchange').onclick = () => modal.classList.add('show');
-    document.getElementById('btn-close-modal').onclick = () => modal.classList.remove('show');
-    
-    document.getElementById('btn-confirm-exchange').onclick = async () => {
-      // Aqui você pode adicionar uma função no dbManager para salvar a data da troca
+    document.getElementById('btn-registrar').onclick = () => {
       alert("Troca registrada com sucesso!");
-      modal.classList.remove('show');
+      // Aqui você pode adicionar o dbManager.recordKitExchange(id) depois
     };
 
-    // Inicializa
-    loadManicure();
+    // Inicia a carga
+    carregarPagina();
   </script>
+
 </body>
 </html>
