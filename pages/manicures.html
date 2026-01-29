@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="icon" href="data:,">
   <style>
-    /* AJUSTE MOBILE IGUAL AO INDEX - USUÁRIO NÃO FICA EM CIMA */
+    /* CSS IGUAL AO INDEX PARA MOBILE */
     @media (max-width: 768px) {
       body { flex-direction: column; }
       
@@ -45,14 +45,16 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
+        position: static; /* Garante que não flutue no mobile */
       }
 
       #user-info { 
         margin-bottom: 0 !important; 
         font-size: 0.75rem; 
-        max-width: 200px;
+        max-width: 180px;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
       
       #logout-btn { 
@@ -67,7 +69,10 @@
         padding: 1.5rem; 
       }
       
-      .filters-grid { grid-template-columns: 1fr !important; }
+      .filters-grid { 
+        grid-template-columns: 1fr !important; 
+        gap: 0.5rem !important;
+      }
     }
   </style>
 </head>
@@ -107,7 +112,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-profile" id="user-info"></div>
+      <div class="user-profile" id="user-info">Carregando...</div>
       <button class="btn btn-secondary" id="logout-btn">Sair</button>
     </div>
   </aside>
@@ -116,7 +121,7 @@
     <div class="header">
       <div>
         <h1>Manicures</h1>
-        <p class="text-muted">Gerencie as colaboradoras cadastradas</p>
+        <p class="text-muted">Lista geral de colaboradoras</p>
       </div>
       <div class="header-actions">
         <button class="btn btn-primary" onclick="window.location.href='new-manicure.html'">
@@ -129,20 +134,20 @@
     <div class="content-section" style="margin-bottom: 1.5rem;">
       <div class="filters-grid" style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; padding: 1rem;">
         <div class="filter-group">
-          <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #64748b;">Buscar</label>
-          <input type="text" id="search-input" placeholder="Nome ou telefone..." style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <label class="text-muted" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; display: block;">Buscar</label>
+          <input type="text" id="search-input" placeholder="Nome ou telefone..." style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
         </div>
         <div class="filter-group">
-          <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #64748b;">Status</label>
-          <select id="status-filter" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <label class="text-muted" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; display: block;">Status</label>
+          <select id="status-filter" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: white;">
             <option value="">Todos</option>
             <option value="active">Ativas</option>
             <option value="inactive">Inativas</option>
           </select>
         </div>
         <div class="filter-group">
-          <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #64748b;">Plano</label>
-          <select id="plan-filter" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <label class="text-muted" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; display: block;">Plano</label>
+          <select id="plan-filter" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: white;">
             <option value="">Todos</option>
             <option value="12">Plano 12</option>
             <option value="15">Plano 15</option>
@@ -157,8 +162,7 @@
         <h2>Resultados (<span id="results-count">0</span>)</h2>
       </div>
       <div class="section-body" id="manicures-list">
-        <p style="text-align: center; color: #94a3b8; padding: 2rem;">Carregando...</p>
-      </div>
+        </div>
     </div>
   </main>
 
@@ -172,15 +176,13 @@
 
     let allManicures = [];
 
-    async function loadManicures() {
+    async function loadData() {
       try {
         allManicures = await dbManager.getAllManicures();
         const user = authManager.currentUser;
         if(user) document.getElementById('user-info').textContent = user.email;
         render();
-      } catch (e) {
-        console.error(e);
-      }
+      } catch (e) { console.error(e); }
     }
 
     function render() {
@@ -199,7 +201,7 @@
       const container = document.getElementById('manicures-list');
 
       if (filtered.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding: 2rem;">Nenhuma manicure encontrada.</p>';
+        container.innerHTML = '<p style="text-align:center; padding: 2rem; color: #94a3b8;">Nenhuma manicure encontrada.</p>';
         return;
       }
 
@@ -222,7 +224,7 @@
     document.getElementById('status-filter').onchange = render;
     document.getElementById('plan-filter').onchange = render;
 
-    loadManicures();
+    loadData();
   </script>
 </body>
 </html>
