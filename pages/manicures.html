@@ -916,15 +916,37 @@
     });
   </script>
 
-  <!-- Config -->
-  <script src="../config/firebase-config.js"></script>
+  
+ <script type="module">
+  // Ao usar type="module", precisamos importar o que vamos usar
+  import { authManager } from '../js/auth.js';
+  import { dbManager } from '../js/database.js';
 
-  <!-- Scripts -->
-  <script type="module" src="../js/utils.js"></script>
-  <script type="module" src="../js/auth.js"></script>
-  <script type="module" src="../js/database.js"></script>
+  // Tornar o authManager e dbManager disponíveis globalmente para as funções antigas
+  window.authManager = authManager;
+  window.dbManager = dbManager;
 
-  <script>
+  // Iniciar a lógica após o carregamento dos módulos
+  async function inicializar() {
+    try {
+      authManager.requireAuth();
+      document.getElementById('logout-btn').onclick = () => authManager.signOut();
+      
+      // Carregar os dados das manicures
+      await loadManicures();
+    } catch (error) {
+      console.error("Falha ao inicializar:", error);
+    }
+  }
+
+  inicializar();
+</script>
+
+
+
+
+
+    
     // Require authentication
     if (typeof authManager !== 'undefined') {
       authManager.requireAuth();
