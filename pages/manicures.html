@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minhas Manicures - Gestão</title>
   <title>Manicures - Gestão de Manicures</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
@@ -12,6 +14,18 @@
     /* ... (Mantive seus estilos originais) ... */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
+      --color-primary: #d946ef;
+      --color-primary-dark: #a21caf;
+      --color-bg: #fafafa;
+      --color-surface: #ffffff;
+      --color-text: #1f2937;
+      --color-text-muted: #6b7280;
+      --color-border: #e5e7eb;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      --color-success: #10b981;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --radius: 16px;
       --color-primary: #d946ef; --color-primary-dark: #a21caf; --color-secondary: #fbbf24;
       --color-bg: #fafafa; --color-surface: #ffffff; --color-text: #1f2937;
       --color-text-muted: #6b7280; --color-border: #e5e7eb; --color-success: #10b981;
@@ -19,6 +33,14 @@
       --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
       --radius: 16px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); padding-bottom: 80px; }
+    
+    .header {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(217, 70, 239, 0.2);
     body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
     .app-container { min-height: 100vh; display: flex; flex-direction: column; }
     .mobile-header { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; z-index: 100; box-shadow: 0 2px 8px rgba(217, 70, 239, 0.2); }
@@ -56,6 +78,77 @@
       .main-content { margin-top: 0; padding: 2.5rem; }
       .manicures-list { grid-template-columns: repeat(2, 1fr); display: grid; }
     }
+    .header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; }
+
+    .search-container {
+      padding: 1rem;
+      max-width: 600px;
+      margin: -25px auto 0;
+    }
+    .search-input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border-radius: 50px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .list-container {
+      padding: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--color-surface);
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s;
+    }
+    .card:active { transform: scale(0.98); }
+
+    .info h3 { font-size: 1.1rem; margin-bottom: 0.25rem; color: var(--color-text); }
+    .info p { font-size: 0.85rem; color: var(--color-text-muted); }
+
+    .status-badge {
+      padding: 0.5rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .status-urgent { background: #fee2e2; color: var(--color-danger); }
+    .status-warning { background: #fef3c7; color: var(--color-warning); }
+    .status-ok { background: #dcfce7; color: var(--color-success); }
+
+    .fab {
+      position: fixed;
+      bottom: 2rem;
+      right: 1.5rem;
+      width: 60px;
+      height: 60px;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(217, 70, 239, 0.4);
+      text-decoration: none;
+      font-size: 1.5rem;
+    }
+
+    .loading { text-align: center; padding: 2rem; color: var(--color-text-muted); }
   </style>
 </head>
 <body>
@@ -139,8 +232,21 @@
 
     <button class="fab" onclick="window.location.href='new-manicure.html'">+</button>
 
+  <header class="header">
+    <h1>Minhas Parceiras</h1>
+  </header>
 
-  <a href="new-manicure.html" class="fab">+</a>
+  <div class="search-container">
+    <input type="text" id="search" class="search-input" placeholder="Buscar por nome...">
+  </div>
+
+  <main class="list-container" id="manicure-list">
+    <div class="loading">Carregando manicures...</div>
+  </main>
+
+  <a href="new-manicure.html" class="fab">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </a>
 
   <script type="module">
     import { authManager } from '../js/auth.js';
@@ -148,37 +254,29 @@
 
     let allManicures = [];
 
-   async function init() {
-  try {
-    await authManager.requireAuth();
-    await loadManicures();
-  } catch (e) { 
-    console.error("Erro na inicialização:", e);
-    // Se o login.html estiver na pasta principal (raiz):
-    window.location.href = '../login.html'; 
-  }
-}
+    async function init() {
+      try {
+        await authManager.requireAuth();
+        loadManicures();
+      } catch (e) { window.location.href = '../login.html'; }
+    }
 
     async function loadManicures() {
-      const container = document.getElementById('manicures-container');
+      const listElement = document.getElementById('manicure-list');
+
       try {
+        // Busca os dados do Firebase
         const data = await dbManager.getAllManicures();
-        // Converte o objeto do Firebase em Array
         allManicures = data ? Object.entries(data).map(([id, val]) => ({ id, ...val })) : [];
-        
+
         renderList(allManicures);
       } catch (error) {
-        console.error("Erro ao buscar dados:", error);
-        container.innerHTML = '<div class="loading">Erro ao carregar do banco de dados.</div>';
+        listElement.innerHTML = '<div class="loading">Erro ao carregar dados.</div>';
       }
     }
 
     function renderList(list) {
-      const container = document.getElementById('manicures-container');
-      const countLabel = document.getElementById('results-count');
-      
-      countLabel.textContent = list.length;
-
+      const container = document.getElementById('manicure-list');
       if (list.length === 0) {
         container.innerHTML = '<div class="loading">Nenhuma manicure encontrada.</div>';
         return;
@@ -190,8 +288,8 @@
           <a href="manicure-details.html?id=${m.id}" class="card">
             <div class="info">
               <h3>${m.name}</h3>
-              <p>${m.phone || 'Sem telefone'}</p>
-              <p>Próxima Troca: ${m.nextExchangeDate ? new Date(m.nextExchangeDate).toLocaleDateString('pt-BR') : 'Não definida'}</p>
+              <p>${m.phone}</p>
+              <p>Troca: ${new Date(m.nextExchangeDate).toLocaleDateString('pt-BR')}</p>
             </div>
             <div class="status-badge ${status.class}">
               ${status.text}
@@ -202,29 +300,21 @@
     }
 
     function calculateStatus(nextDate) {
-      if (!nextDate) return { text: 'Sem Data', class: 'status-warning' };
-      
       const today = new Date().setHours(0,0,0,0);
       const target = new Date(nextDate).setHours(0,0,0,0);
       const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
 
-      if (diffDays <= 0) return { text: 'Atrasada', class: 'status-urgent' };
+      if (diffDays <= 0) return { text: 'Atrásada', class: 'status-urgent' };
       if (diffDays <= 2) return { text: 'Trocar Agora', class: 'status-warning' };
       return { text: 'Em dia', class: 'status-ok' };
     }
 
-    // Filtro de Busca CORRIGIDO
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = allManicures.filter(m => 
-                (m.name && m.name.toLowerCase().includes(term)) || 
-                (m.phone && m.phone.includes(term))
-            );
-            renderList(filtered);
-        });
-    }
+    // Filtro de Busca
+    document.getElementById('search').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = allManicures.filter(m => m.name.toLowerCase().includes(term));
+      renderList(filtered);
+    });
 
     init();
   </script>
