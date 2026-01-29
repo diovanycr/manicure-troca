@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    /* Mantendo seu CSS original que está excelente */
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     :root {
       --color-primary: #d946ef;
       --color-primary-dark: #a21caf;
@@ -28,58 +28,494 @@
       --radius: 16px;
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); line-height: 1.6; min-height: 100vh; }
-    .app-container { min-height: 100vh; display: flex; flex-direction: column; }
-    .mobile-header { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; z-index: 100; box-shadow: 0 2px 8px rgba(217, 70, 239, 0.2); }
-    .mobile-header h1 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; }
-    .back-button { background: none; border: none; color: white; cursor: pointer; padding: 0.5rem; display: flex; align-items: center; }
-    .main-content { margin-top: 64px; padding: 1.5rem 1rem; flex: 1; max-width: 900px; margin-left: auto; margin-right: auto; width: 100%; }
-    .header-card { background: var(--color-surface); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); margin-bottom: 1.5rem; }
-    .header-info h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
-    .header-info-details { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
-    .header-info-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--color-text-muted); }
-    .header-badges { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .badge { padding: 0.375rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-    .badge-success { background: #d1fae5; color: #065f46; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-    .badge-secondary { background: #e5e7eb; color: #4b5563; }
-    .header-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-    .card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); margin-bottom: 1.5rem; overflow: hidden; }
-    .card-header { padding: 1.25rem 1.5rem; border-bottom: 2px solid var(--color-bg); display: flex; align-items: center; gap: 0.5rem; }
-    .card-body { padding: 1.5rem; }
-    .info-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
-    .info-group { display: flex; flex-direction: column; gap: 0.25rem; }
-    .info-label { font-size: 0.8125rem; color: var(--color-text-muted); font-weight: 500; text-transform: uppercase; }
-    .info-value { font-size: 1rem; color: var(--color-text); font-weight: 500; }
-    .info-value.highlight { font-size: 1.5rem; font-weight: 700; color: var(--color-primary); font-family: 'Playfair Display', serif; }
-    .status-toggle { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--color-bg); border-radius: 12px; }
-    .toggle-switch { position: relative; width: 50px; height: 28px; background: var(--color-border); border-radius: 14px; cursor: pointer; transition: background 0.3s; }
-    .toggle-switch.active { background: var(--color-success); }
-    .toggle-switch::after { content: ''; position: absolute; width: 24px; height: 24px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
-    .toggle-switch.active::after { left: 24px; }
-    .history-item { background: var(--color-bg); border-radius: 12px; padding: 1rem; border: 1px solid var(--color-border); margin-bottom: 0.5rem; }
-    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
-    .modal.show { display: flex; }
-    .modal-content { background: var(--color-surface); border-radius: var(--radius); width: 100%; max-width: 500px; animation: modalSlideIn 0.3s; }
-    @keyframes modalSlideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem 1rem; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
-    .btn-primary { background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; }
-    .btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
-    .btn-full { width: 100%; }
-    .loading-spinner { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 999; }
-    .loading-spinner.show { display: flex; }
-    .spinner { width: 40px; height: 40px; border: 4px solid #fff3; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(150%); background: white; padding: 1rem; border-radius: 12px; box-shadow: var(--shadow-lg); transition: 0.3s; z-index: 1000; border-left: 4px solid var(--color-success); }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    @media (min-width: 768px) { .info-grid { grid-template-columns: 1fr 1fr; } .header-info-details { flex-direction: row; gap: 1.5rem; } }
+    
+    body { 
+      font-family: 'Outfit', sans-serif; 
+      background: var(--color-bg); 
+      color: var(--color-text); 
+      line-height: 1.6; 
+      min-height: 100vh; 
+    }
+    
+    .app-container { 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+    }
+    
+    .mobile-header { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      right: 0; 
+      height: 64px; 
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); 
+      color: white; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      padding: 0 1rem; 
+      z-index: 100; 
+      box-shadow: 0 2px 8px rgba(217, 70, 239, 0.2); 
+    }
+    
+    .mobile-header h1 { 
+      font-family: 'Playfair Display', serif; 
+      font-size: 1.25rem; 
+      font-weight: 700; 
+    }
+    
+    .back-button { 
+      background: none; 
+      border: none; 
+      color: white; 
+      cursor: pointer; 
+      padding: 0.5rem; 
+      display: flex; 
+      align-items: center; 
+      transition: var(--transition);
+    }
+    
+    .back-button:hover {
+      opacity: 0.8;
+    }
+    
+    .main-content { 
+      margin-top: 64px; 
+      padding: 1.5rem 1rem; 
+      flex: 1; 
+      max-width: 900px; 
+      margin-left: auto; 
+      margin-right: auto; 
+      width: 100%; 
+    }
+    
+    .header-card { 
+      background: var(--color-surface); 
+      border-radius: var(--radius); 
+      padding: 1.5rem; 
+      box-shadow: var(--shadow-sm); 
+      border: 1px solid var(--color-border); 
+      margin-bottom: 1.5rem; 
+    }
+    
+    .header-info h2 { 
+      font-family: 'Playfair Display', serif; 
+      font-size: 1.5rem; 
+      margin-bottom: 0.5rem; 
+      color: var(--color-text);
+    }
+    
+    .header-info-details { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 0.5rem; 
+      margin-bottom: 1rem; 
+    }
+    
+    .header-info-item { 
+      display: flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+      font-size: 0.875rem; 
+      color: var(--color-text-muted); 
+    }
+    
+    .header-badges { 
+      display: flex; 
+      gap: 0.5rem; 
+      margin-bottom: 1rem; 
+      flex-wrap: wrap; 
+    }
+    
+    .badge { 
+      padding: 0.375rem 0.75rem; 
+      border-radius: 20px; 
+      font-size: 0.75rem; 
+      font-weight: 600; 
+      text-transform: uppercase; 
+    }
+    
+    .badge-success { 
+      background: #d1fae5; 
+      color: #065f46; 
+    }
+    
+    .badge-warning { 
+      background: #fef3c7; 
+      color: #92400e; 
+    }
+    
+    .badge-secondary { 
+      background: #e5e7eb; 
+      color: #4b5563; 
+    }
+    
+    .badge-danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .header-actions { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 0.75rem; 
+    }
+    
+    .card { 
+      background: var(--color-surface); 
+      border-radius: var(--radius); 
+      box-shadow: var(--shadow-sm); 
+      border: 1px solid var(--color-border); 
+      margin-bottom: 1.5rem; 
+      overflow: hidden; 
+    }
+    
+    .card-header { 
+      padding: 1.25rem 1.5rem; 
+      border-bottom: 2px solid var(--color-bg); 
+      display: flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+    }
+    
+    .card-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    
+    .card-body { 
+      padding: 1.5rem; 
+    }
+    
+    .info-grid { 
+      display: grid; 
+      grid-template-columns: 1fr; 
+      gap: 1.25rem; 
+    }
+    
+    .info-group { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 0.25rem; 
+    }
+    
+    .info-label { 
+      font-size: 0.8125rem; 
+      color: var(--color-text-muted); 
+      font-weight: 500; 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px;
+    }
+    
+    .info-value { 
+      font-size: 1rem; 
+      color: var(--color-text); 
+      font-weight: 500; 
+    }
+    
+    .info-value.highlight { 
+      font-size: 1.5rem; 
+      font-weight: 700; 
+      color: var(--color-primary); 
+      font-family: 'Playfair Display', serif; 
+    }
+    
+    .status-toggle { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      padding: 1rem; 
+      background: var(--color-bg); 
+      border-radius: 12px; 
+    }
+    
+    .toggle-switch { 
+      position: relative; 
+      width: 50px; 
+      height: 28px; 
+      background: var(--color-border); 
+      border-radius: 14px; 
+      cursor: pointer; 
+      transition: background 0.3s; 
+    }
+    
+    .toggle-switch.active { 
+      background: var(--color-success); 
+    }
+    
+    .toggle-switch::after { 
+      content: ''; 
+      position: absolute; 
+      width: 24px; 
+      height: 24px; 
+      background: white; 
+      border-radius: 50%; 
+      top: 2px; 
+      left: 2px; 
+      transition: 0.3s; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .toggle-switch.active::after { 
+      left: 24px; 
+    }
+    
+    .history-item { 
+      background: var(--color-bg); 
+      border-radius: 12px; 
+      padding: 1rem; 
+      border: 1px solid var(--color-border); 
+      margin-bottom: 0.75rem; 
+      transition: var(--transition);
+    }
+    
+    .history-item:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .modal { 
+      display: none; 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      right: 0; 
+      bottom: 0; 
+      background: rgba(0,0,0,0.5); 
+      z-index: 200; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 1rem; 
+    }
+    
+    .modal.show { 
+      display: flex; 
+    }
+    
+    .modal-content { 
+      background: var(--color-surface); 
+      border-radius: var(--radius); 
+      width: 100%; 
+      max-width: 500px; 
+      animation: modalSlideIn 0.3s; 
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    @keyframes modalSlideIn { 
+      from { 
+        opacity: 0; 
+        transform: translateY(-20px); 
+      } 
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      } 
+    }
+    
+    .modal-header {
+      padding: 1.5rem; 
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .modal-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    
+    .modal-body {
+      padding: 1.5rem;
+    }
+    
+    .modal-footer {
+      padding: 1.5rem; 
+      display: flex; 
+      gap: 0.75rem;
+      border-top: 1px solid var(--color-border);
+    }
+    
+    .btn { 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 0.5rem; 
+      padding: 0.875rem 1.25rem; 
+      border: none; 
+      border-radius: 12px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      transition: var(--transition); 
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .btn-primary { 
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); 
+      color: white; 
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 4px 12px rgba(217, 70, 239, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary { 
+      background: var(--color-surface); 
+      color: var(--color-text); 
+      border: 1px solid var(--color-border); 
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--color-bg);
+      border-color: var(--color-primary);
+    }
+    
+    .btn-full { 
+      width: 100%; 
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 0.875rem;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.1);
+    }
+    
+    textarea.form-control {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    .loading-spinner { 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.7); 
+      display: none; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 999; 
+    }
+    
+    .loading-spinner.show { 
+      display: flex; 
+    }
+    
+    .spinner { 
+      width: 40px; 
+      height: 40px; 
+      border: 4px solid rgba(255,255,255,0.2); 
+      border-top-color: #fff; 
+      border-radius: 50%; 
+      animation: spin 1s linear infinite; 
+    }
+    
+    @keyframes spin { 
+      to { 
+        transform: rotate(360deg); 
+      } 
+    }
+    
+    .toast { 
+      position: fixed; 
+      bottom: 2rem; 
+      left: 50%; 
+      transform: translateX(-50%) translateY(150%); 
+      background: white; 
+      padding: 1rem 1.5rem; 
+      border-radius: 12px; 
+      box-shadow: var(--shadow-lg); 
+      transition: 0.3s; 
+      z-index: 1000; 
+      border-left: 4px solid var(--color-success); 
+      min-width: 250px;
+      max-width: 90%;
+    }
+    
+    .toast.show { 
+      transform: translateX(-50%) translateY(0); 
+    }
+    
+    .toast.error {
+      border-left-color: var(--color-danger);
+    }
+    
+    .toast-message {
+      font-size: 0.9rem;
+      color: var(--color-text);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--color-text-muted);
+    }
+    
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    .file-upload-area {
+      border: 2px dashed var(--color-border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .file-upload-area:hover {
+      border-color: var(--color-primary);
+      background: rgba(217, 70, 239, 0.05);
+    }
+    
+    .file-upload-area.has-file {
+      border-color: var(--color-success);
+      background: rgba(16, 185, 129, 0.05);
+    }
+    
+    @media (min-width: 768px) { 
+      .info-grid { 
+        grid-template-columns: 1fr 1fr; 
+      } 
+      
+      .header-info-details { 
+        flex-direction: row; 
+        gap: 1.5rem; 
+      }
+      
+      .main-content {
+        padding: 2rem 1.5rem;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="app-container">
     <header class="mobile-header">
-      <button class="back-button" onclick="window.location.href='manicures.html'">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      <button class="back-button" onclick="handleBackNavigation()" aria-label="Voltar">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
       </button>
       <h1 id="mobile-title">Detalhes</h1>
       <div style="width: 40px;"></div>
@@ -91,11 +527,16 @@
           <h2 id="manicure-name">Carregando...</h2>
           <div class="header-info-details">
             <div class="header-info-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
               <span id="manicure-phone">-</span>
             </div>
             <div class="header-info-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
               <span id="manicure-address">-</span>
             </div>
           </div>
@@ -107,24 +548,45 @@
         </div>
         <div class="header-actions">
           <button class="btn btn-primary" onclick="openExchangeModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
             <span>Registrar Troca</span>
           </button>
           <button class="btn btn-secondary" onclick="openReceiptModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
             <span>Comprovante</span>
           </button>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-header"><h3>Informações Cadastrais</h3></div>
+        <div class="card-header">
+          <h3>Informações Cadastrais</h3>
+        </div>
         <div class="card-body">
           <div class="info-grid">
-            <div class="info-group"><span class="info-label">Nome Completo</span><span class="info-value" id="info-name">-</span></div>
-            <div class="info-group"><span class="info-label">Telefone</span><span class="info-value" id="info-phone">-</span></div>
-            <div class="info-group"><span class="info-label">Tipo de Plano</span><span class="info-value" id="info-plan">-</span></div>
-            <div class="info-group"><span class="info-label">Data de Início</span><span class="info-value" id="info-start-date">-</span></div>
+            <div class="info-group">
+              <span class="info-label">Nome Completo</span>
+              <span class="info-value" id="info-name">-</span>
+            </div>
+            <div class="info-group">
+              <span class="info-label">Telefone</span>
+              <span class="info-value" id="info-phone">-</span>
+            </div>
+            <div class="info-group">
+              <span class="info-label">Tipo de Plano</span>
+              <span class="info-value" id="info-plan">-</span>
+            </div>
+            <div class="info-group">
+              <span class="info-label">Data de Início</span>
+              <span class="info-value" id="info-start-date">-</span>
+            </div>
           </div>
           <div class="status-toggle" style="margin-top: 1.5rem;">
             <span>Status da Manicure</span>
@@ -137,70 +599,195 @@
       </div>
 
       <div class="card">
-        <div class="card-header"><h3>Controle de Trocas</h3></div>
+        <div class="card-header">
+          <h3>Controle de Trocas</h3>
+        </div>
         <div class="card-body">
           <div class="info-grid">
-            <div class="info-group"><span class="info-label">Próxima Troca</span><span class="info-value" id="next-exchange">-</span></div>
-            <div class="info-group"><span class="info-label">Dias Restantes</span><span class="info-value highlight" id="days-until">-</span></div>
+            <div class="info-group">
+              <span class="info-label">Próxima Troca</span>
+              <span class="info-value" id="next-exchange">-</span>
+            </div>
+            <div class="info-group">
+              <span class="info-label">Dias Restantes</span>
+              <span class="info-value highlight" id="days-until">-</span>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-header"><h3>Histórico de Trocas</h3></div>
+        <div class="card-header">
+          <h3>Histórico de Trocas</h3>
+        </div>
         <div class="card-body" id="exchange-history">
-          <p style="text-align: center; color: #999;">Carregando histórico...</p>
+          <div class="empty-state">
+            <p>Carregando histórico...</p>
+          </div>
         </div>
       </div>
     </main>
   </div>
 
-  <div class="modal" id="exchange-modal">
+  <!-- Modal de Registro de Troca -->
+  <div class="modal" id="exchange-modal" role="dialog" aria-labelledby="exchange-modal-title" aria-modal="true">
     <div class="modal-content">
-      <div style="padding: 1.5rem; border-bottom: 1px solid var(--color-border);"><h2>Registrar Troca</h2></div>
-      <div style="padding: 1.5rem;">
-        <textarea id="exchange-notes" placeholder="Alguma observação sobre os esmaltes?" style="width:100%; height:100px; padding:10px; border-radius:8px; border:1px solid #ddd; font-family: inherit;"></textarea>
+      <div class="modal-header">
+        <h2 id="exchange-modal-title">Registrar Troca de Kit</h2>
       </div>
-      <div style="padding: 1.5rem; display: flex; gap: 10px;">
-        <button class="btn btn-secondary btn-full" onclick="closeExchangeModal()">Cancelar</button>
-        <button class="btn btn-primary btn-full" onclick="submitExchange()">Confirmar Troca</button>
+      <div class="modal-body">
+        <label for="exchange-notes" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+          Observações (opcional)
+        </label>
+        <textarea 
+          id="exchange-notes" 
+          class="form-control"
+          placeholder="Ex: Trocou todas as cores, cliente solicitou tons mais claros..."
+          maxlength="500"
+        ></textarea>
+        <small style="display: block; margin-top: 0.5rem; color: var(--color-text-muted);">
+          Máximo 500 caracteres
+        </small>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-full" onclick="closeExchangeModal()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary btn-full" onclick="submitExchange()">
+          Confirmar Troca
+        </button>
       </div>
     </div>
   </div>
 
-  <div class="modal" id="receipt-modal">
+  <!-- Modal de Envio de Comprovante -->
+  <div class="modal" id="receipt-modal" role="dialog" aria-labelledby="receipt-modal-title" aria-modal="true">
     <div class="modal-content">
-      <div style="padding: 1.5rem;"><h2>Enviar Comprovante</h2></div>
-      <div style="padding: 1.5rem; text-align: center;">
-        <input type="file" id="file-input" style="display: none;" onchange="previewFile()">
-        <button class="btn btn-secondary btn-full" onclick="document.getElementById('file-input').click()">Selecionar Foto/PDF</button>
-        <div id="file-preview" style="margin-top: 10px; font-size: 0.8rem; color: var(--color-primary); font-weight: 600;"></div>
+      <div class="modal-header">
+        <h2 id="receipt-modal-title">Enviar Comprovante</h2>
       </div>
-      <div style="padding: 1.5rem; display: flex; gap: 10px;">
-        <button class="btn btn-secondary btn-full" onclick="closeReceiptModal()">Cancelar</button>
-        <button class="btn btn-primary btn-full" onclick="submitReceipt()">Enviar</button>
+      <div class="modal-body">
+        <input 
+          type="file" 
+          id="file-input" 
+          accept="image/*,.pdf" 
+          style="display: none;" 
+          onchange="previewFile()"
+        >
+        <div 
+          class="file-upload-area" 
+          id="file-upload-area"
+          onclick="document.getElementById('file-input').click()"
+        >
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <p id="file-preview" style="margin: 0; color: var(--color-text-muted);">
+            Clique para selecionar uma foto ou PDF
+          </p>
+        </div>
+        <small style="display: block; margin-top: 0.75rem; color: var(--color-text-muted);">
+          Formatos aceitos: JPG, PNG, PDF (máx. 5MB)
+        </small>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-full" onclick="closeReceiptModal()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary btn-full" id="submit-receipt-btn" onclick="submitReceipt()" disabled>
+          Enviar Comprovante
+        </button>
       </div>
     </div>
   </div>
 
-  <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
-  <div class="toast" id="toast"><div class="toast-message"></div></div>
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" id="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Toast de Notificação -->
+  <div class="toast" id="toast">
+    <div class="toast-message"></div>
+  </div>
 
   <script type="module">
     import { auth } from '../config/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { dbManager } from '../js/database.js';
 
+    // Utilitários da Página
     const PageUtils = {
-      showLoading: (show) => document.getElementById('loading-spinner').classList.toggle('show', show),
-      showToast: (msg) => {
-        const t = document.getElementById('toast');
-        t.querySelector('.toast-message').textContent = msg;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
+      showLoading: (show) => {
+        const spinner = document.getElementById('loading-spinner');
+        if (spinner) {
+          spinner.classList.toggle('show', show);
+        }
+      },
+      
+      showToast: (msg, isError = false) => {
+        const toast = document.getElementById('toast');
+        const toastMessage = toast.querySelector('.toast-message');
+        
+        if (toastMessage) {
+          toastMessage.textContent = msg;
+        }
+        
+        toast.classList.toggle('error', isError);
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      },
+      
+      formatDate: (timestamp) => {
+        if (!timestamp) return '-';
+        try {
+          const date = new Date(timestamp);
+          return date.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          });
+        } catch (e) {
+          console.error('Erro ao formatar data:', e);
+          return '-';
+        }
+      },
+      
+      formatPhone: (phone) => {
+        if (!phone) return '-';
+        const cleaned = phone.replace(/\D/g, '');
+        
+        if (cleaned.length === 11) {
+          return `(${cleaned.slice(0,2)}) ${cleaned.slice(2,7)}-${cleaned.slice(7)}`;
+        } else if (cleaned.length === 10) {
+          return `(${cleaned.slice(0,2)}) ${cleaned.slice(2,6)}-${cleaned.slice(6)}`;
+        }
+        
+        return phone;
+      },
+      
+      calculateDaysUntil: (targetDate) => {
+        if (!targetDate) return null;
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const target = new Date(targetDate);
+        target.setHours(0, 0, 0, 0);
+        
+        const diffTime = target - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        return diffDays;
       }
     };
 
+    // Estado da Aplicação
     let currentManicure = null;
     const urlParams = new URLSearchParams(window.location.search);
     const manicureId = urlParams.get('id');
@@ -209,7 +796,10 @@
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         if (!manicureId) {
-          window.location.href = 'manicures.html';
+          PageUtils.showToast('ID da manicure não fornecido', true);
+          setTimeout(() => {
+            window.location.href = 'manicures.html';
+          }, 1500);
           return;
         }
         await loadData();
@@ -218,160 +808,377 @@
       }
     });
 
+    // Carregamento de Dados
     async function loadData() {
       PageUtils.showLoading(true);
+      
       try {
         currentManicure = await dbManager.getManicureById(manicureId);
+        
         if (!currentManicure) {
-          alert("Manicure não encontrada!");
-          window.location.href = 'manicures.html';
+          PageUtils.showToast("Manicure não encontrada!", true);
+          setTimeout(() => {
+            window.location.href = 'manicures.html';
+          }, 1500);
           return;
         }
         
         renderHeader();
         renderInfo();
         await renderHistory();
-      } catch (e) { 
-        console.error("Erro ao carregar:", e);
-        PageUtils.showToast("Erro ao carregar dados.");
+      } catch (error) { 
+        console.error("Erro ao carregar dados:", error);
+        PageUtils.showToast("Erro ao carregar dados da manicure", true);
       } finally {
         PageUtils.showLoading(false);
       }
     }
 
+    // Renderização do Cabeçalho
     function renderHeader() {
-      document.getElementById('manicure-name').textContent = currentManicure.name || 'Sem nome';
-      document.getElementById('manicure-phone').textContent = currentManicure.phone || '-';
-      document.getElementById('manicure-address').textContent = currentManicure.address || 'Endereço não informado';
-      document.getElementById('plan-badge').textContent = `Plano ${currentManicure.planType || '15'} dias`;
+      // Nome
+      const nameElement = document.getElementById('manicure-name');
+      if (nameElement) {
+        nameElement.textContent = currentManicure.name || 'Sem nome';
+      }
       
+      // Telefone
+      const phoneElement = document.getElementById('manicure-phone');
+      if (phoneElement) {
+        phoneElement.textContent = PageUtils.formatPhone(currentManicure.phone);
+      }
+      
+      // Endereço
+      const addressElement = document.getElementById('manicure-address');
+      if (addressElement) {
+        addressElement.textContent = currentManicure.address || 'Endereço não informado';
+      }
+      
+      // Badge do Plano
+      const planBadge = document.getElementById('plan-badge');
+      if (planBadge) {
+        const planType = currentManicure.planType || '15';
+        planBadge.textContent = `Plano ${planType} dias`;
+      }
+      
+      // Badge de Status
       const statusBadge = document.getElementById('status-badge');
-      const isActive = currentManicure.status === 'active';
-      statusBadge.textContent = isActive ? 'Ativa' : 'Inativa';
-      statusBadge.className = `badge ${isActive ? 'badge-success' : 'badge-secondary'}`;
+      if (statusBadge) {
+        const isActive = currentManicure.status === 'active';
+        statusBadge.textContent = isActive ? 'Ativa' : 'Inativa';
+        statusBadge.className = `badge ${isActive ? 'badge-success' : 'badge-secondary'}`;
+      }
       
-      // Cálculo de dias
+      // Cálculo de Dias e Badge de Alerta
       if (currentManicure.nextExchangeDate) {
-        const today = new Date().setHours(0,0,0,0);
-        const next = new Date(currentManicure.nextExchangeDate).setHours(0,0,0,0);
-        const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24));
+        const daysUntil = PageUtils.calculateDaysUntil(currentManicure.nextExchangeDate);
         
-        document.getElementById('days-until').textContent = diff;
-        document.getElementById('next-exchange').textContent = new Date(currentManicure.nextExchangeDate).toLocaleDateString('pt-BR');
+        const daysElement = document.getElementById('days-until');
+        const nextExchangeElement = document.getElementById('next-exchange');
+        const dueSoonBadge = document.getElementById('due-soon-badge');
         
-        // Alerta visual se estiver perto ou atrasado
-        const daysLabel = document.getElementById('days-until');
-        if (diff <= 0) daysLabel.style.color = 'var(--color-danger)';
-        else if (diff <= 2) daysLabel.style.color = 'var(--color-warning)';
-        else daysLabel.style.color = 'var(--color-primary)';
-
-        document.getElementById('due-soon-badge').style.display = diff <= 2 ? 'inline-block' : 'none';
+        if (daysElement && nextExchangeElement) {
+          daysElement.textContent = daysUntil !== null ? daysUntil : '-';
+          nextExchangeElement.textContent = PageUtils.formatDate(currentManicure.nextExchangeDate);
+          
+          // Cores baseadas nos dias restantes
+          if (daysUntil !== null) {
+            if (daysUntil < 0) {
+              daysElement.style.color = 'var(--color-danger)';
+              if (dueSoonBadge) {
+                dueSoonBadge.textContent = 'Atrasado';
+                dueSoonBadge.className = 'badge badge-danger';
+                dueSoonBadge.style.display = 'inline-block';
+              }
+            } else if (daysUntil <= 2) {
+              daysElement.style.color = 'var(--color-warning)';
+              if (dueSoonBadge) {
+                dueSoonBadge.textContent = 'Troca Próxima';
+                dueSoonBadge.className = 'badge badge-warning';
+                dueSoonBadge.style.display = 'inline-block';
+              }
+            } else {
+              daysElement.style.color = 'var(--color-primary)';
+              if (dueSoonBadge) {
+                dueSoonBadge.style.display = 'none';
+              }
+            }
+          }
+        }
       }
     }
 
+    // Renderização das Informações
     function renderInfo() {
-      document.getElementById('info-name').textContent = currentManicure.name;
-      document.getElementById('info-phone').textContent = currentManicure.phone;
-      document.getElementById('info-plan').textContent = `${currentManicure.planType} dias`;
-      document.getElementById('info-start-date').textContent = new Date(currentManicure.startDate).toLocaleDateString('pt-BR');
+      const infoName = document.getElementById('info-name');
+      const infoPhone = document.getElementById('info-phone');
+      const infoPlan = document.getElementById('info-plan');
+      const infoStartDate = document.getElementById('info-start-date');
       
-      const toggle = document.getElementById('toggle-switch');
-      toggle.classList.toggle('active', currentManicure.status === 'active');
-      document.getElementById('status-text').textContent = currentManicure.status === 'active' ? 'Ativa' : 'Inativa';
+      if (infoName) infoName.textContent = currentManicure.name || '-';
+      if (infoPhone) infoPhone.textContent = PageUtils.formatPhone(currentManicure.phone);
+      if (infoPlan) infoPlan.textContent = `${currentManicure.planType || '15'} dias`;
+      if (infoStartDate) infoStartDate.textContent = PageUtils.formatDate(currentManicure.startDate);
+      
+      // Toggle de Status
+      const toggleSwitch = document.getElementById('toggle-switch');
+      const statusText = document.getElementById('status-text');
+      
+      if (toggleSwitch && statusText) {
+        const isActive = currentManicure.status === 'active';
+        toggleSwitch.classList.toggle('active', isActive);
+        statusText.textContent = isActive ? 'Ativa' : 'Inativa';
+      }
     }
 
+    // Renderização do Histórico
     async function renderHistory() {
+      const container = document.getElementById('exchange-history');
+      
+      if (!container) return;
+      
       try {
         const history = await dbManager.getKitExchanges(manicureId);
-        const container = document.getElementById('exchange-history');
         
         if (!history || history.length === 0) {
-          container.innerHTML = '<p style="text-align:center; color:#999; padding: 20px;">Nenhuma troca registrada ainda.</p>';
+          container.innerHTML = `
+            <div class="empty-state">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+              </svg>
+              <p>Nenhuma troca registrada ainda</p>
+            </div>
+          `;
           return;
         }
         
-        container.innerHTML = history.sort((a,b) => b.date - a.date).map(ex => `
+        // Ordena por data (mais recente primeiro)
+        const sortedHistory = history.sort((a, b) => b.date - a.date);
+        
+        container.innerHTML = sortedHistory.map(exchange => `
           <div class="history-item">
-            <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
-                <strong>${new Date(ex.date).toLocaleDateString('pt-BR')}</strong>
-                <small style="color:var(--color-primary)">Kit Trocado</small>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <strong style="font-size: 0.95rem;">${PageUtils.formatDate(exchange.date)}</strong>
+              <span style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600; text-transform: uppercase;">
+                Kit Trocado
+              </span>
             </div>
-            <p style="font-size:0.85rem; color:#666;">${ex.notes || 'Sem observações'}</p>
+            ${exchange.notes ? `
+              <p style="font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.5;">
+                ${exchange.notes}
+              </p>
+            ` : `
+              <p style="font-size: 0.875rem; color: var(--color-text-muted); font-style: italic;">
+                Sem observações
+              </p>
+            `}
           </div>
         `).join('');
-      } catch (err) {
-        console.error("Erro histórico:", err);
+      } catch (error) {
+        console.error("Erro ao carregar histórico:", error);
+        container.innerHTML = `
+          <div class="empty-state">
+            <p style="color: var(--color-danger);">Erro ao carregar histórico</p>
+          </div>
+        `;
       }
     }
 
-    // --- FUNÇÕES DE AÇÃO ---
-    window.openExchangeModal = () => document.getElementById('exchange-modal').classList.add('show');
-    window.closeExchangeModal = () => document.getElementById('exchange-modal').classList.remove('show');
-    window.openReceiptModal = () => document.getElementById('receipt-modal').classList.add('show');
-    window.closeReceiptModal = () => document.getElementById('receipt-modal').classList.remove('show');
+    // Funções de Modal - Troca de Kit
+    window.openExchangeModal = () => {
+      const modal = document.getElementById('exchange-modal');
+      if (modal) {
+        modal.classList.add('show');
+        document.getElementById('exchange-notes').value = '';
+        document.getElementById('exchange-notes').focus();
+      }
+    };
 
-    window.toggleStatus = async () => {
-      const newStatus = currentManicure.status === 'active' ? 'inactive' : 'active';
-      try {
-        await dbManager.updateManicure(manicureId, { status: newStatus });
-        await loadData();
-        PageUtils.showToast("Status atualizado!");
-      } catch (e) {
-        PageUtils.showToast("Erro ao atualizar status.");
+    window.closeExchangeModal = () => {
+      const modal = document.getElementById('exchange-modal');
+      if (modal) {
+        modal.classList.remove('show');
       }
     };
 
     window.submitExchange = async () => {
-      const notes = document.getElementById('exchange-notes').value;
+      const notesInput = document.getElementById('exchange-notes');
+      const notes = notesInput ? notesInput.value.trim() : '';
+      
       PageUtils.showLoading(true);
+      
       try {
         // 1. Registra a troca no histórico
         await dbManager.addExchange(manicureId, { 
-            notes, 
-            date: Date.now() 
+          notes, 
+          date: Date.now() 
         });
 
         // 2. Calcula nova data (Hoje + Dias do Plano)
-        const planDays = parseInt(currentManicure.planType);
-        const newNextDate = Date.now() + (planDays * 24 * 60 * 60 * 1000);
+        const planDays = parseInt(currentManicure.planType) || 15;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const newNextDate = today.getTime() + (planDays * 24 * 60 * 60 * 1000);
 
         // 3. Atualiza a manicure com a nova data de troca
         await dbManager.updateManicure(manicureId, { 
-            nextExchangeDate: newNextDate 
+          nextExchangeDate: newNextDate 
         });
 
-        document.getElementById('exchange-notes').value = "";
         closeExchangeModal();
-        await loadData(); // Recarrega a tela
-        PageUtils.showToast("Troca registrada e nova data calculada!");
-      } catch (e) {
-        console.error(e);
-        PageUtils.showToast("Erro ao registrar troca.");
+        await loadData(); // Recarrega todos os dados
+        PageUtils.showToast("Troca registrada com sucesso!");
+      } catch (error) {
+        console.error("Erro ao registrar troca:", error);
+        PageUtils.showToast("Erro ao registrar troca. Tente novamente.", true);
       } finally {
         PageUtils.showLoading(false);
+      }
+    };
+
+    // Funções de Modal - Comprovante
+    window.openReceiptModal = () => {
+      const modal = document.getElementById('receipt-modal');
+      if (modal) {
+        modal.classList.add('show');
+        // Reset do input
+        const fileInput = document.getElementById('file-input');
+        if (fileInput) fileInput.value = '';
+        resetFilePreview();
+      }
+    };
+
+    window.closeReceiptModal = () => {
+      const modal = document.getElementById('receipt-modal');
+      if (modal) {
+        modal.classList.remove('show');
       }
     };
 
     window.previewFile = () => {
-      const file = document.getElementById('file-input').files[0];
-      document.getElementById('file-preview').textContent = file ? `✓ ${file.name}` : '';
+      const fileInput = document.getElementById('file-input');
+      const filePreview = document.getElementById('file-preview');
+      const fileUploadArea = document.getElementById('file-upload-area');
+      const submitBtn = document.getElementById('submit-receipt-btn');
+      
+      if (!fileInput || !filePreview || !fileUploadArea) return;
+      
+      const file = fileInput.files[0];
+      
+      if (file) {
+        // Validação de tamanho (5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB em bytes
+        if (file.size > maxSize) {
+          PageUtils.showToast("Arquivo muito grande. Máximo 5MB.", true);
+          fileInput.value = '';
+          resetFilePreview();
+          return;
+        }
+        
+        // Validação de tipo
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+        if (!validTypes.includes(file.type)) {
+          PageUtils.showToast("Formato inválido. Use JPG, PNG ou PDF.", true);
+          fileInput.value = '';
+          resetFilePreview();
+          return;
+        }
+        
+        filePreview.innerHTML = `
+          <strong style="color: var(--color-success);">✓ ${file.name}</strong><br>
+          <small style="color: var(--color-text-muted);">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+        `;
+        fileUploadArea.classList.add('has-file');
+        
+        if (submitBtn) {
+          submitBtn.disabled = false;
+        }
+      } else {
+        resetFilePreview();
+      }
     };
 
-    window.submitReceipt = async () => {
-      const file = document.getElementById('file-input').files[0];
-      if (!file) return PageUtils.showToast("Selecione um arquivo primeiro");
+    function resetFilePreview() {
+      const filePreview = document.getElementById('file-preview');
+      const fileUploadArea = document.getElementById('file-upload-area');
+      const submitBtn = document.getElementById('submit-receipt-btn');
       
+      if (filePreview) {
+        filePreview.innerHTML = 'Clique para selecionar uma foto ou PDF';
+      }
+      
+      if (fileUploadArea) {
+        fileUploadArea.classList.remove('has-file');
+      }
+      
+      if (submitBtn) {
+        submitBtn.disabled = true;
+      }
+    }
+
+    window.submitReceipt = async () => {
+      const fileInput = document.getElementById('file-input');
+      
+      if (!fileInput || !fileInput.files[0]) {
+        PageUtils.showToast("Selecione um arquivo primeiro", true);
+        return;
+      }
+      
+      const file = fileInput.files[0];
       PageUtils.showLoading(true);
+      
       try {
         await dbManager.uploadReceipt(manicureId, file);
         closeReceiptModal();
         PageUtils.showToast("Comprovante enviado com sucesso!");
-      } catch (e) {
-        PageUtils.showToast("Erro ao enviar arquivo.");
+      } catch (error) {
+        console.error("Erro ao enviar comprovante:", error);
+        PageUtils.showToast("Erro ao enviar arquivo. Tente novamente.", true);
       } finally {
         PageUtils.showLoading(false);
       }
     };
+
+    // Toggle de Status
+    window.toggleStatus = async () => {
+      if (!currentManicure) return;
+      
+      const newStatus = currentManicure.status === 'active' ? 'inactive' : 'active';
+      
+      PageUtils.showLoading(true);
+      
+      try {
+        await dbManager.updateManicure(manicureId, { status: newStatus });
+        await loadData();
+        PageUtils.showToast(`Status alterado para ${newStatus === 'active' ? 'Ativa' : 'Inativa'}`);
+      } catch (error) {
+        console.error("Erro ao atualizar status:", error);
+        PageUtils.showToast("Erro ao atualizar status. Tente novamente.", true);
+      } finally {
+        PageUtils.showLoading(false);
+      }
+    };
+
+    // Navegação de Volta
+    window.handleBackNavigation = () => {
+      window.location.href = 'manicures.html';
+    };
+
+    // Fechar modal ao clicar fora
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        e.target.classList.remove('show');
+      }
+    });
+
+    // Fechar modal com tecla ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('.modal.show');
+        modals.forEach(modal => modal.classList.remove('show'));
+      }
+    });
   </script>
 </body>
 </html>
