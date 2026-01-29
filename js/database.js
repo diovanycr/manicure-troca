@@ -10,8 +10,8 @@ import {
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Usando o caminho absoluto para evitar erro 404 no GitHub Pages
-import { auth } from 'https://diovanycr.github.io/manicure-troca/config/firebase-config.js'; 
+// Ajustado para caminho relativo: sai da pasta 'js' e entra na 'config'
+import { auth } from '../config/firebase-config.js'; 
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 class DatabaseManager {
@@ -22,14 +22,13 @@ class DatabaseManager {
 
   /**
    * Garante que temos o ID do usuário antes de qualquer operação.
-   * Se o Firebase ainda não respondeu, ela espera até 5 segundos.
    */
   async _waitForUser() {
     if (this.userId) return this.userId;
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error("Tempo esgotado ao tentar identificar usuário. Você está logado?"));
+        reject(new Error("Tempo esgotado ao tentar identificar usuário."));
       }, 5000);
 
       const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -38,9 +37,7 @@ class DatabaseManager {
           this.userId = user.uid;
           resolve(user.uid);
         } else {
-          reject(new Error("Usuário não autenticado. Por favor, faça login novamente."));
-          // Opcional: Redirecionar para login caso não haja usuário
-          // window.location.href = '../pages/login.html';
+          reject(new Error("Usuário não autenticado."));
         }
         unsubscribe();
       });
@@ -51,11 +48,7 @@ class DatabaseManager {
 
   async createManicure(data) {
     try {
-      // 1. Espera o login ser confirmado
       const uid = await this._waitForUser();
-      console.log("Usuário confirmado:", uid);
-
-      // 2. Cria a referência no banco
       const manicuresRef = ref(this.db, `users/${uid}/manicures`);
       const newManicureRef = push(manicuresRef);
       
@@ -66,14 +59,11 @@ class DatabaseManager {
         status: data.status || 'active'
       };
 
-      // 3. Salva os dados
       await set(newManicureRef, manicureData);
-      console.log("Sucesso ao gravar no Firebase!");
       return manicureData;
-
     } catch (error) {
-      console.error("Erro na função createManicure:", error.message);
-      throw error; // Repassa o erro para o formulário tratar (mostrar alerta)
+      console.error("Erro ao criar:", error);
+      throw error;
     }
   }
 
@@ -91,8 +81,25 @@ class DatabaseManager {
       }
       return manicures;
     } catch (error) {
-      console.error("Erro ao buscar manicures:", error);
+      console.error("Erro ao buscar todas:", error);
       return [];
+    }
+  }
+
+  // NOVA FUNÇÃO: Busca apenas uma manicure pelo ID (Uso na manicure-details.html)
+  async getManicureById(manicureId) {
+    try {
+      const uid = await this._waitForUser();
+      const manicureRef = ref(this.db, `users/${uid}/manicures/${manicureId}`);
+      const snapshot = await get(manicureRef);
+      
+      if (snapshot.exists()) {
+        return snapshot.val();
+      }
+      return null;
+    } catch (error) {
+      console.error("Erro ao buscar detalhes:", error);
+      throw error;
     }
   }
 
@@ -111,7 +118,6 @@ class DatabaseManager {
     await remove(manicureRef);
   }
 
-  // ===== LISTENER EM TEMPO REAL =====
   onManicuresChange(callback) {
     this._waitForUser().then(uid => {
       const manicuresRef = ref(this.db, `users/${uid}/manicures`);
