@@ -4,281 +4,798 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nova Manicure - Gestão de Manicures</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #7c3aed;
-      --primary-hover: #6d28d9;
-      --bg-body: #f8fafc;
-      --text-main: #1e293b;
-      --border: #e2e8f0;
-      --success: #22c55e;
-    }
-
-    body { 
-      background-color: var(--bg-body); 
-      font-family: 'Inter', sans-serif; 
-      color: var(--text-main); 
+    * {
       margin: 0;
-    }
-
-    .container-page {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      color: var(--primary);
-      text-decoration: none;
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: all 0.2s ease;
-      padding: 8px 12px;
-      border-radius: 8px;
-      background: #f1f5f9;
-    }
-
-    .back-link:hover { 
-      background: #e2e8f0;
-      color: var(--primary-hover); 
-    }
-
-    .form-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 0.75rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-
-    .form-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
-    .form-header h1 { margin: 0; font-size: 1.5rem; }
-    .form-header p { margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem; }
-
-    .form-body { padding: 2rem; }
-    .form-group { margin-bottom: 1.5rem; }
-    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-    
-    .form-group input, .form-group textarea, .form-group select {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: 0.5rem;
-      font-size: 1rem;
+      padding: 0;
       box-sizing: border-box;
     }
 
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    :root {
+      --color-primary: #d946ef;
+      --color-primary-dark: #a21caf;
+      --color-secondary: #fbbf24;
+      --color-bg: #fafafa;
+      --color-surface: #ffffff;
+      --color-text: #1f2937;
+      --color-text-muted: #6b7280;
+      --color-border: #e5e7eb;
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+      --radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-    .form-footer {
-      padding: 1.5rem;
-      background: #f8fafc;
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Mobile-First Layout */
+    .app-container {
+      min-height: 100vh;
       display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-      border-top: 1px solid var(--border);
+      flex-direction: column;
     }
 
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-    }
-
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
-    .btn-secondary { background: white; border: 1px solid var(--border); color: #475569; }
-
-    /* ESTILOS DO MODAL DE SUCESSO */
-    .modal-overlay {
+    /* Mobile Header */
+    .mobile-header {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(15, 23, 42, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(4px);
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 2.5rem;
-      border-radius: 1.25rem;
-      text-align: center;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      transform: translateY(20px);
-      transition: all 0.3s ease;
-      max-width: 320px;
-      width: 90%;
-    }
-
-    .modal-overlay.active .modal-content {
-      transform: translateY(0);
-    }
-
-    .modal-icon {
-      width: 64px;
+      right: 0;
       height: 64px;
-      background: #f0fdf4;
-      color: var(--success);
-      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(217, 70, 239, 0.2);
+    }
+
+    .mobile-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .back-button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 1.5rem;
+      border-radius: 8px;
+      transition: var(--transition);
     }
 
-    @media (max-width: 600px) {
-      .form-row { grid-template-columns: 1fr; }
-      .form-footer { flex-direction: column; }
+    .back-button:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-top: 64px;
+      padding: 1.5rem 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+    }
+
+    .page-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      margin-bottom: 0.25rem;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* Form Card */
+    .form-card {
+      background: var(--color-surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .form-body {
+      padding: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--color-text);
+      font-size: 0.9375rem;
+    }
+
+    .form-group label .required {
+      color: var(--color-danger);
+      margin-left: 0.25rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+      pointer-events: none;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: 'Outfit', sans-serif;
+      transition: var(--transition);
+      background: var(--color-surface);
+      color: var(--color-text);
+    }
+
+    .form-group input.with-icon {
+      padding-left: 3rem;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-group select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 3rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .helper-text {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      margin-top: 0.375rem;
+    }
+
+    /* Info Box */
+    .info-box {
+      background: linear-gradient(135deg, rgba(217, 70, 239, 0.05), rgba(162, 28, 175, 0.05));
+      border: 1px solid rgba(217, 70, 239, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .info-box-icon {
+      flex-shrink: 0;
+      color: var(--color-primary);
+    }
+
+    .info-box-content h4 {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: var(--color-text);
+    }
+
+    .info-box-content p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+
+    /* Form Footer */
+    .form-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg);
+      display: flex;
+      gap: 1rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.5rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      font-family: 'Outfit', sans-serif;
+      flex: 1;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      color: white;
+      box-shadow: 0 4px 12px rgba(217, 70, 239, 0.3);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba(217, 70, 239, 0.3);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--color-surface);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:active {
+      background: var(--color-bg);
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .loading-spinner.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(150%);
+      background: white;
+      color: var(--color-text);
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 280px;
+      max-width: 90%;
+      border: 1px solid var(--color-border);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.success {
+      border-left: 4px solid var(--color-success);
+    }
+
+    .toast.warning {
+      border-left: 4px solid var(--color-warning);
+    }
+
+    .toast.danger {
+      border-left: 4px solid var(--color-danger);
+    }
+
+    .toast-icon {
+      flex-shrink: 0;
+    }
+
+    .toast-icon.success {
+      color: var(--color-success);
+    }
+
+    .toast-icon.warning {
+      color: var(--color-warning);
+    }
+
+    .toast-icon.danger {
+      color: var(--color-danger);
+    }
+
+    /* Tablet Styles */
+    @media (min-width: 768px) {
+      .mobile-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .main-content {
+        padding: 2rem;
+        margin-top: 80px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .form-body {
+        padding: 2rem;
+      }
+    }
+
+    /* Desktop Styles */
+    @media (min-width: 1024px) {
+      .mobile-header {
+        height: auto;
+        position: relative;
+        padding: 2rem;
+        border-radius: var(--radius);
+        margin-bottom: 2rem;
+      }
+
+      .back-button {
+        position: absolute;
+        left: 2rem;
+      }
+
+      .mobile-header h1 {
+        text-align: center;
+      }
+
+      .main-content {
+        margin-top: 2rem;
+        padding: 2.5rem;
+      }
+
+      .btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        box-shadow: 0 6px 16px rgba(217, 70, 239, 0.4);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container-page">
-    <a href="../index.html" class="back-link">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-      </svg>
-      Voltar
-    </a>
+  <div class="app-container">
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+      <button class="back-button" onclick="window.location.href='../index.html'">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h1>Nova Manicure</h1>
+      <div style="width: 40px;"></div>
+    </header>
 
-    <div class="form-card">
-      <div class="form-header">
-        <h1>Nova Manicure</h1>
-        <p>Cadastre uma nova profissional no sistema</p>
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header" style="display: none;">
+        <h1 class="page-title">Nova Manicure</h1>
+        <p class="page-subtitle">Cadastre uma nova manicure no sistema</p>
       </div>
 
-      <form id="manicure-form">
-        <div class="form-body">
-          <div class="form-group">
-            <label>Nome Completo *</label>
-            <input type="text" id="name" placeholder="Digite o nome" required>
+      <div class="form-card">
+        <form id="manicure-form" class="form-body">
+          <div class="info-box">
+            <div class="info-box-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+            </div>
+            <div class="info-box-content">
+              <h4>Informações do Cadastro</h4>
+              <p>Preencha todos os campos obrigatórios para cadastrar uma nova manicure no sistema</p>
+            </div>
           </div>
 
           <div class="form-group">
-            <label>Telefone *</label>
-            <input type="tel" id="phone" placeholder="(00) 00000-0000" required>
+            <label for="name">
+              Nome Completo
+              <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                class="with-icon"
+                placeholder="Digite o nome completo" 
+                required
+                autocomplete="name"
+              >
+            </div>
           </div>
 
           <div class="form-group">
-            <label>Endereço Completo *</label>
-            <textarea id="address" rows="2" placeholder="Rua, número, bairro..." required></textarea>
+            <label for="phone">
+              Telefone
+              <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+              </span>
+              <input 
+                type="tel" 
+                id="phone" 
+                name="phone" 
+                class="with-icon"
+                placeholder="(00) 00000-0000" 
+                required
+                autocomplete="tel"
+              >
+            </div>
+            <p class="helper-text">Formato: (11) 98765-4321</p>
+          </div>
+
+          <div class="form-group">
+            <label for="address">
+              Endereço Completo
+              <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-icon" style="top: 1.25rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </span>
+              <textarea 
+                id="address" 
+                name="address" 
+                class="with-icon"
+                placeholder="Rua, número, bairro, cidade, estado" 
+                required
+              ></textarea>
+            </div>
+            <p class="helper-text">Exemplo: Rua das Flores, 123, Centro, São Paulo - SP</p>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Plano *</label>
-              <select id="plan-type" required>
-                <option value="">Selecione</option>
-                <option value="12">Plano 12</option>
-                <option value="15">Plano 15</option>
-                <option value="18">Plano 18</option>
+              <label for="plan-type">
+                Tipo de Plano
+                <span class="required">*</span>
+              </label>
+              <select id="plan-type" name="planType" required>
+                <option value="">Selecione um plano</option>
+                <option value="12">Plano 12 dias</option>
+                <option value="15">Plano 15 dias</option>
+                <option value="18">Plano 18 dias</option>
               </select>
+              <p class="helper-text">Intervalo entre trocas de kit</p>
             </div>
 
             <div class="form-group">
-              <label>Data de Início *</label>
-              <input type="date" id="start-date" required>
+              <label for="start-date">
+                Data de Início
+                <span class="required">*</span>
+              </label>
+              <input 
+                type="date" 
+                id="start-date" 
+                name="startDate" 
+                required
+              >
+              <p class="helper-text">Data do primeiro kit</p>
             </div>
           </div>
-        </div>
+        </form>
 
         <div class="form-footer">
-          <button type="button" class="btn btn-secondary" onclick="window.location.href='../index.html'">Cancelar</button>
-          <button type="submit" class="btn btn-primary" id="submit-btn">Cadastrar Manicure</button>
+          <button type="button" class="btn btn-secondary" onclick="window.location.href='../index.html'">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            <span>Cancelar</span>
+          </button>
+          <button type="submit" class="btn btn-primary" form="manicure-form" id="submit-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Cadastrar</span>
+          </button>
         </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="success-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-icon">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
       </div>
-      <h3>Sucesso!</h3>
-      <p>Manicure cadastrada com sucesso no sistema.</p>
-    </div>
+    </main>
   </div>
 
-  <script type="module">
-    // USANDO CAMINHOS ABSOLUTOS PARA EVITAR ERRO 404 NO GITHUB PAGES
-    import { authManager } from 'https://diovanycr.github.io/manicure-troca/js/auth.js';
-    import { dbManager } from 'https://diovanycr.github.io/manicure-troca/js/database.js';
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" id="loading-spinner">
+    <div class="spinner"></div>
+  </div>
 
-    // Garante que o usuário está logado
-    authManager.requireAuth();
+  <!-- Toast Container -->
+  <div class="toast" id="toast">
+    <div class="toast-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <div class="toast-message"></div>
+  </div>
 
-    // Define a data de hoje por padrão
-    document.getElementById('start-date').valueAsDate = new Date();
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
 
-    const form = document.getElementById('manicure-form');
-    const btn = document.getElementById('submit-btn');
-    const modal = document.getElementById('success-modal');
+  <!-- Config -->
+  <script src="../config/firebase-config.js"></script>
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  <!-- Scripts -->
+  <script src="../js/utils.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/database.js"></script>
+
+  <script>
+    // Require authentication
+    if (typeof authManager !== 'undefined') {
+      authManager.requireAuth();
+    }
+
+    // Utils functions
+    const Utils = {
+      showLoading: () => {
+        document.getElementById('loading-spinner').classList.add('show');
+      },
+      hideLoading: () => {
+        document.getElementById('loading-spinner').classList.remove('show');
+      },
+      showToast: (message, type = 'success') => {
+        const toast = document.getElementById('toast');
+        const toastMessage = toast.querySelector('.toast-message');
+        const toastIcon = toast.querySelector('.toast-icon');
+        
+        // Update message
+        toastMessage.textContent = message;
+        
+        // Update style
+        toast.className = 'toast ' + type;
+        toastIcon.className = 'toast-icon ' + type;
+        
+        // Update icon
+        let iconPath = '<polyline points="20 6 9 17 4 12"/>';
+        if (type === 'warning') {
+          iconPath = '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>';
+        } else if (type === 'danger') {
+          iconPath = '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
+        }
+        toastIcon.querySelector('svg').innerHTML = iconPath;
+        
+        // Show toast
+        toast.classList.add('show');
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      },
+      formatPhoneInput: (value) => {
+        // Remove tudo que não é número
+        const numbers = value.replace(/\D/g, '');
+        
+        // Aplica a máscara
+        if (numbers.length <= 10) {
+          return numbers.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3').replace(/-$/, '');
+        } else {
+          return numbers.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').replace(/-$/, '');
+        }
+      },
+      calculateNextExchangeDate: (startDate) => {
+        const planType = parseInt(document.getElementById('plan-type').value);
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + planType);
+        return date.getTime();
+      },
+      isDueSoon: (nextExchangeDate) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const exchangeDate = new Date(nextExchangeDate);
+        exchangeDate.setHours(0, 0, 0, 0);
+        const diff = Math.ceil((exchangeDate - today) / (1000 * 60 * 60 * 24));
+        return diff <= 2;
+      }
+    };
+
+    // Set today's date as default
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0];
+    document.getElementById('start-date').value = dateStr;
+
+    // Format phone input
+    document.getElementById('phone').addEventListener('input', (e) => {
+      const cursorPos = e.target.selectionStart;
+      const oldValue = e.target.value;
+      const newValue = Utils.formatPhoneInput(e.target.value);
+      e.target.value = newValue;
       
-      const data = {
-        name: document.getElementById('name').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        address: document.getElementById('address').value.trim(),
-        planType: document.getElementById('plan-type').value,
-        startDate: document.getElementById('start-date').value,
-        status: 'active',
-        createdAt: new Date().toISOString()
-      };
+      // Manter o cursor na posição correta
+      if (newValue.length > oldValue.length) {
+        e.target.setSelectionRange(cursorPos + 1, cursorPos + 1);
+      }
+    });
+
+    // Handle form submission
+    document.getElementById('manicure-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const planType = document.getElementById('plan-type').value;
+      const startDateValue = document.getElementById('start-date').value;
+
+      // Validate
+      if (!name || !phone || !address || !planType || !startDateValue) {
+        Utils.showToast('Preencha todos os campos obrigatórios', 'warning');
+        return;
+      }
+
+      // Validate phone format
+      const phoneNumbers = phone.replace(/\D/g, '');
+      if (phoneNumbers.length < 10) {
+        Utils.showToast('Telefone inválido. Use o formato (00) 00000-0000', 'warning');
+        return;
+      }
 
       try {
-        btn.disabled = true;
-        btn.textContent = 'Salvando...';
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        const originalText = submitBtn.querySelector('span').textContent;
+        submitBtn.querySelector('span').textContent = 'Cadastrando...';
+        Utils.showLoading();
 
-        // Verifica qual função existe no dbManager
-        const saveFunction = dbManager.createManicure || dbManager.addManicure;
+        // Create date at noon to avoid timezone issues
+        const [year, month, day] = startDateValue.split('-');
+        const startDate = new Date(year, month - 1, day, 12, 0, 0).getTime();
+
+        // Calculate next exchange date
+        const nextExchangeDate = Utils.calculateNextExchangeDate(startDate);
+
+        // Create manicure
+        const manicure = await dbManager.createManicure({
+          name,
+          phone,
+          address,
+          planType,
+          startDate,
+          nextExchangeDate,
+          status: 'active',
+          isDueSoon: Utils.isDueSoon(nextExchangeDate),
+          lastExchangeDate: null
+        });
+
+        Utils.hideLoading();
+        Utils.showToast('Manicure cadastrada com sucesso!', 'success');
         
-        if (!saveFunction) {
-          throw new Error("Sistema de banco de dados não inicializado.");
-        }
-
-        // Executa o salvamento
-        await saveFunction.call(dbManager, data);
-        
-        // Exibe o modal de sucesso
-        modal.classList.add('active');
-
-        // Aguarda 2 segundos exibindo o modal e depois redireciona
         setTimeout(() => {
-          window.location.href = '../index.html';
-        }, 2000);
+          window.location.href = `manicure-details.html?id=${manicure.id}`;
+        }, 1000);
+      } catch (error) {
+        console.error('Error creating manicure:', error);
+        Utils.hideLoading();
+        Utils.showToast('Erro ao cadastrar manicure. Tente novamente.', 'danger');
+        
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = false;
+        submitBtn.querySelector('span').textContent = 'Cadastrar';
+      }
+    });
 
-      } catch (err) {
-        console.error("Erro ao cadastrar:", err);
-        alert('Erro ao cadastrar: ' + err.message);
-        btn.disabled = false;
-        btn.textContent = 'Cadastrar Manicure';
+    // Show desktop header on larger screens
+    if (window.innerWidth >= 1024) {
+      document.querySelector('.page-header').style.display = 'block';
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) {
+        document.querySelector('.page-header').style.display = 'block';
+      } else {
+        document.querySelector('.page-header').style.display = 'none';
       }
     });
   </script>
