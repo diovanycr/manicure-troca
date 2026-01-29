@@ -718,7 +718,7 @@
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { dbManager } from '../js/database.js';
 
-    // Utilitários da Página
+    // UTILITÁRIOS DA PÁGINA
     const PageUtils = {
       showLoading: (show) => {
         const spinner = document.getElementById('loading-spinner');
@@ -787,52 +787,63 @@
       }
     };
 
-    // Estado da Aplicação
+    // ESTADO DA APLICAÇÃO
     let currentManicure = null;
     const urlParams = new URLSearchParams(window.location.search);
-    const manicureId = urlParams.get('id');
+    // ✅ CORREÇÃO: Decodifica o ID da URL
+    const manicureId = decodeURIComponent(urlParams.get('id') || '');
 
-    // Observador de Autenticação
+    console.log('==============================================');
+    console.log('🔍 DEBUG - RECUPERAÇÃO DO ID');
+    console.log('==============================================');
+    console.log('URL completa:', window.location.href);
+    console.log('Parâmetro bruto:', urlParams.get('id'));
+    console.log('ID decodificado:', manicureId);
+    console.log('==============================================');
+
+    // OBSERVADOR DE AUTENTICAÇÃO
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        console.log('Usuário autenticado:', user.uid);
-        console.log('Manicure ID da URL:', manicureId);
+        console.log('✅ Usuário autenticado:', user.uid);
+        console.log('🔍 Buscando manicure com ID:', manicureId);
         
         if (!manicureId) {
-          console.error('ID da manicure não fornecido na URL');
+          console.error('❌ ID da manicure não fornecido na URL');
           PageUtils.showToast('ID da manicure não fornecido', true);
           setTimeout(() => {
             window.location.href = 'manicures.html';
           }, 1500);
           return;
         }
+        
         await loadData();
       } else {
-        console.log('Usuário não autenticado, redirecionando para login');
+        console.log('❌ Usuário não autenticado, redirecionando');
         window.location.href = '../login.html';
       }
     });
 
-    // Carregamento de Dados
+    // CARREGAMENTO DE DADOS
     async function loadData() {
       PageUtils.showLoading(true);
       
       try {
-        console.log('=== DEBUG INÍCIO ===');
-        console.log('1. Manicure ID da URL:', manicureId);
-        console.log('2. Tipo do ID:', typeof manicureId);
-        console.log('3. dbManager existe?', !!dbManager);
-        console.log('4. dbManager.getManicureById existe?', !!dbManager?.getManicureById);
+        console.log('==============================================');
+        console.log('📡 BUSCANDO MANICURE');
+        console.log('==============================================');
+        console.log('ID:', manicureId);
+        console.log('Método: dbManager.getManicureById()');
         
+        // ✅ USA O MÉTODO CORRETO DO dbManager
         currentManicure = await dbManager.getManicureById(manicureId);
         
-        console.log('5. Resposta do banco:', currentManicure);
-        console.log('6. currentManicure é null?', currentManicure === null);
-        console.log('7. currentManicure é undefined?', currentManicure === undefined);
-        console.log('=== DEBUG FIM ===');
+        console.log('Resposta:', currentManicure);
+        console.log('currentManicure é null?', currentManicure === null);
+        console.log('currentManicure é undefined?', currentManicure === undefined);
+        console.log('==============================================');
         
         if (!currentManicure) {
-          console.error('❌ Manicure não encontrada no banco de dados');
+          console.error('❌ MANICURE NÃO ENCONTRADA');
           console.error('ID buscado:', manicureId);
           PageUtils.showToast("Manicure não encontrada!", true);
           setTimeout(() => {
@@ -841,124 +852,85 @@
           return;
         }
         
-        console.log('✅ Manicure encontrada! Renderizando...');
+        console.log('✅ MANICURE CARREGADA:', currentManicure.name);
         renderHeader();
         renderInfo();
         await renderHistory();
       } catch (error) { 
-        console.error("❌ Erro ao carregar dados:", error);
-        console.error("Stack trace:", error.stack);
-        console.error("Mensagem:", error.message);
+        console.error("==============================================");
+        console.error("❌ ERRO GERAL");
+        console.error("==============================================");
+        console.error("Erro:", error);
+        console.error("Stack:", error.stack);
+        console.error("==============================================");
         PageUtils.showToast("Erro ao carregar dados da manicure", true);
       } finally {
         PageUtils.showLoading(false);
       }
     }
 
-    // Renderização do Cabeçalho
+    // RENDERIZAÇÃO DO CABEÇALHO
     function renderHeader() {
-      // Nome
-      const nameElement = document.getElementById('manicure-name');
-      if (nameElement) {
-        nameElement.textContent = currentManicure.name || 'Sem nome';
-      }
+      document.getElementById('manicure-name').textContent = currentManicure.name || 'Sem nome';
+      document.getElementById('manicure-phone').textContent = PageUtils.formatPhone(currentManicure.phone);
+      document.getElementById('manicure-address').textContent = currentManicure.address || 'Endereço não informado';
       
-      // Telefone
-      const phoneElement = document.getElementById('manicure-phone');
-      if (phoneElement) {
-        phoneElement.textContent = PageUtils.formatPhone(currentManicure.phone);
-      }
+      const planType = currentManicure.planType || '15';
+      document.getElementById('plan-badge').textContent = `Plano ${planType} dias`;
       
-      // Endereço
-      const addressElement = document.getElementById('manicure-address');
-      if (addressElement) {
-        addressElement.textContent = currentManicure.address || 'Endereço não informado';
-      }
-      
-      // Badge do Plano
-      const planBadge = document.getElementById('plan-badge');
-      if (planBadge) {
-        const planType = currentManicure.planType || '15';
-        planBadge.textContent = `Plano ${planType} dias`;
-      }
-      
-      // Badge de Status
+      const isActive = currentManicure.status === 'active';
       const statusBadge = document.getElementById('status-badge');
-      if (statusBadge) {
-        const isActive = currentManicure.status === 'active';
-        statusBadge.textContent = isActive ? 'Ativa' : 'Inativa';
-        statusBadge.className = `badge ${isActive ? 'badge-success' : 'badge-secondary'}`;
-      }
+      statusBadge.textContent = isActive ? 'Ativa' : 'Inativa';
+      statusBadge.className = `badge ${isActive ? 'badge-success' : 'badge-secondary'}`;
       
-      // Cálculo de Dias e Badge de Alerta
       if (currentManicure.nextExchangeDate) {
         const daysUntil = PageUtils.calculateDaysUntil(currentManicure.nextExchangeDate);
-        
         const daysElement = document.getElementById('days-until');
         const nextExchangeElement = document.getElementById('next-exchange');
         const dueSoonBadge = document.getElementById('due-soon-badge');
         
-        if (daysElement && nextExchangeElement) {
-          daysElement.textContent = daysUntil !== null ? daysUntil : '-';
-          nextExchangeElement.textContent = PageUtils.formatDate(currentManicure.nextExchangeDate);
-          
-          // Cores baseadas nos dias restantes
-          if (daysUntil !== null) {
-            if (daysUntil < 0) {
-              daysElement.style.color = 'var(--color-danger)';
-              if (dueSoonBadge) {
-                dueSoonBadge.textContent = 'Atrasado';
-                dueSoonBadge.className = 'badge badge-danger';
-                dueSoonBadge.style.display = 'inline-block';
-              }
-            } else if (daysUntil <= 2) {
-              daysElement.style.color = 'var(--color-warning)';
-              if (dueSoonBadge) {
-                dueSoonBadge.textContent = 'Troca Próxima';
-                dueSoonBadge.className = 'badge badge-warning';
-                dueSoonBadge.style.display = 'inline-block';
-              }
-            } else {
-              daysElement.style.color = 'var(--color-primary)';
-              if (dueSoonBadge) {
-                dueSoonBadge.style.display = 'none';
-              }
-            }
+        daysElement.textContent = daysUntil !== null ? daysUntil : '-';
+        nextExchangeElement.textContent = PageUtils.formatDate(currentManicure.nextExchangeDate);
+        
+        if (daysUntil !== null) {
+          if (daysUntil < 0) {
+            daysElement.style.color = 'var(--color-danger)';
+            dueSoonBadge.textContent = 'Atrasado';
+            dueSoonBadge.className = 'badge badge-danger';
+            dueSoonBadge.style.display = 'inline-block';
+          } else if (daysUntil <= 2) {
+            daysElement.style.color = 'var(--color-warning)';
+            dueSoonBadge.textContent = 'Troca Próxima';
+            dueSoonBadge.className = 'badge badge-warning';
+            dueSoonBadge.style.display = 'inline-block';
+          } else {
+            daysElement.style.color = 'var(--color-primary)';
+            dueSoonBadge.style.display = 'none';
           }
         }
       }
     }
 
-    // Renderização das Informações
+    // RENDERIZAÇÃO DAS INFORMAÇÕES
     function renderInfo() {
-      const infoName = document.getElementById('info-name');
-      const infoPhone = document.getElementById('info-phone');
-      const infoPlan = document.getElementById('info-plan');
-      const infoStartDate = document.getElementById('info-start-date');
+      document.getElementById('info-name').textContent = currentManicure.name || '-';
+      document.getElementById('info-phone').textContent = PageUtils.formatPhone(currentManicure.phone);
+      document.getElementById('info-plan').textContent = `${currentManicure.planType || '15'} dias`;
+      document.getElementById('info-start-date').textContent = PageUtils.formatDate(currentManicure.startDate);
       
-      if (infoName) infoName.textContent = currentManicure.name || '-';
-      if (infoPhone) infoPhone.textContent = PageUtils.formatPhone(currentManicure.phone);
-      if (infoPlan) infoPlan.textContent = `${currentManicure.planType || '15'} dias`;
-      if (infoStartDate) infoStartDate.textContent = PageUtils.formatDate(currentManicure.startDate);
-      
-      // Toggle de Status
       const toggleSwitch = document.getElementById('toggle-switch');
       const statusText = document.getElementById('status-text');
-      
-      if (toggleSwitch && statusText) {
-        const isActive = currentManicure.status === 'active';
-        toggleSwitch.classList.toggle('active', isActive);
-        statusText.textContent = isActive ? 'Ativa' : 'Inativa';
-      }
+      const isActive = currentManicure.status === 'active';
+      toggleSwitch.classList.toggle('active', isActive);
+      statusText.textContent = isActive ? 'Ativa' : 'Inativa';
     }
 
-    // Renderização do Histórico
+    // RENDERIZAÇÃO DO HISTÓRICO
     async function renderHistory() {
       const container = document.getElementById('exchange-history');
       
-      if (!container) return;
-      
       try {
+        // ✅ USA O MÉTODO CORRETO DO dbManager
         const history = await dbManager.getKitExchanges(manicureId);
         
         if (!history || history.length === 0) {
@@ -974,7 +946,6 @@
           return;
         }
         
-        // Ordena por data (mais recente primeiro)
         const sortedHistory = history.sort((a, b) => b.date - a.date);
         
         container.innerHTML = sortedHistory.map(exchange => `
@@ -1006,7 +977,7 @@
       }
     }
 
-    // Funções de Modal - Troca de Kit
+    // FUNÇÕES DE MODAL - TROCA DE KIT
     window.openExchangeModal = () => {
       const modal = document.getElementById('exchange-modal');
       if (modal) {
@@ -1030,25 +1001,14 @@
       PageUtils.showLoading(true);
       
       try {
-        // 1. Registra a troca no histórico
+        // ✅ USA O MÉTODO CORRETO DO dbManager
         await dbManager.addExchange(manicureId, { 
           notes, 
           date: Date.now() 
         });
 
-        // 2. Calcula nova data (Hoje + Dias do Plano)
-        const planDays = parseInt(currentManicure.planType) || 15;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const newNextDate = today.getTime() + (planDays * 24 * 60 * 60 * 1000);
-
-        // 3. Atualiza a manicure com a nova data de troca
-        await dbManager.updateManicure(manicureId, { 
-          nextExchangeDate: newNextDate 
-        });
-
         closeExchangeModal();
-        await loadData(); // Recarrega todos os dados
+        await loadData();
         PageUtils.showToast("Troca registrada com sucesso!");
       } catch (error) {
         console.error("Erro ao registrar troca:", error);
@@ -1058,12 +1018,11 @@
       }
     };
 
-    // Funções de Modal - Comprovante
+    // FUNÇÕES DE MODAL - COMPROVANTE
     window.openReceiptModal = () => {
       const modal = document.getElementById('receipt-modal');
       if (modal) {
         modal.classList.add('show');
-        // Reset do input
         const fileInput = document.getElementById('file-input');
         if (fileInput) fileInput.value = '';
         resetFilePreview();
@@ -1088,8 +1047,7 @@
       const file = fileInput.files[0];
       
       if (file) {
-        // Validação de tamanho (5MB)
-        const maxSize = 5 * 1024 * 1024; // 5MB em bytes
+        const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
           PageUtils.showToast("Arquivo muito grande. Máximo 5MB.", true);
           fileInput.value = '';
@@ -1097,7 +1055,6 @@
           return;
         }
         
-        // Validação de tipo
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
         if (!validTypes.includes(file.type)) {
           PageUtils.showToast("Formato inválido. Use JPG, PNG ou PDF.", true);
@@ -1150,6 +1107,7 @@
       PageUtils.showLoading(true);
       
       try {
+        // ✅ USA O MÉTODO DO dbManager
         await dbManager.uploadReceipt(manicureId, file);
         closeReceiptModal();
         PageUtils.showToast("Comprovante enviado com sucesso!");
@@ -1161,7 +1119,7 @@
       }
     };
 
-    // Toggle de Status
+    // TOGGLE DE STATUS
     window.toggleStatus = async () => {
       if (!currentManicure) return;
       
@@ -1181,19 +1139,18 @@
       }
     };
 
-    // Navegação de Volta
+    // NAVEGAÇÃO
     window.handleBackNavigation = () => {
       window.location.href = 'manicures.html';
     };
 
-    // Fechar modal ao clicar fora
+    // EVENTOS DE MODAL
     document.addEventListener('click', (e) => {
       if (e.target.classList.contains('modal')) {
         e.target.classList.remove('show');
       }
     });
 
-    // Fechar modal com tecla ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         const modals = document.querySelectorAll('.modal.show');
