@@ -5,155 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manicures - Gestão de Manicures</title>
   <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:,">
   <style>
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 250px;
-      height: 100vh;
-      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-      color: white;
-      padding: 2rem 1rem;
-      overflow-y: auto;
-      z-index: 100;
+    /* PADRONIZAÇÃO DE UX E MOBILE (IDÊNTICO À INDEX) */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      
+      .sidebar { 
+        width: 100%; 
+        height: auto; 
+        position: relative; 
+        padding: 1rem;
+        min-height: auto;
+      }
+
+      .sidebar-header {
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-menu {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .nav-item { margin-bottom: 0; flex-shrink: 0; }
+      
+      .nav-link {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+      }
+
+      /* Ajuste do rodapé no mobile para não sobrepor o conteúdo */
+      .sidebar-footer {
+        position: static; 
+        margin-top: 1rem;
+        padding-top: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      #user-info { 
+        margin-bottom: 0 !important; 
+        font-size: 0.75rem; 
+        color: white;
+        max-width: 60%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      
+      #logout-btn { 
+        width: auto !important; 
+        margin-top: 0 !important; 
+        padding: 6px 12px !important;
+        font-size: 0.75rem;
+      }
+
+      .main-content { 
+        margin-left: 0; 
+        padding: 1.25rem; 
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .header-actions { width: 100%; }
+      .header-actions .btn-primary { width: 100%; justify-content: center; }
+      
+      .filters-grid { grid-template-columns: 1fr; } /* Filtros em coluna no mobile */
     }
 
-    .sidebar-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar-logo {
-      width: 40px;
-      height: 40px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .sidebar-title h2 { font-size: 1.1rem; margin: 0; }
-    .sidebar-title p { font-size: 0.75rem; opacity: 0.8; margin: 0; }
-
-    .nav-menu { list-style: none; padding: 0; margin-bottom: 2rem; }
-    .nav-item { margin-bottom: 0.5rem; }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
-      border-radius: 0.5rem;
-      transition: 0.2s;
-    }
-
-    .nav-link:hover, .nav-link.active {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-    }
-
-    .sidebar-footer {
-      position: absolute;
-      bottom: 1rem;
-      left: 1rem;
-      right: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .main-content {
-      margin-left: 250px;
-      padding: 2rem;
-      min-height: 100vh;
-      background: #f8fafc;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-
-    /* Estilo do Botão Corrigido */
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #7c3aed;
-      color: white;
-      border: none;
-      padding: 0.75rem 1.25rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      font-weight: 600;
-      text-decoration: none;
-      transition: 0.2s;
-    }
-
-    .btn-primary:hover { background: #6d28d9; }
-
-    .filters-card, .manicures-card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 0.75rem;
-      border: 1px solid #e2e8f0;
-      margin-bottom: 2rem;
-    }
-
-    .filters-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-
-    .filter-group { display: flex; flex-direction: column; }
-    .filter-group label { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; }
-    .filter-group input, .filter-group select {
-      padding: 0.75rem;
-      border: 1px solid #e2e8f0;
-      border-radius: 0.5rem;
-    }
-
+    /* Estilos extras para a lista */
     .manicure-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1.25rem;
       border: 1px solid #e2e8f0;
-      border-radius: 0.5rem;
-      margin-bottom: 1rem;
+      border-radius: 0.75rem;
+      margin-bottom: 0.75rem;
+      background: white;
       cursor: pointer;
-      transition: 0.2s;
+      transition: all 0.2s;
     }
-
-    .manicure-item:hover { border-color: #7c3aed; background: #fdfaff; }
-
-    .badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 500;
+    .manicure-item:hover {
+      border-color: #7c3aed;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-    .badge-success { background: #dcfce7; color: #166534; }
-    .badge-secondary { background: #f1f5f9; color: #475569; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-
-    @media (max-width: 768px) {
-      .sidebar { width: 100%; height: auto; position: relative; }
-      .main-content { margin-left: 0; }
-    }
+    .manicure-info h3 { margin: 0; font-size: 1.05rem; color: #1e293b; }
+    .manicure-info p { margin: 4px 0 0; color: #64748b; font-size: 0.875rem; }
   </style>
 </head>
 <body>
+
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">
@@ -189,8 +146,8 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-profile" id="user-info"></div>
-      <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" id="logout-btn">Sair</button>
+      <div class="user-profile" id="user-info">Carregando...</div>
+      <button class="btn btn-secondary" id="logout-btn">Sair</button>
     </div>
   </aside>
 
@@ -198,11 +155,11 @@
     <div class="header">
       <div>
         <h1>Manicures</h1>
-        <p style="color: #64748b;">Gerencie todas as manicures cadastradas</p>
+        <p class="text-muted">Lista e gestão de colaboradoras</p>
       </div>
       <div class="header-actions">
         <button class="btn btn-primary" onclick="window.location.href='new-manicure.html'">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
@@ -220,7 +177,7 @@
         <div class="filter-group">
           <label>Status</label>
           <select id="status-filter">
-            <option value="">Todos</option>
+            <option value="">Todos os status</option>
             <option value="active">Ativas</option>
             <option value="inactive">Inativas</option>
           </select>
@@ -228,7 +185,7 @@
         <div class="filter-group">
           <label>Plano</label>
           <select id="plan-filter">
-            <option value="">Todos</option>
+            <option value="">Todos os planos</option>
             <option value="12">Plano 12</option>
             <option value="15">Plano 15</option>
             <option value="18">Plano 18</option>
@@ -237,36 +194,34 @@
       </div>
     </div>
 
-    <div class="manicures-card">
-      <div class="card-header">
-        <h2 style="font-size: 1.1rem; margin-bottom: 1rem;">Resultados (<span id="results-count">0</span>)</h2>
+    <div class="content-section">
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.1rem; margin: 0;">Colaboradoras (<span id="results-count">0</span>)</h2>
       </div>
-      <div class="card-body" id="manicures-list">
-        <div class="empty-state" style="text-align: center; padding: 2rem;">
-          <p>Carregando manicures...</p>
-        </div>
+      <div id="manicures-list">
+        <p style="text-align: center; color: #64748b; padding: 3rem;">A carregar lista...</p>
       </div>
     </div>
   </main>
 
   <script src="../js/utils.js"></script>
-  
   <script type="module">
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
 
     authManager.requireAuth();
-
-    let allManicures = [];
     document.getElementById('logout-btn').onclick = () => authManager.signOut();
 
-    async function loadManicures() {
-      const list = document.getElementById('manicures-list');
+    let allManicures = [];
+
+    async function loadData() {
       try {
         allManicures = await dbManager.getAllManicures();
+        const user = authManager.currentUser;
+        if(user) document.getElementById('user-info').textContent = user.email;
         render();
       } catch (error) {
-        list.innerHTML = `<p style="color:red">Erro: ${error.message}</p>`;
+        document.getElementById('manicures-list').innerHTML = `<p style="color:red; text-align:center;">Erro ao ligar à base de dados.</p>`;
       }
     }
 
@@ -278,27 +233,28 @@
       const filtered = allManicures.filter(m => {
         const matchesSearch = m.name.toLowerCase().includes(query) || m.phone.includes(query);
         const matchesStatus = !status || m.status === status;
-        const matchesPlan = !plan || m.planType === plan;
+        const matchesPlan = !plan || String(m.planType) === plan;
         return matchesSearch && matchesStatus && matchesPlan;
       });
 
-      const list = document.getElementById('manicures-list');
       document.getElementById('results-count').textContent = filtered.length;
+      const listContainer = document.getElementById('manicures-list');
 
       if (filtered.length === 0) {
-        list.innerHTML = '<div class="empty-state" style="text-align: center; padding: 2rem;"><p>Nenhuma manicure encontrada.</p></div>';
+        listContainer.innerHTML = `
+          <div style="text-align: center; padding: 3rem; color: #64748b;">
+            <p>Nenhuma manicure encontrada com os filtros selecionados.</p>
+          </div>`;
         return;
       }
 
-      list.innerHTML = filtered.map(m => `
+      listContainer.innerHTML = filtered.map(m => `
         <div class="manicure-item" onclick="window.location.href='manicure-details.html?id=${m.id}'">
           <div class="manicure-info">
-            <h3 style="margin: 0; font-size: 1.1rem;">${m.name}</h3>
-            <p style="margin: 4px 0; color: #64748b;">${m.phone} • Plano ${m.planType}</p>
-            <p style="font-size: 0.75rem; color: #94a3b8;">Próxima troca: ${window.Utils ? Utils.formatDate(m.nextExchangeDate) : m.nextExchangeDate}</p>
+            <h3>${m.name}</h3>
+            <p>${m.phone} • Plano ${m.planType}</p>
           </div>
-          <div class="manicure-meta" style="display: flex; gap: 8px; align-items: center;">
-            ${m.isDueSoon ? '<span class="badge badge-warning">Troca próxima</span>' : ''}
+          <div class="manicure-meta">
             <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}">
               ${m.status === 'active' ? 'Ativa' : 'Inativa'}
             </span>
@@ -307,11 +263,13 @@
       `).join('');
     }
 
-    document.getElementById('search-input').addEventListener('keyup', render);
-    document.getElementById('status-filter').addEventListener('change', render);
-    document.getElementById('plan-filter').addEventListener('change', render);
+    // Eventos de Filtro
+    document.getElementById('search-input').onkeyup = render;
+    document.getElementById('status-filter').onchange = render;
+    document.getElementById('plan-filter').onchange = render;
 
-    loadManicures();
+    // Inicialização
+    loadData();
   </script>
 </body>
 </html>
