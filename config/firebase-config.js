@@ -1,9 +1,6 @@
 // Firebase Configuration (Compat Version)
 // Configuração do Firebase - Sistema de Gestão de Manicures
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
 const firebaseConfig = {
   apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
   authDomain: "parceiro-be3e9.firebaseapp.com",
