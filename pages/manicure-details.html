@@ -818,13 +818,22 @@
       PageUtils.showLoading(true);
       
       try {
-        console.log('Tentando carregar manicure com ID:', manicureId);
+        console.log('=== DEBUG INÍCIO ===');
+        console.log('1. Manicure ID da URL:', manicureId);
+        console.log('2. Tipo do ID:', typeof manicureId);
+        console.log('3. dbManager existe?', !!dbManager);
+        console.log('4. dbManager.getManicureById existe?', !!dbManager?.getManicureById);
+        
         currentManicure = await dbManager.getManicureById(manicureId);
         
-        console.log('Manicure carregada:', currentManicure);
+        console.log('5. Resposta do banco:', currentManicure);
+        console.log('6. currentManicure é null?', currentManicure === null);
+        console.log('7. currentManicure é undefined?', currentManicure === undefined);
+        console.log('=== DEBUG FIM ===');
         
         if (!currentManicure) {
-          console.error('Manicure não encontrada no banco de dados');
+          console.error('❌ Manicure não encontrada no banco de dados');
+          console.error('ID buscado:', manicureId);
           PageUtils.showToast("Manicure não encontrada!", true);
           setTimeout(() => {
             window.location.href = 'manicures.html';
@@ -832,12 +841,14 @@
           return;
         }
         
+        console.log('✅ Manicure encontrada! Renderizando...');
         renderHeader();
         renderInfo();
         await renderHistory();
       } catch (error) { 
-        console.error("Erro ao carregar dados:", error);
+        console.error("❌ Erro ao carregar dados:", error);
         console.error("Stack trace:", error.stack);
+        console.error("Mensagem:", error.message);
         PageUtils.showToast("Erro ao carregar dados da manicure", true);
       } finally {
         PageUtils.showLoading(false);
