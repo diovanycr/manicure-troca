@@ -335,8 +335,9 @@
 
       container.innerHTML = list.map(m => {
         const status = getStatus(m.nextExchangeDate);
+        console.log('Manicure ID:', m.id); // Debug para ver os IDs
         return `
-          <a href="manicure-details.html?id=${m.id}" class="list-item">
+          <a href="manicure-details-fixed.html?id=${m.id}" class="list-item">
             <div class="item-info">
               <h3>${m.name}</h3>
               <p>${m.phone || 'Sem telefone'} • Plano ${m.planType || '-'}</p>
