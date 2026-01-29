@@ -1,5 +1,7 @@
-// Database Manager (Compat Version)
+// Database Manager (Module Version)
+import { auth, database, storage } from '../config/firebase-config.js';
 
+// Definimos o objeto
 const dbManager = {
   // Get reference to user's data
   getUserRef: function(userId) {
@@ -162,7 +164,6 @@ const dbManager = {
         });
       });
 
-      // Reverse to show newest first
       return exchanges.reverse();
     } catch (error) {
       console.error('Error getting exchanges:', error);
@@ -176,16 +177,13 @@ const dbManager = {
       const userId = auth.currentUser ? auth.currentUser.uid : null;
       if (!userId) throw new Error('User not authenticated');
 
-      // Generate unique filename
       const timestamp = Date.now();
       const fileName = `receipt_${manicureId}_${timestamp}_${file.name}`;
       const storageRef = storage.ref(`users/${userId}/receipts/${fileName}`);
 
-      // Upload file
       const uploadTask = await storageRef.put(file);
       const downloadURL = await uploadTask.ref.getDownloadURL();
 
-      // Save receipt info to database
       const receiptRef = database.ref(`users/${userId}/manicures/${manicureId}/receipts`).push();
       const receipt = {
         id: receiptRef.key,
@@ -200,32 +198,6 @@ const dbManager = {
       return receipt;
     } catch (error) {
       console.error('Error uploading receipt:', error);
-      throw error;
-    }
-  },
-
-  // Get payment receipts for a manicure
-  getPaymentReceipts: async function(manicureId) {
-    try {
-      const userId = auth.currentUser ? auth.currentUser.uid : null;
-      if (!userId) return [];
-
-      const snapshot = await database.ref(`users/${userId}/manicures/${manicureId}/receipts`)
-        .orderByChild('uploadedAt')
-        .once('value');
-      
-      const receipts = [];
-      snapshot.forEach((childSnapshot) => {
-        receipts.push({
-          id: childSnapshot.key,
-          ...childSnapshot.val()
-        });
-      });
-
-      // Reverse to show newest first
-      return receipts.reverse();
-    } catch (error) {
-      console.error('Error getting receipts:', error);
       throw error;
     }
   },
@@ -245,11 +217,8 @@ const dbManager = {
       });
       callback(manicures);
     });
-  },
-
-  // Stop listening to manicures changes
-  stopListeningToManicures: function() {
-    const ref = this.getManicuresRef();
-    if (ref) ref.off();
   }
 };
+
+// ESTA É A LINHA QUE RESOLVE O ERRO:
+export { dbManager };
