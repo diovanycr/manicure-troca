@@ -335,9 +335,11 @@
 
       container.innerHTML = list.map(m => {
         const status = getStatus(m.nextExchangeDate);
-        console.log('Manicure ID:', m.id); // Debug para ver os IDs
+        // CORREÇÃO: Codifica o ID para URL
+        const encodedId = encodeURIComponent(m.id);
+        console.log('? Manicure:', m.name, '| ID Original:', m.id, '| ID Codificado:', encodedId);
         return `
-          <a href="manicure-details.html?id=${m.id}" class="list-item">
+          <a href="manicure-details.html?id=${encodedId}" class="list-item">
             <div class="item-info">
               <h3>${m.name}</h3>
               <p>${m.phone || 'Sem telefone'} • Plano ${m.planType || '-'}</p>
