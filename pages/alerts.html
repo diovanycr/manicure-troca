@@ -6,6 +6,62 @@
   <title>Alertas - Gestão de Manicures</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="icon" href="data:,">
+  <style>
+    /* Ajustes específicos para garantir que o mobile fique perfeito */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      
+      .sidebar { 
+        width: 100%; 
+        height: auto; 
+        position: relative; 
+        padding: 1rem;
+      }
+
+      .sidebar-header {
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .nav-menu {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+      }
+
+      .nav-item { margin-bottom: 0; }
+      
+      .nav-link {
+        padding: 8px 12px;
+        white-space: nowrap;
+        font-size: 0.85rem;
+      }
+
+      .sidebar-footer {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .user-profile { margin-bottom: 0 !important; font-size: 0.75rem; }
+      
+      .btn-logout { 
+        width: auto !important; 
+        margin-top: 0 !important; 
+        padding: 6px 12px !important;
+        font-size: 0.75rem;
+      }
+
+      .main-content { 
+        margin-left: 0; 
+        padding: 1.5rem; 
+      }
+    }
+  </style>
 </head>
 <body>
   <aside class="sidebar">
@@ -43,54 +99,42 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-profile" id="user-info"></div>
-      <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" id="logout-btn">
-        Sair
-      </button>
+      <div class="user-profile" id="user-info">Carregando...</div>
+      <button class="btn btn-secondary btn-logout" id="logout-btn">Sair</button>
     </div>
   </aside>
 
   <main class="main-content">
     <div class="header">
-      <div>
-        <h1>Alertas</h1>
-        <p class="text-muted">Ações urgentes e trocas programadas</p>
-      </div>
+      <h1>Alertas</h1>
+      <p class="text-muted">Acompanhamento de trocas</p>
     </div>
 
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-card-header">
           <span class="stat-card-title">Trocas Atrasadas</span>
-          <span class="stat-card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          </span>
+          <span class="stat-card-icon">🔴</span>
         </div>
         <div class="stat-card-value" id="overdue-count">0</div>
-        <div class="stat-card-desc">Exigem atenção imediata</div>
       </div>
 
       <div class="stat-card">
         <div class="stat-card-header">
           <span class="stat-card-title">Próximos (2 dias)</span>
-          <span class="stat-card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </span>
+          <span class="stat-card-icon">🟡</span>
         </div>
         <div class="stat-card-value" id="upcoming-count">0</div>
-        <div class="stat-card-desc">Trocas para os próximos dias</div>
       </div>
     </div>
 
     <div class="content-section">
       <div class="section-header">
-        <h2 style="display: flex; align-items: center; gap: 8px;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          Manicures sob Alerta
-        </h2>
+        <h2>Lista de Atenção</h2>
       </div>
       <div class="section-body" id="alerts-list">
-        </div>
+        <p style="text-align: center; color: #94a3b8; padding: 2rem;">Buscando informações...</p>
+      </div>
     </div>
   </main>
 
@@ -116,7 +160,6 @@
         let upcoming = 0;
         let htmlContent = '';
 
-        // Ordenar por data
         const sorted = manicures
           .filter(m => m.status === 'active' && m.nextExchangeDate)
           .sort((a, b) => new Date(a.nextExchangeDate) - new Date(b.nextExchangeDate));
@@ -126,7 +169,6 @@
           dataTroca.setHours(0,0,0,0);
           const diffDays = Math.ceil((dataTroca - hoje) / (1000 * 60 * 60 * 24));
 
-          // Filtro de 2 dias (igual ao seu dashboard)
           if (diffDays <= 2) {
             const isAtrasado = diffDays < 0;
             if (isAtrasado) overdue++; else upcoming++;
@@ -135,11 +177,11 @@
               <div class="manicure-item" onclick="window.location.href='manicure-details.html?id=${m.id}'">
                 <div class="manicure-info">
                   <h3>${m.name}</h3>
-                  <p>${m.phone} • Plano ${m.planType || 'Padrão'}</p>
+                  <p>📅 ${new Date(m.nextExchangeDate).toLocaleDateString()}</p>
                 </div>
                 <div class="manicure-meta">
                   <span class="badge ${isAtrasado ? 'badge-danger' : 'badge-warning'}">
-                    ${isAtrasado ? 'Atrasado ' + Math.abs(diffDays) + 'd' : 'Troca em ' + diffDays + 'd'}
+                    ${isAtrasado ? 'Atrasado' : 'Em ' + diffDays + 'd'}
                   </span>
                 </div>
               </div>
@@ -149,18 +191,8 @@
 
         document.getElementById('overdue-count').textContent = overdue;
         document.getElementById('upcoming-count').textContent = upcoming;
-        
-        container.innerHTML = htmlContent || `
-          <div class="empty-state">
-            <div class="empty-state-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </div>
-            <p>Nenhum alerta pendente no momento</p>
-          </div>
-        `;
-      } catch (e) {
-        console.error(e);
-      }
+        container.innerHTML = htmlContent || '<p style="text-align:center; padding:2rem;">Tudo em dia!</p>';
+      } catch (e) { console.error(e); }
     }
 
     loadAlerts();
