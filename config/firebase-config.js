@@ -1,7 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+// Firebase Configuration (Compat Version)
+// Configuração do Firebase - Sistema de Gestão de Manicures
 
 const firebaseConfig = {
   apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
@@ -13,16 +11,18 @@ const firebaseConfig = {
   appId: "1:619982778395:web:25c141958b7c06da02c8be"
 };
 
-// Inicializa o Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
 
-// Inicializa e exporta os serviços
-export const db = getDatabase(app);
-export const auth = getAuth(app);
-export const storage = getStorage(app);
-export { app };
+// Create references (available globally)
+const auth = firebase.auth();
+const database = firebase.database();
+const storage = firebase.storage();
 
-// Mantém compatibilidade global se necessário
-window.firebaseServices = { db, auth, storage, app };
-
-export default firebaseConfig;
+// Also make available via window for compatibility
+window.firebaseServices = { 
+  db: database, 
+  auth: auth, 
+  storage: storage, 
+  app: app 
+};
