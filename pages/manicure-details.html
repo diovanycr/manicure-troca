@@ -5,758 +5,242 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detalhes da Manicure - Gestão de Manicures</title>
   <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:,">
   <style>
-    .container-page {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
+    .container-page { max-width: 900px; margin: 0 auto; padding: 2rem; }
+    .header-card { background: white; padding: 2rem; border-radius: 1rem; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+    .card { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; }
+    .card-header { padding: 1.5rem; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc; }
+    .card-body { padding: 1.5rem; }
+    
+    /* Toggle Switch */
+    .status-toggle { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f1f5f9; border-radius: 0.5rem; cursor: pointer; margin-top: 1rem; }
+    .toggle-switch { width: 46px; height: 24px; background: #cbd5e1; border-radius: 23px; position: relative; transition: 0.3s; }
+    .toggle-switch.active { background: #22c55e; }
+    .toggle-switch::after { content: ''; position: absolute; width: 20px; height: 20px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
+    .toggle-switch.active::after { left: 24px; }
 
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--primary);
-      text-decoration: none;
-      margin-bottom: 2rem;
-      font-weight: 500;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
-    }
-
-    .header-card {
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: 0.75rem;
-      box-shadow: var(--shadow-sm);
-      padding: 2rem;
-      margin-bottom: 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .header-info h1 {
-      margin: 0 0 0.5rem 0;
-    }
-
-    .header-info p {
-      margin: 0.25rem 0;
-      color: var(--text-secondary);
-      font-size: 0.875rem;
-    }
-
-    .header-badges {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 0.5rem;
-      flex-direction: column;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-
-    .badge-success {
-      background-color: rgba(16, 185, 129, 0.1);
-      color: var(--success);
-    }
-
-    .badge-warning {
-      background-color: rgba(245, 158, 11, 0.1);
-      color: var(--warning);
-    }
-
-    .badge-secondary {
-      background-color: var(--bg-tertiary);
-      color: var(--text-primary);
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .card {
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: 0.75rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .card-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .card-header h2 {
-      margin: 0;
-      font-size: 1.1rem;
-    }
-
-    .card-body {
-      padding: 1.5rem;
-    }
-
-    .info-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .info-group:last-child {
-      margin-bottom: 0;
-    }
-
-    .info-label {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-      margin-bottom: 0.25rem;
-    }
-
-    .info-value {
-      font-size: 1rem;
-      color: var(--text-primary);
-    }
-
-    .status-toggle {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem;
-      background: var(--bg-secondary);
-      border-radius: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .toggle-switch {
-      position: relative;
-      width: 50px;
-      height: 28px;
-      background: var(--border-color);
-      border-radius: 14px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .toggle-switch.active {
-      background: var(--success);
-    }
-
-    .toggle-switch::after {
-      content: '';
-      position: absolute;
-      width: 24px;
-      height: 24px;
-      background: white;
-      border-radius: 50%;
-      top: 2px;
-      left: 2px;
-      transition: left 0.3s;
-    }
-
-    .toggle-switch.active::after {
-      left: 24px;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 0.5rem;
-      flex-direction: column;
-    }
-
-    .btn {
-      padding: 0.75rem 1rem;
-      border: none;
-      border-radius: 0.5rem;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: var(--transition);
-      text-align: center;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-dark);
-    }
-
-    .btn-secondary {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-    }
-
-    .btn-secondary:hover {
-      background: var(--border-color-light);
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-content {
-      background: white;
-      border-radius: 0.75rem;
-      box-shadow: var(--shadow-lg);
-      max-width: 500px;
-      width: 90%;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .modal-header h2 {
-      margin: 0;
-    }
-
-    .modal-body {
-      padding: 1.5rem;
-    }
-
-    .modal-footer {
-      padding: 1.5rem;
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid var(--border-color);
-      border-radius: 0.5rem;
-      font-family: inherit;
-      font-size: 0.875rem;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-    }
-
-    .file-upload {
-      border: 2px dashed var(--border-color);
-      border-radius: 0.5rem;
-      padding: 2rem;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .file-upload:hover {
-      border-color: var(--primary);
-      background: rgba(124, 58, 237, 0.05);
-    }
-
-    .file-upload input {
-      display: none;
-    }
-
-    .file-preview {
-      margin-top: 1rem;
-      padding: 1rem;
-      background: var(--bg-secondary);
-      border-radius: 0.5rem;
-      text-align: center;
-    }
-
-    .file-preview img {
-      max-width: 100%;
-      max-height: 200px;
-      border-radius: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .exchange-history {
-      list-style: none;
-    }
-
-    .exchange-item {
-      padding: 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .exchange-item-date {
-      font-weight: 500;
-      color: var(--primary);
-    }
-
-    .exchange-item-notes {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      margin-top: 0.25rem;
-    }
-
-    @media (max-width: 768px) {
-      .container-page {
-        padding: 1rem;
-      }
-
-      .header-card {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .grid-2 {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-
-      .header-actions {
-        width: 100%;
-      }
-
-      .header-actions .btn {
-        width: 100%;
-      }
-    }
+    /* Modais */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 500px; }
+    
+    .history-item { padding: 12px; border-bottom: 1px solid #f1f5f9; }
+    .history-item:last-child { border: none; }
+    .btn-group { display: flex; flex-direction: column; gap: 10px; }
+    .text-muted { color: #64748b; font-size: 0.9rem; }
   </style>
 </head>
 <body>
-  <div class="container-page">
-    <a href="manicures.html" class="back-link">← Voltar</a>
 
-    <!-- Header -->
+  <div class="container-page">
+    <a href="../index.html" style="text-decoration: none; color: #7c3aed; font-weight: bold; display: inline-block; margin-bottom: 1rem;">← Voltar para Lista</a>
+
     <div class="header-card">
       <div class="header-info">
-        <h1 id="manicure-name">Carregando...</h1>
-        <p id="manicure-phone"></p>
-        <p id="manicure-address"></p>
-        <div class="header-badges">
-          <span class="badge badge-secondary" id="plan-badge">Plano -</span>
-          <span class="badge" id="status-badge">-</span>
-          <span class="badge badge-warning" id="due-soon-badge" style="display: none;">Troca próxima</span>
+        <h1 id="det-name">Carregando...</h1>
+        <p id="det-phone" class="text-muted">--</p>
+        <div style="margin-top: 10px;">
+            <span id="det-status-badge" class="badge">---</span>
         </div>
       </div>
-      <div class="header-actions">
-        <button class="btn btn-primary" onclick="openExchangeModal()">✅ Registrar Troca</button>
-        <button class="btn btn-secondary" onclick="openReceiptModal()">📄 Enviar Comprovante</button>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="btn-open-exchange">🔄 Registrar Troca</button>
+        <button class="btn btn-secondary" id="btn-open-receipt">📂 Enviar Comprovante</button>
       </div>
     </div>
 
-    <!-- Main Content -->
     <div class="grid-2">
-      <!-- Manicure Info -->
       <div class="card">
-        <div class="card-header">
-          <h2>Informações Cadastrais</h2>
-        </div>
+        <div class="card-header">Informações Cadastrais</div>
         <div class="card-body">
-          <div class="info-group">
-            <div class="info-label">Nome</div>
-            <div class="info-value" id="info-name">-</div>
-          </div>
-          <div class="info-group">
-            <div class="info-label">Telefone</div>
-            <div class="info-value" id="info-phone">-</div>
-          </div>
-          <div class="info-group">
-            <div class="info-label">Endereço</div>
-            <div class="info-value" id="info-address">-</div>
-          </div>
-          <div class="info-group">
-            <div class="info-label">Tipo de Plano</div>
-            <div class="info-value" id="info-plan">-</div>
-          </div>
-          <div class="info-group">
-            <div class="info-label">Data de Início</div>
-            <div class="info-value" id="info-start-date">-</div>
-          </div>
-
-          <div class="status-toggle" id="status-toggle">
+          <p><strong>Endereço:</strong> <br><span id="det-address" class="text-muted">--</span></p>
+          <p style="margin-top: 1rem;"><strong>Plano Atual:</strong> <span id="det-plan">--</span></p>
+          
+          <div class="status-toggle" id="btn-toggle-status">
             <span>Status:</span>
-            <div class="toggle-switch" id="toggle-switch" onclick="toggleStatus()"></div>
-            <span id="status-text">Ativa</span>
+            <div class="toggle-switch" id="toggle-ui"></div>
+            <span id="status-text">---</span>
           </div>
         </div>
       </div>
 
-      <!-- Kit Exchange Info -->
       <div class="card">
-        <div class="card-header">
-          <h2>Controle de Trocas</h2>
-        </div>
+        <div class="card-header">Controle de Trocas</div>
         <div class="card-body">
-          <div class="info-group">
-            <div class="info-label">Última Troca</div>
-            <div class="info-value" id="last-exchange">Nenhuma troca registrada</div>
-          </div>
-          <div class="info-group">
-            <div class="info-label">Próxima Troca</div>
-            <div class="info-value" id="next-exchange">-</div>
-          </div>
-          <div class="info-group">
-            <div class="info-label">Dias até Troca</div>
-            <div class="info-value" id="days-until">-</div>
-          </div>
-          <div class="info-group">
-            <div class="info-label">Ciclo</div>
-            <div class="info-value">28 dias</div>
-          </div>
+          <p><strong>Última Troca:</strong> <span id="last-date">--/--/----</span></p>
+          <p><strong>Próxima Troca:</strong> <span id="next-date">--/--/----</span></p>
+          <hr style="margin: 1rem 0; border: 0; border-top: 1px solid #eee;">
+          <p><strong>Dias restantes:</strong> <span id="days-left" style="font-weight: bold; color: #7c3aed;">--</span></p>
         </div>
       </div>
     </div>
 
-    <!-- Exchange History -->
-    <div class="card" style="margin-bottom: 2rem;">
-      <div class="card-header">
-        <h2>Histórico de Trocas</h2>
-      </div>
-      <div class="card-body" id="exchange-history">
-        <p class="text-muted">Nenhuma troca registrada</p>
-      </div>
-    </div>
-
-    <!-- Payment Receipts -->
     <div class="card">
-      <div class="card-header">
-        <h2>Comprovantes de Pagamento</h2>
-      </div>
-      <div class="card-body" id="receipts-list">
-        <p class="text-muted">Nenhum comprovante enviado</p>
+      <div class="card-header">Histórico de Trocas</div>
+      <div class="card-body" id="history-list">
+        <p class="text-muted">Buscando histórico...</p>
       </div>
     </div>
   </div>
 
-  <!-- Exchange Modal -->
-  <div class="modal" id="exchange-modal">
+  <div class="modal" id="modal-exchange">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2>Registrar Troca de Kit</h2>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Observações (opcional)</label>
-          <textarea id="exchange-notes" placeholder="Adicione observações sobre a troca..." rows="4"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeExchangeModal()">Cancelar</button>
-        <button class="btn btn-primary" onclick="submitExchange()" id="exchange-submit">Confirmar Troca</button>
+      <h2>Registrar Troca de Kit</h2>
+      <p class="text-muted">Isso atualizará a data da próxima troca para daqui a 28 dias.</p>
+      <textarea id="exchange-notes" placeholder="Observações (opcional)..." style="width: 100%; margin: 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;"></textarea>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn btn-secondary" id="btn-close-exchange">Cancelar</button>
+        <button class="btn btn-primary" id="btn-confirm-exchange">Confirmar Registro</button>
       </div>
     </div>
   </div>
 
-  <!-- Receipt Modal -->
-  <div class="modal" id="receipt-modal">
+  <div class="modal" id="modal-receipt">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2>Enviar Comprovante</h2>
-      </div>
-      <div class="modal-body">
-        <div class="file-upload" onclick="document.getElementById('file-input').click()">
-          <div style="font-size: 2rem; margin-bottom: 0.5rem;">📁</div>
-          <p>Clique para selecionar arquivo</p>
-          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Imagens ou PDF</p>
-          <input type="file" id="file-input" accept="image/*,.pdf" onchange="previewFile()">
-        </div>
-        <div id="file-preview"></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeReceiptModal()">Cancelar</button>
-        <button class="btn btn-primary" onclick="submitReceipt()" id="receipt-submit">Enviar</button>
+      <h2>Enviar Comprovante</h2>
+      <p class="text-muted">Selecione a imagem do pagamento.</p>
+      <input type="file" id="file-input" accept="image/*" style="margin: 20px 0;">
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn btn-secondary" id="btn-close-receipt">Cancelar</button>
+        <button class="btn btn-primary" id="btn-upload-receipt">Fazer Upload</button>
       </div>
     </div>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
+  <script type="module">
+    import { authManager } from '../js/auth.js';
+    import { dbManager } from '../js/database.js';
+    import { getDatabase, ref, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  <!-- Config -->
-  <script src="../config/firebase-config.js"></script>
-
-  <!-- Scripts -->
-  <script src="../js/utils.js"></script>
-  <script src="../js/auth.js"></script>
-  <script src="../js/database.js"></script>
-
-  <script>
-    // Require authentication
+    // 1. Verificação de Autenticação
     authManager.requireAuth();
 
-    let currentManicure = null;
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
     let selectedFile = null;
 
-    // Get manicure ID from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const manicureId = urlParams.get('id');
+    if (!id) window.location.href = '../index.html';
 
-    if (!manicureId) {
-      window.location.href = 'manicures.html';
+    // 2. Carregamento Inicial
+    async function init() {
+        try {
+            const uid = await dbManager._waitForUser();
+            const db = getDatabase();
+            const mRef = ref(db, `users/${uid}/manicures/${id}`);
+
+            const snap = await get(mRef);
+            if (snap.exists()) {
+                const data = snap.val();
+                renderUI(data);
+                loadExchanges(uid);
+            } else {
+                alert("Manicure não encontrada!");
+                window.location.href = '../index.html';
+            }
+        } catch (err) {
+            console.error("Erro ao iniciar:", err);
+        }
     }
 
-    // Load manicure details
-    async function loadManicureDetails() {
-      try {
-        currentManicure = await dbManager.getManicureById(manicureId);
+    function renderUI(data) {
+        document.getElementById('det-name').textContent = data.name;
+        document.getElementById('det-phone').textContent = data.phone;
+        document.getElementById('det-address').textContent = data.address || 'Endereço não cadastrado';
+        document.getElementById('det-plan').textContent = "Plano " + data.planType;
         
-        if (!currentManicure) {
-          Utils.showToast('Manicure não encontrada', 'danger');
-          window.location.href = 'manicures.html';
-          return;
-        }
-
-        // Update header
-        document.getElementById('manicure-name').textContent = currentManicure.name;
-        document.getElementById('manicure-phone').textContent = currentManicure.phone;
-        document.getElementById('manicure-address').textContent = currentManicure.address;
-        document.getElementById('plan-badge').textContent = `Plano ${currentManicure.planType}`;
+        const isActive = data.status === 'active';
+        const badge = document.getElementById('det-status-badge');
+        badge.textContent = isActive ? 'ATIVA' : 'INATIVA';
+        badge.className = `badge ${isActive ? 'badge-success' : 'badge-secondary'}`;
         
-        const statusBadge = document.getElementById('status-badge');
-        statusBadge.textContent = currentManicure.status === 'active' ? 'Ativa' : 'Inativa';
-        statusBadge.className = currentManicure.status === 'active' 
-          ? 'badge badge-success' 
-          : 'badge badge-secondary';
+        document.getElementById('toggle-ui').classList.toggle('active', isActive);
+        document.getElementById('status-text').textContent = isActive ? 'Ativa' : 'Inativa';
 
-        if (currentManicure.isDueSoon) {
-          document.getElementById('due-soon-badge').style.display = 'inline-block';
+        // Datas
+        if(data.lastExchangeDate) {
+            document.getElementById('last-date').textContent = new Date(data.lastExchangeDate).toLocaleDateString();
         }
+        if(data.nextExchangeDate) {
+            const next = new Date(data.nextExchangeDate);
+            document.getElementById('next-date').textContent = next.toLocaleDateString();
+            
+            const diff = Math.ceil((next - new Date()) / (1000 * 60 * 60 * 24));
+            document.getElementById('days-left').textContent = diff > 0 ? diff + " dias" : "Troca Atrasada!";
+        }
+    }
 
-        // Update info
-        document.getElementById('info-name').textContent = currentManicure.name;
-        document.getElementById('info-phone').textContent = currentManicure.phone;
-        document.getElementById('info-address').textContent = currentManicure.address;
-        document.getElementById('info-plan').textContent = `Plano ${currentManicure.planType}`;
-        document.getElementById('info-start-date').textContent = Utils.formatDate(currentManicure.startDate);
-
-        // Update status toggle
-        const toggleSwitch = document.getElementById('toggle-switch');
-        const statusText = document.getElementById('status-text');
-        if (currentManicure.status === 'active') {
-          toggleSwitch.classList.add('active');
-          statusText.textContent = 'Ativa';
+    async function loadExchanges(uid) {
+        const db = getDatabase();
+        const hRef = ref(db, `users/${uid}/exchanges/${id}`);
+        const snap = await get(hRef);
+        const list = document.getElementById('history-list');
+        
+        if (snap.exists()) {
+            list.innerHTML = '';
+            Object.values(snap.val()).reverse().forEach(ex => {
+                const date = new Date(ex.date).toLocaleDateString();
+                list.innerHTML += `
+                    <div class="history-item">
+                        <strong>📅 ${date}</strong> - ${ex.notes || 'Sem observações'}
+                    </div>`;
+            });
         } else {
-          toggleSwitch.classList.remove('active');
-          statusText.textContent = 'Inativa';
+            list.innerHTML = '<p class="text-muted">Nenhuma troca registrada.</p>';
         }
+    }
 
-        // Update exchange info
-        const daysUntil = Utils.calculateDaysUntilExchange(currentManicure.nextExchangeDate);
-        document.getElementById('next-exchange').textContent = Utils.formatDate(currentManicure.nextExchangeDate);
-        document.getElementById('days-until').textContent = `${daysUntil} dia${daysUntil !== 1 ? 's' : ''}`;
+    // 3. Eventos de Clique (Modais e Ações)
+    document.getElementById('btn-open-exchange').onclick = () => document.getElementById('modal-exchange').classList.add('show');
+    document.getElementById('btn-close-exchange').onclick = () => document.getElementById('modal-exchange').classList.remove('show');
+    
+    document.getElementById('btn-open-receipt').onclick = () => document.getElementById('modal-receipt').classList.add('show');
+    document.getElementById('btn-close-receipt').onclick = () => document.getElementById('modal-receipt').classList.remove('show');
 
-        // Load exchange history
-        const exchanges = await dbManager.getKitExchanges(manicureId);
-        if (exchanges.length > 0) {
-          document.getElementById('last-exchange').textContent = Utils.formatDate(exchanges[0].exchangeDate);
-          document.getElementById('exchange-history').innerHTML = exchanges.map(e => `
-            <div class="exchange-item">
-              <div class="exchange-item-date">📅 ${Utils.formatDateTime(e.exchangeDate)}</div>
-              ${e.notes ? `<div class="exchange-item-notes">${e.notes}</div>` : ''}
-            </div>
-          `).join('');
+    // Registrar Troca
+    document.getElementById('btn-confirm-exchange').onclick = async () => {
+        const btn = document.getElementById('btn-confirm-exchange');
+        btn.disabled = true;
+        btn.textContent = "Salvando...";
+        
+        try {
+            const uid = await dbManager._waitForUser();
+            const db = getDatabase();
+            const notes = document.getElementById('exchange-notes').value;
+            const now = Date.now();
+            const next = now + (28 * 24 * 60 * 60 * 1000); // +28 dias
+
+            // Salva no histórico
+            const historyRef = push(ref(db, `users/${uid}/exchanges/${id}`));
+            await set(historyRef, { date: now, notes: notes });
+
+            // Atualiza datas na manicure
+            await update(ref(db, `users/${uid}/manicures/${id}`), {
+                lastExchangeDate: now,
+                nextExchangeDate: next
+            });
+
+            location.reload();
+        } catch (err) {
+            alert("Erro ao salvar troca");
+            btn.disabled = false;
         }
+    };
 
-        // Load receipts
-        const receipts = await dbManager.getPaymentReceipts(manicureId);
-        if (receipts.length > 0) {
-          document.getElementById('receipts-list').innerHTML = receipts.map(r => `
-            <div class="exchange-item">
-              <div class="exchange-item-date">📄 ${r.fileName}</div>
-              <div class="exchange-item-notes">${Utils.formatDateTime(r.uploadedAt)}</div>
-              <a href="${r.fileUrl}" target="_blank" class="btn btn-secondary" style="margin-top: 0.5rem; width: 100%;">
-                Visualizar
-              </a>
-            </div>
-          `).join('');
-        }
-      } catch (error) {
-        console.error('Error loading manicure:', error);
-        Utils.showToast('Erro ao carregar detalhes', 'danger');
-      }
-    }
+    // Mudar Status (Ativa/Inativa)
+    document.getElementById('btn-toggle-status').onclick = async () => {
+        const uid = await dbManager._waitForUser();
+        const db = getDatabase();
+        const currentActive = document.getElementById('toggle-ui').classList.contains('active');
+        const newStatus = currentActive ? 'inactive' : 'active';
 
-    // Toggle status
-    async function toggleStatus() {
-      try {
-        const newStatus = await dbManager.toggleManicureStatus(manicureId);
-        Utils.showToast(`Status alterado para ${newStatus === 'active' ? 'Ativa' : 'Inativa'}`, 'success');
-        loadManicureDetails();
-      } catch (error) {
-        console.error('Error toggling status:', error);
-        Utils.showToast('Erro ao alterar status', 'danger');
-      }
-    }
+        await update(ref(db, `users/${uid}/manicures/${id}`), { status: newStatus });
+        location.reload();
+    };
 
-    // Exchange modal functions
-    function openExchangeModal() {
-      document.getElementById('exchange-modal').classList.add('show');
-      document.getElementById('exchange-notes').value = '';
-    }
-
-    function closeExchangeModal() {
-      document.getElementById('exchange-modal').classList.remove('show');
-    }
-
-    async function submitExchange() {
-      try {
-        const notes = document.getElementById('exchange-notes').value;
-        const submitBtn = document.getElementById('exchange-submit');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Registrando...';
-
-        // Record exchange
-        await dbManager.recordKitExchange(manicureId, notes);
-
-        // Update next exchange date
-        const nextExchangeDate = Utils.calculateNextExchangeDate(Date.now());
-        await dbManager.updateManicure(manicureId, {
-          lastExchangeDate: Date.now(),
-          nextExchangeDate,
-          isDueSoon: Utils.isDueSoon(nextExchangeDate)
-        });
-
-        Utils.showToast('Troca de kit registrada com sucesso!', 'success');
-        closeExchangeModal();
-        loadManicureDetails();
-      } catch (error) {
-        console.error('Error recording exchange:', error);
-        Utils.showToast('Erro ao registrar troca', 'danger');
-        document.getElementById('exchange-submit').disabled = false;
-        document.getElementById('exchange-submit').textContent = 'Confirmar Troca';
-      }
-    }
-
-    // Receipt modal functions
-    function openReceiptModal() {
-      document.getElementById('receipt-modal').classList.add('show');
-      selectedFile = null;
-      document.getElementById('file-input').value = '';
-      document.getElementById('file-preview').innerHTML = '';
-    }
-
-    function closeReceiptModal() {
-      document.getElementById('receipt-modal').classList.remove('show');
-    }
-
-    function previewFile() {
-      const input = document.getElementById('file-input');
-      selectedFile = input.files[0];
-
-      if (!selectedFile) return;
-
-      const preview = document.getElementById('file-preview');
-      const fileName = selectedFile.name;
-      const fileSize = (selectedFile.size / 1024).toFixed(2);
-
-      if (selectedFile.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          preview.innerHTML = `
-            <div class="file-preview">
-              <img src="${e.target.result}" alt="Preview">
-              <p>${fileName} (${fileSize} KB)</p>
-            </div>
-          `;
-        };
-        reader.readAsDataURL(selectedFile);
-      } else {
-        preview.innerHTML = `
-          <div class="file-preview">
-            <p>📄 ${fileName}</p>
-            <p style="font-size: 0.75rem; color: var(--text-secondary);">${fileSize} KB</p>
-          </div>
-        `;
-      }
-    }
-
-    async function submitReceipt() {
-      if (!selectedFile) {
-        Utils.showToast('Selecione um arquivo', 'warning');
-        return;
-      }
-
-      try {
-        const submitBtn = document.getElementById('receipt-submit');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Enviando...';
-
-        await dbManager.uploadPaymentReceipt(manicureId, selectedFile);
-        Utils.showToast('Comprovante enviado com sucesso!', 'success');
-        closeReceiptModal();
-        loadManicureDetails();
-      } catch (error) {
-        console.error('Error uploading receipt:', error);
-        Utils.showToast('Erro ao enviar comprovante: ' + error.message, 'danger');
-        document.getElementById('receipt-submit').disabled = false;
-        document.getElementById('receipt-submit').textContent = 'Enviar';
-      }
-    }
-
-    // Close modals when clicking outside
-    window.addEventListener('click', (e) => {
-      const exchangeModal = document.getElementById('exchange-modal');
-      const receiptModal = document.getElementById('receipt-modal');
-
-      if (e.target === exchangeModal) closeExchangeModal();
-      if (e.target === receiptModal) closeReceiptModal();
-    });
-
-    // Load details on page load
-    document.addEventListener('DOMContentLoaded', loadManicureDetails);
+    // Iniciar
+    init();
   </script>
 </body>
 </html>
