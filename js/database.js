@@ -1,4 +1,4 @@
-// Database Manager (SDK Modular v10)
+// Database Manager (SDK Modular v10) - COMPLETO
 import { auth, database, storage } from '../config/firebase-config.js';
 import { 
     ref, 
@@ -16,7 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const dbManager = {
-  // Auxiliar para pegar o ID do usuário atual de forma segura
+  // Auxiliar para pegar o ID do usuário atual
   getUserId: function() {
     return auth.currentUser ? auth.currentUser.uid : null;
   },
@@ -27,9 +27,33 @@ const dbManager = {
     return uid ? ref(database, `users/${uid}/manicures`) : null;
   },
 
-  // --- OPERAÇÕES DE MANICURE ---
+  // --- LISTAGEM (O que estava faltando) ---
 
-  // Busca uma manicure específica por ID (Necessário para a página de detalhes)
+  // Busca todas as manicures (Usado no manicures.html)
+  getAllManicures: async function() {
+    try {
+      const mRef = this.getManicuresRef();
+      if (!mRef) throw new Error('Usuário não autenticado');
+
+      const snapshot = await get(mRef);
+      const manicures = [];
+      
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          manicures.push({
+            id: childSnapshot.key,
+            ...childSnapshot.val()
+          });
+        });
+      }
+      return manicures;
+    } catch (error) {
+      console.error('Erro ao listar manicures:', error);
+      throw error;
+    }
+  },
+
+  // Busca uma única manicure (Usado no manicure-details.html)
   getManicureById: async function(manicureId) {
     try {
       const uid = this.getUserId();
@@ -38,15 +62,14 @@ const dbManager = {
       const itemRef = ref(database, `users/${uid}/manicures/${manicureId}`);
       const snapshot = await get(itemRef);
       
-      if (snapshot.exists()) {
-        return { id: snapshot.key, ...snapshot.val() };
-      }
-      return null;
+      return snapshot.exists() ? { id: snapshot.key, ...snapshot.val() } : null;
     } catch (error) {
       console.error('Erro ao buscar manicure:', error);
       throw error;
     }
   },
+
+  // --- CADASTRO E ATUALIZAÇÃO ---
 
   createManicure: async function(manicureData) {
     const mRef = this.getManicuresRef();
@@ -73,42 +96,31 @@ const dbManager = {
     });
   },
 
-  // --- HISTÓRICO DE TROCAS ---
+  // --- TROCAS DE KIT ---
 
-  // Registra uma nova troca e calcula a próxima data automaticamente
   addExchange: async function(manicureId, exchangeData) {
-    try {
-      const uid = this.getUserId();
-      const manicure = await this.getManicureById(manicureId);
-      
-      // 1. Salvar no histórico de trocas
-      const historyRef = ref(database, `users/${uid}/manicures/${manicureId}/exchanges`);
-      const newExchangeRef = push(historyRef);
-      const timestamp = Date.now();
+    const uid = this.getUserId();
+    const manicure = await this.getManicureById(manicureId);
+    
+    const historyRef = ref(database, `users/${uid}/manicures/${manicureId}/exchanges`);
+    const newExchangeRef = push(historyRef);
+    const timestamp = Date.now();
 
-      await set(newExchangeRef, {
-        id: newExchangeRef.key,
-        date: timestamp,
-        notes: exchangeData.notes || ""
-      });
+    await set(newExchangeRef, {
+      id: newExchangeRef.key,
+      date: timestamp,
+      notes: exchangeData.notes || ""
+    });
 
-      // 2. Calcular próxima troca baseado no plano (ex: 15 ou 30 dias)
-      const planDays = parseInt(manicure.planType) || 15;
-      const nextExchange = timestamp + (planDays * 24 * 60 * 60 * 1000);
+    const planDays = parseInt(manicure.planType) || 15;
+    const nextExchange = timestamp + (planDays * 24 * 60 * 60 * 1000);
 
-      // 3. Atualizar a manicure com as novas datas
-      await this.updateManicure(manicureId, {
-        lastExchangeDate: timestamp,
-        nextExchangeDate: nextExchange
-      });
-
-    } catch (error) {
-      console.error('Erro ao registrar troca:', error);
-      throw error;
-    }
+    await this.updateManicure(manicureId, {
+      lastExchangeDate: timestamp,
+      nextExchangeDate: nextExchange
+    });
   },
 
-  // Busca o histórico de trocas
   getKitExchanges: async function(manicureId) {
     const uid = this.getUserId();
     const historyRef = ref(database, `users/${uid}/manicures/${manicureId}/exchanges`);
@@ -118,31 +130,6 @@ const dbManager = {
       snapshot.forEach(child => { exchanges.push(child.val()); });
     }
     return exchanges;
-  },
-
-  // --- UPLOAD DE COMPROVANTES (FIREBASE STORAGE) ---
-  uploadReceipt: async function(manicureId, file) {
-    try {
-      const uid = this.getUserId();
-      const fileName = `${Date.now()}_${file.name}`;
-      const fileRef = sRef(storage, `users/${uid}/receipts/${manicureId}/${fileName}`);
-      
-      const uploadResult = await uploadBytes(fileRef, file);
-      const downloadUrl = await getDownloadURL(uploadResult.ref);
-      
-      // Opcional: Salva a referência da URL no banco da manicure
-      const receiptsRef = ref(database, `users/${uid}/manicures/${manicureId}/receipts`);
-      await push(receiptsRef, {
-        url: downloadUrl,
-        date: Date.now(),
-        fileName: file.name
-      });
-      
-      return downloadUrl;
-    } catch (error) {
-      console.error('Erro no upload:', error);
-      throw error;
-    }
   }
 };
 
