@@ -8,12 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --color-primary: #d946ef;
       --color-primary-dark: #a21caf;
@@ -32,689 +27,74 @@
       --radius: 16px;
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--color-bg);
-      color: var(--color-text);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-      min-height: 100vh;
-    }
-
-    /* Mobile-First Layout */
-    .app-container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Mobile Header */
-    .mobile-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 64px;
-      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 1rem;
-      z-index: 100;
-      box-shadow: 0 2px 8px rgba(217, 70, 239, 0.2);
-    }
-
-    .mobile-header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .back-button {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      transition: var(--transition);
-      flex-shrink: 0;
-    }
-
-    .back-button:active {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .header-menu {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      transition: var(--transition);
-      flex-shrink: 0;
-    }
-
-    .header-menu:active {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    /* Main Content */
-    .main-content {
-      margin-top: 64px;
-      padding: 1.5rem 1rem;
-      flex: 1;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-      width: 100%;
-    }
-
-    /* Header Card */
-    .header-card {
-      background: var(--color-surface);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--color-border);
-      margin-bottom: 1.5rem;
-    }
-
-    .header-info h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-      color: var(--color-text);
-    }
-
-    .header-info-details {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .header-info-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      color: var(--color-text-muted);
-    }
-
-    .header-info-item svg {
-      flex-shrink: 0;
-    }
-
-    .header-badges {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .badge {
-      padding: 0.375rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-
-    .badge-success {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-    .badge-warning {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .badge-danger {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .badge-secondary {
-      background: #e5e7eb;
-      color: #4b5563;
-    }
-
-    .header-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-
-    /* Cards */
-    .card {
-      background: var(--color-surface);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--color-border);
-      margin-bottom: 1.5rem;
-      overflow: hidden;
-    }
-
-    .card-header {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 2px solid var(--color-bg);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .card-header h3 {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--color-text);
-      margin: 0;
-    }
-
-    .card-body {
-      padding: 1.5rem;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.25rem;
-    }
-
-    .info-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .info-label {
-      font-size: 0.8125rem;
-      color: var(--color-text-muted);
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .info-value {
-      font-size: 1rem;
-      color: var(--color-text);
-      font-weight: 500;
-    }
-
-    .info-value.highlight {
-      font-size: 1.5rem;
-      font-weight: 700;
-      font-family: 'Playfair Display', serif;
-      color: var(--color-primary);
-    }
-
-    /* Status Toggle */
-    .status-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem;
-      background: var(--color-bg);
-      border-radius: 12px;
-    }
-
-    .status-toggle-label {
-      font-size: 0.9375rem;
-      font-weight: 500;
-      color: var(--color-text);
-    }
-
-    .toggle-switch {
-      position: relative;
-      width: 50px;
-      height: 28px;
-      background: var(--color-border);
-      border-radius: 14px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .toggle-switch.active {
-      background: var(--color-success);
-    }
-
-    .toggle-switch::after {
-      content: '';
-      position: absolute;
-      width: 24px;
-      height: 24px;
-      background: white;
-      border-radius: 50%;
-      top: 2px;
-      left: 2px;
-      transition: left 0.3s;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .toggle-switch.active::after {
-      left: 24px;
-    }
-
-    /* History Items */
-    .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .history-item {
-      background: var(--color-bg);
-      border-radius: 12px;
-      padding: 1rem;
-      border: 1px solid var(--color-border);
-    }
-
-    .history-item-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 600;
-      color: var(--color-text);
-      margin-bottom: 0.5rem;
-    }
-
-    .history-item-date {
-      font-size: 0.875rem;
-      color: var(--color-text-muted);
-    }
-
-    .history-item-notes {
-      font-size: 0.875rem;
-      color: var(--color-text-muted);
-      margin-top: 0.5rem;
-      padding-top: 0.5rem;
-      border-top: 1px solid var(--color-border);
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 2rem 1rem;
-      color: var(--color-text-muted);
-    }
-
-    .empty-state svg {
-      opacity: 0.3;
-      margin-bottom: 0.75rem;
-    }
-
-    .empty-state p {
-      font-size: 0.875rem;
-    }
-
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.875rem 1rem;
-      border: none;
-      border-radius: 12px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      text-decoration: none;
-      font-family: 'Outfit', sans-serif;
-      white-space: nowrap;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-      color: white;
-      box-shadow: 0 4px 12px rgba(217, 70, 239, 0.3);
-    }
-
-    .btn-primary:active:not(:disabled) {
-      transform: translateY(1px);
-      box-shadow: 0 2px 8px rgba(217, 70, 239, 0.3);
-    }
-
-    .btn-secondary {
-      background: var(--color-surface);
-      color: var(--color-text);
-      border: 1px solid var(--color-border);
-    }
-
-    .btn-secondary:active:not(:disabled) {
-      background: var(--color-bg);
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .btn-full {
-      width: 100%;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--color-surface);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
-      max-width: 500px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      animation: modalSlideIn 0.3s ease-out;
-    }
-
-    @keyframes modalSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .modal-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .modal-header h2 {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-
-    .modal-body {
-      padding: 1.5rem;
-    }
-
-    .modal-footer {
-      padding: 1.5rem;
-      border-top: 1px solid var(--color-border);
-      display: flex;
-      gap: 0.75rem;
-    }
-
-    /* Form */
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-group:last-child {
-      margin-bottom: 0;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      font-size: 0.9375rem;
-    }
-
-    .form-group textarea {
-      width: 100%;
-      padding: 0.875rem;
-      border: 1px solid var(--color-border);
-      border-radius: 12px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 1rem;
-      resize: vertical;
-      min-height: 120px;
-      transition: var(--transition);
-    }
-
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.1);
-    }
-
-    /* File Upload */
-    .file-upload {
-      border: 2px dashed var(--color-border);
-      border-radius: 12px;
-      padding: 2rem;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      background: var(--color-bg);
-    }
-
-    .file-upload:hover {
-      border-color: var(--color-primary);
-      background: rgba(217, 70, 239, 0.05);
-    }
-
-    .file-upload input {
-      display: none;
-    }
-
-    .file-upload-icon {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .file-upload-text {
-      font-weight: 500;
-      color: var(--color-text);
-      margin-bottom: 0.25rem;
-    }
-
-    .file-upload-hint {
-      font-size: 0.8125rem;
-      color: var(--color-text-muted);
-    }
-
-    .file-preview {
-      margin-top: 1rem;
-      padding: 1rem;
-      background: var(--color-bg);
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .file-preview img {
-      max-width: 100%;
-      max-height: 200px;
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
-    }
-
-    /* Loading Spinner */
-    .loading-spinner {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-
-    .loading-spinner.show {
-      display: flex;
-    }
-
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      border-top: 4px solid white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Toast Notification */
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(150%);
-      background: white;
-      color: var(--color-text);
-      padding: 1rem 1.5rem;
-      border-radius: 12px;
-      box-shadow: var(--shadow-lg);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      min-width: 280px;
-      max-width: 90%;
-      border: 1px solid var(--color-border);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .toast.success {
-      border-left: 4px solid var(--color-success);
-    }
-
-    .toast.warning {
-      border-left: 4px solid var(--color-warning);
-    }
-
-    .toast.danger {
-      border-left: 4px solid var(--color-danger);
-    }
-
-    /* Tablet Styles */
-    @media (min-width: 768px) {
-      .mobile-header h1 {
-        font-size: 1.5rem;
-      }
-
-      .main-content {
-        padding: 2rem;
-        margin-top: 80px;
-      }
-
-      .header-card {
-        padding: 2rem;
-      }
-
-      .header-info h2 {
-        font-size: 1.75rem;
-      }
-
-      .header-actions {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .info-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    /* Desktop Styles */
-    @media (min-width: 1024px) {
-      .mobile-header {
-        display: none;
-      }
-
-      .main-content {
-        margin-top: 2rem;
-        padding: 2.5rem;
-      }
-
-      .header-info-details {
-        flex-direction: row;
-        gap: 1.5rem;
-      }
-
-      .btn:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-      }
-
-      .btn-primary:hover:not(:disabled) {
-        box-shadow: 0 6px 16px rgba(217, 70, 239, 0.4);
-      }
-    }
+    body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); line-height: 1.6; min-height: 100vh; }
+    .app-container { min-height: 100vh; display: flex; flex-direction: column; }
+    .mobile-header { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; z-index: 100; box-shadow: 0 2px 8px rgba(217, 70, 239, 0.2); }
+    .mobile-header h1 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; }
+    .back-button { background: none; border: none; color: white; cursor: pointer; padding: 0.5rem; display: flex; align-items: center; }
+    .main-content { margin-top: 64px; padding: 1.5rem 1rem; flex: 1; max-width: 900px; margin-left: auto; margin-right: auto; width: 100%; }
+    .header-card { background: var(--color-surface); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); margin-bottom: 1.5rem; }
+    .header-info h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .header-info-details { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+    .header-info-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--color-text-muted); }
+    .header-badges { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .badge { padding: 0.375rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    .badge-success { background: #d1fae5; color: #065f46; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-secondary { background: #e5e7eb; color: #4b5563; }
+    .header-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); margin-bottom: 1.5rem; overflow: hidden; }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 2px solid var(--color-bg); display: flex; align-items: center; gap: 0.5rem; }
+    .card-body { padding: 1.5rem; }
+    .info-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+    .info-group { display: flex; flex-direction: column; gap: 0.25rem; }
+    .info-label { font-size: 0.8125rem; color: var(--color-text-muted); font-weight: 500; text-transform: uppercase; }
+    .info-value { font-size: 1rem; color: var(--color-text); font-weight: 500; }
+    .info-value.highlight { font-size: 1.5rem; font-weight: 700; color: var(--color-primary); font-family: 'Playfair Display', serif; }
+    .status-toggle { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--color-bg); border-radius: 12px; }
+    .toggle-switch { position: relative; width: 50px; height: 28px; background: var(--color-border); border-radius: 14px; cursor: pointer; transition: background 0.3s; }
+    .toggle-switch.active { background: var(--color-success); }
+    .toggle-switch::after { content: ''; position: absolute; width: 24px; height: 24px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
+    .toggle-switch.active::after { left: 24px; }
+    .history-item { background: var(--color-bg); border-radius: 12px; padding: 1rem; border: 1px solid var(--color-border); margin-bottom: 0.5rem; }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+    .modal.show { display: flex; }
+    .modal-content { background: var(--color-surface); border-radius: var(--radius); width: 100%; max-width: 500px; animation: modalSlideIn 0.3s; }
+    @keyframes modalSlideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem 1rem; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+    .btn-primary { background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; }
+    .btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+    .btn-full { width: 100%; }
+    .loading-spinner { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 999; }
+    .loading-spinner.show { display: flex; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #fff3; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(150%); background: white; padding: 1rem; border-radius: 12px; box-shadow: var(--shadow-lg); transition: 0.3s; z-index: 1000; border-left: 4px solid var(--color-success); }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    @media (min-width: 768px) { .info-grid { grid-template-columns: 1fr 1fr; } .header-info-details { flex-direction: row; gap: 1.5rem; } }
   </style>
 </head>
 <body>
   <div class="app-container">
-    <!-- Mobile Header -->
     <header class="mobile-header">
       <button class="back-button" onclick="window.location.href='manicures.html'">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <h1 id="mobile-title">Detalhes</h1>
       <div style="width: 40px;"></div>
     </header>
 
-    <!-- Main Content -->
     <main class="main-content">
-      <!-- Header Card -->
       <div class="header-card">
         <div class="header-info">
           <h2 id="manicure-name">Carregando...</h2>
           <div class="header-info-details">
             <div class="header-info-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
               <span id="manicure-phone">-</span>
             </div>
             <div class="header-info-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               <span id="manicure-address">-</span>
             </div>
           </div>
@@ -726,567 +106,207 @@
         </div>
         <div class="header-actions">
           <button class="btn btn-primary" onclick="openExchangeModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
             <span>Registrar Troca</span>
           </button>
           <button class="btn btn-secondary" onclick="openReceiptModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             <span>Comprovante</span>
           </button>
         </div>
       </div>
 
-      <!-- Informações Cadastrais -->
       <div class="card">
-        <div class="card-header">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-          <h3>Informações Cadastrais</h3>
-        </div>
+        <div class="card-header"><h3>Informações Cadastrais</h3></div>
         <div class="card-body">
           <div class="info-grid">
-            <div class="info-group">
-              <span class="info-label">Nome Completo</span>
-              <span class="info-value" id="info-name">-</span>
-            </div>
-            <div class="info-group">
-              <span class="info-label">Telefone</span>
-              <span class="info-value" id="info-phone">-</span>
-            </div>
-            <div class="info-group">
-              <span class="info-label">Endereço</span>
-              <span class="info-value" id="info-address">-</span>
-            </div>
-            <div class="info-group">
-              <span class="info-label">Tipo de Plano</span>
-              <span class="info-value" id="info-plan">-</span>
-            </div>
-            <div class="info-group">
-              <span class="info-label">Data de Início</span>
-              <span class="info-value" id="info-start-date">-</span>
-            </div>
+            <div class="info-group"><span class="info-label">Nome Completo</span><span class="info-value" id="info-name">-</span></div>
+            <div class="info-group"><span class="info-label">Telefone</span><span class="info-value" id="info-phone">-</span></div>
+            <div class="info-group"><span class="info-label">Tipo de Plano</span><span class="info-value" id="info-plan">-</span></div>
+            <div class="info-group"><span class="info-label">Data de Início</span><span class="info-value" id="info-start-date">-</span></div>
           </div>
-
           <div class="status-toggle" style="margin-top: 1.5rem;">
-            <span class="status-toggle-label">Status da Manicure</span>
+            <span>Status da Manicure</span>
             <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <span id="status-text" style="font-size: 0.875rem; color: var(--color-text-muted);">Ativa</span>
+              <span id="status-text">Ativa</span>
               <div class="toggle-switch" id="toggle-switch" onclick="toggleStatus()"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Controle de Trocas -->
       <div class="card">
-        <div class="card-header">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
-          <h3>Controle de Trocas</h3>
-        </div>
+        <div class="card-header"><h3>Controle de Trocas</h3></div>
         <div class="card-body">
           <div class="info-grid">
-            <div class="info-group">
-              <span class="info-label">Última Troca</span>
-              <span class="info-value" id="last-exchange">Nenhuma troca</span>
-            </div>
-            <div class="info-group">
-              <span class="info-label">Próxima Troca</span>
-              <span class="info-value" id="next-exchange">-</span>
-            </div>
-            <div class="info-group">
-              <span class="info-label">Dias até Troca</span>
-              <span class="info-value highlight" id="days-until">-</span>
-            </div>
-            <div class="info-group">
-              <span class="info-label">Intervalo do Plano</span>
-              <span class="info-value" id="plan-interval">- dias</span>
-            </div>
+            <div class="info-group"><span class="info-label">Próxima Troca</span><span class="info-value" id="next-exchange">-</span></div>
+            <div class="info-group"><span class="info-label">Dias Restantes</span><span class="info-value highlight" id="days-until">-</span></div>
           </div>
         </div>
       </div>
 
-      <!-- Histórico de Trocas -->
       <div class="card">
-        <div class="card-header">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-            <polyline points="17 6 23 6 23 12"/>
-          </svg>
-          <h3>Histórico de Trocas</h3>
-        </div>
+        <div class="card-header"><h3>Histórico de Trocas</h3></div>
         <div class="card-body" id="exchange-history">
-          <div class="empty-state">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-            <p>Nenhuma troca registrada ainda</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Comprovantes de Pagamento -->
-      <div class="card">
-        <div class="card-header">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-            <polyline points="10 9 9 9 8 9"/>
-          </svg>
-          <h3>Comprovantes de Pagamento</h3>
-        </div>
-        <div class="card-body" id="receipts-list">
-          <div class="empty-state">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-            <p>Nenhum comprovante enviado</p>
-          </div>
+          <p style="text-align: center; color: #999;">Carregando histórico...</p>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Exchange Modal -->
   <div class="modal" id="exchange-modal">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2>Registrar Troca de Kit</h2>
+      <div style="padding: 1.5rem; border-bottom: 1px solid var(--color-border);"><h2>Registrar Troca</h2></div>
+      <div style="padding: 1.5rem;">
+        <textarea id="exchange-notes" placeholder="Observações..." style="width:100%; height:100px; padding:10px; border-radius:8px; border:1px solid #ddd;"></textarea>
       </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Observações (opcional)</label>
-          <textarea id="exchange-notes" placeholder="Adicione observações sobre a troca..."></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
+      <div style="padding: 1.5rem; display: flex; gap: 10px;">
         <button class="btn btn-secondary btn-full" onclick="closeExchangeModal()">Cancelar</button>
-        <button class="btn btn-primary btn-full" onclick="submitExchange()" id="exchange-submit">Confirmar</button>
+        <button class="btn btn-primary btn-full" onclick="submitExchange()">Confirmar</button>
       </div>
     </div>
   </div>
 
-  <!-- Receipt Modal -->
   <div class="modal" id="receipt-modal">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2>Enviar Comprovante</h2>
+      <div style="padding: 1.5rem;"><h2>Enviar Comprovante</h2></div>
+      <div style="padding: 1.5rem; text-align: center;">
+        <input type="file" id="file-input" style="display: none;" onchange="previewFile()">
+        <button class="btn btn-secondary btn-full" onclick="document.getElementById('file-input').click()">Selecionar Arquivo</button>
+        <div id="file-preview" style="margin-top: 10px; font-size: 0.8rem;"></div>
       </div>
-      <div class="modal-body">
-        <div class="file-upload" onclick="document.getElementById('file-input').click()">
-          <div class="file-upload-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-          </div>
-          <p class="file-upload-text">Clique para selecionar arquivo</p>
-          <p class="file-upload-hint">Imagens (JPG, PNG) ou PDF</p>
-          <input type="file" id="file-input" accept="image/*,.pdf" onchange="previewFile()">
-        </div>
-        <div id="file-preview"></div>
-      </div>
-      <div class="modal-footer">
+      <div style="padding: 1.5rem; display: flex; gap: 10px;">
         <button class="btn btn-secondary btn-full" onclick="closeReceiptModal()">Cancelar</button>
-        <button class="btn btn-primary btn-full" onclick="submitReceipt()" id="receipt-submit">Enviar</button>
+        <button class="btn btn-primary btn-full" onclick="submitReceipt()">Enviar</button>
       </div>
     </div>
   </div>
 
-  <!-- Loading Spinner -->
-  <div class="loading-spinner" id="loading-spinner">
-    <div class="spinner"></div>
-  </div>
+  <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
+  <div class="toast" id="toast"><div class="toast-message"></div></div>
 
-  <!-- Toast Container -->
-  <div class="toast" id="toast">
-    <div class="toast-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="20 6 9 17 4 12"/>
-      </svg>
-    </div>
-    <div class="toast-message"></div>
-  </div>
-
-  <!-- Firebase - VERSÃO COMPAT (compatível com script tags normais) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
-  <!-- Config -->
   <script src="../config/firebase-config.js"></script>
 
-  <!-- Scripts -->
-  <script type="module" src="../js/utils.js"></script>
-  <script type="module" src="../js/auth.js"></script>
-  <script type="module" src="../js/database.js"></script>
+  <script type="module">
+    import { authManager } from '../js/auth.js';
+    import { dbManager } from '../js/database.js';
 
-  <script>
-    // Require authentication
-    if (typeof authManager !== 'undefined') {
-      authManager.requireAuth();
-    }
+    // Expor funções para o HTML (onclick)
+    window.openExchangeModal = () => document.getElementById('exchange-modal').classList.add('show');
+    window.closeExchangeModal = () => document.getElementById('exchange-modal').classList.remove('show');
+    window.openReceiptModal = () => document.getElementById('receipt-modal').classList.add('show');
+    window.closeReceiptModal = () => document.getElementById('receipt-modal').classList.remove('show');
 
     let currentManicure = null;
-    let selectedFile = null;
+    const manicureId = new URLSearchParams(window.location.search).get('id');
 
-    // Get manicure ID from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const manicureId = urlParams.get('id');
+    if (!manicureId) window.location.href = 'manicures.html';
 
-    if (!manicureId) {
-      window.location.href = 'manicures.html';
-    }
-
-    // Utils functions locais (renomeado para evitar conflito)
     const PageUtils = {
-      showLoading: () => {
-        document.getElementById('loading-spinner').classList.add('show');
-      },
-      hideLoading: () => {
-        document.getElementById('loading-spinner').classList.remove('show');
-      },
-      showToast: (message, type = 'success') => {
-        const toast = document.getElementById('toast');
-        const toastMessage = toast.querySelector('.toast-message');
-        const toastIcon = toast.querySelector('.toast-icon');
-        
-        toastMessage.textContent = message;
-        toast.className = 'toast ' + type;
-        toastIcon.className = 'toast-icon ' + type;
-        
-        let iconPath = '<polyline points="20 6 9 17 4 12"/>';
-        if (type === 'warning') {
-          iconPath = '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>';
-        } else if (type === 'danger') {
-          iconPath = '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
-        }
-        toastIcon.querySelector('svg').innerHTML = iconPath;
-        
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-      },
-      formatDate: (timestamp) => {
-        return new Date(timestamp).toLocaleDateString('pt-BR');
-      },
-      formatDateTime: (timestamp) => {
-        return new Date(timestamp).toLocaleString('pt-BR');
-      },
-      calculateDaysUntilExchange: (date) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const exchangeDate = new Date(date);
-        exchangeDate.setHours(0, 0, 0, 0);
-        const diff = Math.ceil((exchangeDate - today) / (1000 * 60 * 60 * 24));
-        return diff;
-      },
-      calculateNextExchangeDate: (startDate) => {
-        const planType = currentManicure ? parseInt(currentManicure.planType) : 15;
-        const date = new Date(startDate);
-        date.setDate(date.getDate() + planType);
-        return date.getTime();
-      },
-      isDueSoon: (nextExchangeDate) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const exchangeDate = new Date(nextExchangeDate);
-        exchangeDate.setHours(0, 0, 0, 0);
-        const diff = Math.ceil((exchangeDate - today) / (1000 * 60 * 60 * 24));
-        return diff <= 2;
+      showLoading: (show) => document.getElementById('loading-spinner').classList.toggle('show', show),
+      showToast: (msg) => {
+        const t = document.getElementById('toast');
+        t.querySelector('.toast-message').textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
       }
     };
 
-    // Load manicure details
-    async function loadManicureDetails() {
-      try {
-        PageUtils.showLoading();
-        
-        if (typeof dbManager === 'undefined') {
-          console.error('Database manager not loaded');
-          PageUtils.hideLoading();
-          return;
-        }
+    async function init() {
+      await authManager.requireAuth();
+      loadData();
+    }
 
+    async function loadData() {
+      PageUtils.showLoading(true);
+      try {
         currentManicure = await dbManager.getManicureById(manicureId);
+        if (!currentManicure) return window.location.href = 'manicures.html';
         
-        if (!currentManicure) {
-          PageUtils.showToast('Manicure não encontrada', 'danger');
-          setTimeout(() => window.location.href = 'manicures.html', 1000);
-          return;
-        }
-
-        // Update header
-        const firstName = currentManicure.name.split(' ')[0];
-        document.getElementById('mobile-title').textContent = firstName;
-        document.getElementById('manicure-name').textContent = currentManicure.name;
-        document.getElementById('manicure-phone').textContent = currentManicure.phone;
-        document.getElementById('manicure-address').textContent = currentManicure.address;
-        document.getElementById('plan-badge').textContent = `Plano ${currentManicure.planType}`;
-        
-        const statusBadge = document.getElementById('status-badge');
-        statusBadge.textContent = currentManicure.status === 'active' ? 'Ativa' : 'Inativa';
-        statusBadge.className = currentManicure.status === 'active' 
-          ? 'badge badge-success' 
-          : 'badge badge-secondary';
-
-        if (currentManicure.isDueSoon) {
-          document.getElementById('due-soon-badge').style.display = 'inline-block';
-        }
-
-        // Update info
-        document.getElementById('info-name').textContent = currentManicure.name;
-        document.getElementById('info-phone').textContent = currentManicure.phone;
-        document.getElementById('info-address').textContent = currentManicure.address;
-        document.getElementById('info-plan').textContent = `Plano ${currentManicure.planType} dias`;
-        document.getElementById('info-start-date').textContent = PageUtils.formatDate(currentManicure.startDate);
-        document.getElementById('plan-interval').textContent = `${currentManicure.planType} dias`;
-
-        // Update status toggle
-        const toggleSwitch = document.getElementById('toggle-switch');
-        const statusText = document.getElementById('status-text');
-        if (currentManicure.status === 'active') {
-          toggleSwitch.classList.add('active');
-          statusText.textContent = 'Ativa';
-        } else {
-          toggleSwitch.classList.remove('active');
-          statusText.textContent = 'Inativa';
-        }
-
-        // Update exchange info
-        const daysUntil = PageUtils.calculateDaysUntilExchange(currentManicure.nextExchangeDate);
-        document.getElementById('next-exchange').textContent = PageUtils.formatDate(currentManicure.nextExchangeDate);
-        document.getElementById('days-until').textContent = daysUntil;
-
-        if (currentManicure.lastExchangeDate) {
-          document.getElementById('last-exchange').textContent = PageUtils.formatDate(currentManicure.lastExchangeDate);
-        }
-
-        // Load exchange history
-        const exchanges = await dbManager.getKitExchanges(manicureId);
-        const historyContainer = document.getElementById('exchange-history');
-        
-        if (exchanges && exchanges.length > 0) {
-          historyContainer.innerHTML = `
-            <div class="history-list">
-              ${exchanges.map(e => `
-                <div class="history-item">
-                  <div class="history-item-header">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    <span>Troca de Kit</span>
-                  </div>
-                  <div class="history-item-date">${PageUtils.formatDateTime(e.exchangeDate)}</div>
-                  ${e.notes ? `<div class="history-item-notes">${e.notes}</div>` : ''}
-                </div>
-              `).join('')}
-            </div>
-          `;
-        }
-
-        // Load receipts
-        const receipts = await dbManager.getPaymentReceipts(manicureId);
-        const receiptsContainer = document.getElementById('receipts-list');
-        
-        if (receipts && receipts.length > 0) {
-          receiptsContainer.innerHTML = `
-            <div class="history-list">
-              ${receipts.map(r => `
-                <div class="history-item">
-                  <div class="history-item-header">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                      <polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                    <span>${r.fileName}</span>
-                  </div>
-                  <div class="history-item-date">${PageUtils.formatDateTime(r.uploadedAt)}</div>
-                  <a href="${r.fileUrl}" target="_blank" class="btn btn-secondary btn-full" style="margin-top: 0.75rem;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                    <span>Visualizar Comprovante</span>
-                  </a>
-                </div>
-              `).join('')}
-            </div>
-          `;
-        }
-
-        PageUtils.hideLoading();
-      } catch (error) {
-        console.error('Error loading manicure:', error);
-        PageUtils.hideLoading();
-        PageUtils.showToast('Erro ao carregar detalhes', 'danger');
-      }
+        renderHeader();
+        renderInfo();
+        await renderHistory();
+      } catch (e) { console.error(e); }
+      PageUtils.showLoading(false);
     }
 
-    // Toggle status
-    async function toggleStatus() {
-      try {
-        PageUtils.showLoading();
-        const newStatus = await dbManager.toggleManicureStatus(manicureId);
-        PageUtils.hideLoading();
-        PageUtils.showToast(`Status alterado para ${newStatus === 'active' ? 'Ativa' : 'Inativa'}`, 'success');
-        loadManicureDetails();
-      } catch (error) {
-        console.error('Error toggling status:', error);
-        PageUtils.hideLoading();
-        PageUtils.showToast('Erro ao alterar status', 'danger');
-      }
+    function renderHeader() {
+      document.getElementById('manicure-name').textContent = currentManicure.name;
+      document.getElementById('manicure-phone').textContent = currentManicure.phone;
+      document.getElementById('manicure-address').textContent = currentManicure.address;
+      document.getElementById('plan-badge').textContent = `Plano ${currentManicure.planType}`;
+      
+      const statusBadge = document.getElementById('status-badge');
+      statusBadge.textContent = currentManicure.status === 'active' ? 'Ativa' : 'Inativa';
+      statusBadge.className = `badge ${currentManicure.status === 'active' ? 'badge-success' : 'badge-secondary'}`;
+      
+      const diff = Math.ceil((currentManicure.nextExchangeDate - Date.now()) / (1000 * 60 * 60 * 24));
+      document.getElementById('days-until').textContent = diff;
+      document.getElementById('next-exchange').textContent = new Date(currentManicure.nextExchangeDate).toLocaleDateString();
+      document.getElementById('due-soon-badge').style.display = diff <= 2 ? 'inline-block' : 'none';
     }
 
-    // Exchange modal functions
-    function openExchangeModal() {
-      document.getElementById('exchange-modal').classList.add('show');
-      document.getElementById('exchange-notes').value = '';
+    function renderInfo() {
+      document.getElementById('info-name').textContent = currentManicure.name;
+      document.getElementById('info-phone').textContent = currentManicure.phone;
+      document.getElementById('info-plan').textContent = `${currentManicure.planType} dias`;
+      document.getElementById('info-start-date').textContent = new Date(currentManicure.startDate).toLocaleDateString();
+      
+      const toggle = document.getElementById('toggle-switch');
+      toggle.classList.toggle('active', currentManicure.status === 'active');
+      document.getElementById('status-text').textContent = currentManicure.status === 'active' ? 'Ativa' : 'Inativa';
     }
 
-    function closeExchangeModal() {
-      document.getElementById('exchange-modal').classList.remove('show');
-    }
-
-    async function submitExchange() {
-      try {
-        const notes = document.getElementById('exchange-notes').value;
-        const submitBtn = document.getElementById('exchange-submit');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Registrando...';
-        PageUtils.showLoading();
-
-        await dbManager.recordKitExchange(manicureId, notes);
-
-        const nextExchangeDate = PageUtils.calculateNextExchangeDate(Date.now());
-        await dbManager.updateManicure(manicureId, {
-          lastExchangeDate: Date.now(),
-          nextExchangeDate,
-          isDueSoon: PageUtils.isDueSoon(nextExchangeDate)
-        });
-
-        PageUtils.hideLoading();
-        PageUtils.showToast('Troca de kit registrada com sucesso!', 'success');
-        closeExchangeModal();
-        loadManicureDetails();
-      } catch (error) {
-        console.error('Error recording exchange:', error);
-        PageUtils.hideLoading();
-        PageUtils.showToast('Erro ao registrar troca', 'danger');
-        document.getElementById('exchange-submit').disabled = false;
-        document.getElementById('exchange-submit').textContent = 'Confirmar';
-      }
-    }
-
-    // Receipt modal functions
-    function openReceiptModal() {
-      document.getElementById('receipt-modal').classList.add('show');
-      selectedFile = null;
-      document.getElementById('file-input').value = '';
-      document.getElementById('file-preview').innerHTML = '';
-    }
-
-    function closeReceiptModal() {
-      document.getElementById('receipt-modal').classList.remove('show');
-    }
-
-    function previewFile() {
-      const input = document.getElementById('file-input');
-      selectedFile = input.files[0];
-
-      if (!selectedFile) return;
-
-      const preview = document.getElementById('file-preview');
-      const fileName = selectedFile.name;
-      const fileSize = (selectedFile.size / 1024).toFixed(2);
-
-      if (selectedFile.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          preview.innerHTML = `
-            <div class="file-preview">
-              <img src="${e.target.result}" alt="Preview">
-              <p style="font-weight: 500;">${fileName}</p>
-              <p style="font-size: 0.8125rem; color: var(--color-text-muted);">${fileSize} KB</p>
-            </div>
-          `;
-        };
-        reader.readAsDataURL(selectedFile);
-      } else {
-        preview.innerHTML = `
-          <div class="file-preview">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.5rem;">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-            <p style="font-weight: 500;">${fileName}</p>
-            <p style="font-size: 0.8125rem; color: var(--color-text-muted);">${fileSize} KB</p>
-          </div>
-        `;
-      }
-    }
-
-    async function submitReceipt() {
-      if (!selectedFile) {
-        PageUtils.showToast('Selecione um arquivo', 'warning');
+    async function renderHistory() {
+      const history = await dbManager.getKitExchanges(manicureId);
+      const container = document.getElementById('exchange-history');
+      if (!history || history.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#999;">Nenhuma troca registrada.</p>';
         return;
       }
-
-      try {
-        const submitBtn = document.getElementById('receipt-submit');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Enviando...';
-        PageUtils.showLoading();
-
-        await dbManager.uploadPaymentReceipt(manicureId, selectedFile);
-        
-        PageUtils.hideLoading();
-        PageUtils.showToast('Comprovante enviado com sucesso!', 'success');
-        closeReceiptModal();
-        loadManicureDetails();
-      } catch (error) {
-        console.error('Error uploading receipt:', error);
-        PageUtils.hideLoading();
-        PageUtils.showToast('Erro ao enviar comprovante', 'danger');
-        document.getElementById('receipt-submit').disabled = false;
-        document.getElementById('receipt-submit').textContent = 'Enviar';
-      }
+      container.innerHTML = history.reverse().map(ex => `
+        <div class="history-item">
+          <strong>${new Date(ex.date).toLocaleDateString()}</strong>
+          <p style="font-size:0.85rem; color:#666;">${ex.notes || 'Sem observações'}</p>
+        </div>
+      `).join('');
     }
 
-    // Close modals when clicking outside
-    window.addEventListener('click', (e) => {
-      const exchangeModal = document.getElementById('exchange-modal');
-      const receiptModal = document.getElementById('receipt-modal');
+    window.toggleStatus = async () => {
+      const newStatus = currentManicure.status === 'active' ? 'inactive' : 'active';
+      await dbManager.updateManicure(manicureId, { status: newStatus });
+      loadData();
+    };
 
-      if (e.target === exchangeModal) closeExchangeModal();
-      if (e.target === receiptModal) closeReceiptModal();
-    });
+    window.submitExchange = async () => {
+      const notes = document.getElementById('exchange-notes').value;
+      PageUtils.showLoading(true);
+      await dbManager.addExchange(manicureId, { notes });
+      closeExchangeModal();
+      loadData();
+      PageUtils.showToast("Troca registrada!");
+    };
 
-    // Load details on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(loadManicureDetails, 500);
-    });
+    window.previewFile = () => {
+      const file = document.getElementById('file-input').files[0];
+      document.getElementById('file-preview').textContent = file ? file.name : '';
+    };
+
+    window.submitReceipt = async () => {
+      const file = document.getElementById('file-input').files[0];
+      if (!file) return PageUtils.showToast("Selecione um arquivo");
+      PageUtils.showLoading(true);
+      await dbManager.uploadReceipt(manicureId, file);
+      closeReceiptModal();
+      PageUtils.showLoading(false);
+      PageUtils.showToast("Comprovante enviado!");
+    };
+
+    init();
   </script>
 </body>
 </html>
