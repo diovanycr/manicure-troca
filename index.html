@@ -953,28 +953,187 @@
     });
   </script>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
+  <!-- Firebase SDK v8 (compatible version) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-  <!-- Config -->
-  <script src="config/firebase-config.js"></script>
-
-  <!-- Scripts -->
-  <script src="js/utils.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/database.js"></script>
-
+  <!-- Firebase Config -->
   <script>
-    // Require authentication
-    if (typeof authManager !== 'undefined') {
-      authManager.requireAuth();
-      document.getElementById('logout-btn').onclick = () => authManager.signOut();
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
 
-    // Utils functions
+    // Auth Manager
+    const authManager = {
+      currentUser: null,
+
+      async signInWithGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        try {
+          const result = await firebase.auth().signInWithPopup(provider);
+          this.currentUser = result.user;
+          window.location.href = 'index.html';
+        } catch (error) {
+          console.error('Error signing in:', error);
+          alert('Erro ao fazer login: ' + error.message);
+        }
+      },
+
+      async signOut() {
+        try {
+          await firebase.auth().signOut();
+          window.location.href = 'pages/login.html';
+        } catch (error) {
+          console.error('Error signing out:', error);
+        }
+      },
+
+      requireAuth() {
+        firebase.auth().onAuthStateChanged((user) => {
+          if (user) {
+            this.currentUser = user;
+          } else {
+            window.location.href = 'pages/login.html';
+          }
+        });
+      }
+    };
+
+    // Database Manager
+    const dbManager = {
+      db: firebase.database(),
+
+      async getAllManicures() {
+        try {
+          const snapshot = await this.db.ref('manicures').once('value');
+          const data = snapshot.val();
+          if (!data) return [];
+          return Object.keys(data).map(key => ({ id: key, ...data[key] }));
+        } catch (error) {
+          console.error('Error getting manicures:', error);
+          return [];
+        }
+      },
+
+      async getManicureById(id) {
+        try {
+          const snapshot = await this.db.ref(`manicures/${id}`).once('value');
+          const data = snapshot.val();
+          return data ? { id, ...data } : null;
+        } catch (error) {
+          console.error('Error getting manicure:', error);
+          return null;
+        }
+      },
+
+      async createManicure(data) {
+        try {
+          const ref = await this.db.ref('manicures').push(data);
+          return { id: ref.key, ...data };
+        } catch (error) {
+          console.error('Error creating manicure:', error);
+          throw error;
+        }
+      },
+
+      async updateManicure(id, data) {
+        try {
+          await this.db.ref(`manicures/${id}`).update(data);
+        } catch (error) {
+          console.error('Error updating manicure:', error);
+          throw error;
+        }
+      },
+
+      async toggleManicureStatus(id) {
+        try {
+          const manicure = await this.getManicureById(id);
+          const newStatus = manicure.status === 'active' ? 'inactive' : 'active';
+          await this.updateManicure(id, { status: newStatus });
+          return newStatus;
+        } catch (error) {
+          console.error('Error toggling status:', error);
+          throw error;
+        }
+      },
+
+      async recordKitExchange(manicureId, notes) {
+        try {
+          const exchange = {
+            exchangeDate: Date.now(),
+            notes: notes || ''
+          };
+          await this.db.ref(`exchanges/${manicureId}`).push(exchange);
+        } catch (error) {
+          console.error('Error recording exchange:', error);
+          throw error;
+        }
+      },
+
+      async getKitExchanges(manicureId) {
+        try {
+          const snapshot = await this.db.ref(`exchanges/${manicureId}`).once('value');
+          const data = snapshot.val();
+          if (!data) return [];
+          return Object.keys(data)
+            .map(key => ({ id: key, ...data[key] }))
+            .sort((a, b) => b.exchangeDate - a.exchangeDate);
+        } catch (error) {
+          console.error('Error getting exchanges:', error);
+          return [];
+        }
+      },
+
+      async uploadPaymentReceipt(manicureId, file) {
+        try {
+          const storageRef = firebase.storage().ref();
+          const fileRef = storageRef.child(`receipts/${manicureId}/${Date.now()}_${file.name}`);
+          await fileRef.put(file);
+          const fileUrl = await fileRef.getDownloadURL();
+          
+          const receipt = {
+            fileName: file.name,
+            fileUrl: fileUrl,
+            uploadedAt: Date.now()
+          };
+          
+          await this.db.ref(`receipts/${manicureId}`).push(receipt);
+        } catch (error) {
+          console.error('Error uploading receipt:', error);
+          throw error;
+        }
+      },
+
+      async getPaymentReceipts(manicureId) {
+        try {
+          const snapshot = await this.db.ref(`receipts/${manicureId}`).once('value');
+          const data = snapshot.val();
+          if (!data) return [];
+          return Object.keys(data)
+            .map(key => ({ id: key, ...data[key] }))
+            .sort((a, b) => b.uploadedAt - a.uploadedAt);
+        } catch (error) {
+          console.error('Error getting receipts:', error);
+          return [];
+        }
+      }
+    };
+
+    // Utils
     const Utils = {
       showLoading: () => {
         document.getElementById('loading-spinner').classList.add('show');
@@ -1007,19 +1166,17 @@
       }
     };
 
+    // Require authentication
+    authManager.requireAuth();
+    document.getElementById('logout-btn').onclick = () => authManager.signOut();
+
     // Load dashboard data
     async function loadDashboard() {
       try {
-        if (typeof Utils !== 'undefined') Utils.showLoading();
+        Utils.showLoading();
         
-        if (typeof dbManager === 'undefined') {
-          console.error('Database manager not loaded');
-          if (typeof Utils !== 'undefined') Utils.hideLoading();
-          return;
-        }
-
         const manicures = await dbManager.getAllManicures();
-        const user = typeof authManager !== 'undefined' ? authManager.currentUser : null;
+        const user = authManager.currentUser;
         
         if (user) {
           document.getElementById('user-info').textContent = user.email;
@@ -1082,12 +1239,12 @@
           `;
         }
 
-        if (typeof Utils !== 'undefined') Utils.hideLoading();
+        Utils.hideLoading();
       } catch (e) { 
         console.error(e);
         document.getElementById('recent-manicures').innerHTML = 
           '<div style="color: var(--color-danger); text-align: center; padding: 2rem;">Erro ao carregar dados. Tente novamente.</div>';
-        if (typeof Utils !== 'undefined') Utils.hideLoading();
+        Utils.hideLoading();
       }
     }
 
