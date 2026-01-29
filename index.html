@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:,">
  <style>
-  /* AJUSTE DE UX FINO PARA O RODAPÉ MOBILE */
+  /* AJUSTE DE UX MOBILE - RODAPÉ COMPACTO */
   @media (max-width: 768px) {
     body { flex-direction: column; }
     
@@ -15,44 +15,45 @@
       width: 100%; 
       height: auto; 
       position: relative; 
-      padding: 0.8rem 1rem; /* Reduzido de 1.5rem */
+      padding: 0.8rem 1rem; /* Reduzi o padding geral da barra */
     }
 
     .sidebar-header {
-      margin-bottom: 0.8rem;
-      padding-bottom: 0.8rem;
+      margin-bottom: 0.6rem;
+      padding-bottom: 0.6rem;
     }
 
-    /* Menu compacto e funcional */
+    /* Menu lateral no mobile em linha */
     .nav-menu {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       overflow-x: auto;
-      padding-bottom: 8px; /* Reduzido o respiro inferior */
+      padding-bottom: 8px;
     }
 
+    .nav-item { flex-shrink: 0; }
+    
     .nav-link {
-      padding: 10px 16px; /* Ajuste para não ficar gigante */
-      font-size: 0.9rem;
-      min-width: 100px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
     }
 
-    /* RODAPÉ OTIMIZADO - SEM ESPAÇOS SOBRANDO */
+    /* RODAPÉ AJUSTADO: APROXIMANDO O E-MAIL DO BOTÃO */
     .sidebar-footer {
-      margin-top: 0.5rem; /* Reduzido de 1rem */
-      padding-top: 0.8rem; /* Reduzido de 1rem */
+      margin-top: 0.4rem; /* Reduzi o espaço entre o menu e o rodapé */
+      padding-top: 0.6rem; 
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      justify-content: space-between; /* Mantém um em cada ponta */
+      gap: 5px; /* Reduz o espaço mínimo entre eles */
     }
 
     #user-info { 
       margin-bottom: 0 !important; 
-      font-size: 0.8rem; /* Fonte levemente menor para caber melhor */
-      color: rgba(255, 255, 255, 0.9);
-      max-width: 60%;
+      font-size: 0.8rem;
+      color: white;
+      max-width: 70%; /* Dá mais espaço para o e-mail aparecer */
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -61,16 +62,14 @@
     #logout-btn { 
       width: auto !important; 
       margin-top: 0 !important; 
-      padding: 6px 12px !important; /* Botão mais baixo e elegante */
+      padding: 6px 12px !important; /* Tamanho original padrão */
       font-size: 0.75rem;
-      font-weight: 500;
-      border-radius: 6px;
-      flex-shrink: 0;
+      flex-shrink: 0; /* Não deixa o botão encolher */
     }
 
     .main-content { 
       margin-left: 0; 
-      padding: 1rem; /* Padding do conteúdo mais justo no mobile */
+      padding: 1.25rem; 
     }
   }
 </style>
