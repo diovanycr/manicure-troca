@@ -219,14 +219,33 @@
         
         const newId = await dbManager.addManicure(manicureData);
         
+        // CORREÇÃO: Garantir que newId seja uma string válida
+        console.log('ID retornado:', newId, 'Tipo:', typeof newId);
+        
+        let validId;
+        if (typeof newId === 'object' && newId !== null) {
+          // Se for um objeto, tenta extrair a propriedade 'key' ou converte para string
+          validId = newId.key || JSON.stringify(newId);
+          console.warn('ID retornado era um objeto, usando:', validId);
+        } else if (typeof newId === 'string') {
+          validId = newId;
+        } else {
+          validId = String(newId);
+        }
+        
+        // Validação adicional
+        if (!validId || validId === '[object Object]' || validId === 'undefined' || validId === 'null') {
+          throw new Error('ID inválido retornado pelo banco de dados');
+        }
+        
         PageUtils.showToast("Cadastrada com sucesso!");
         setTimeout(() => {
-          window.location.href = `manicure-details.html?id=${newId}`;
+          window.location.href = `manicure-details.html?id=${encodeURIComponent(validId)}`;
         }, 1500);
 
       } catch (err) {
-        console.error(err);
-        PageUtils.showToast("Erro ao cadastrar", "danger");
+        console.error('Erro ao cadastrar:', err);
+        PageUtils.showToast(err.message || "Erro ao cadastrar", "danger");
         btn.disabled = false;
       } finally {
         PageUtils.showLoading(false);
