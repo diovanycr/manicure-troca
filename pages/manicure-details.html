@@ -191,21 +191,14 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
   <script src="../config/firebase-config.js"></script>
 
-  <script type="module">
+ <script type="module">
+    // 2. IMPORTAÇÕES CORRETAS (SDK v10)
+    import { auth } from '../config/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
 
-    // Expor funções para o HTML (onclick)
-    window.openExchangeModal = () => document.getElementById('exchange-modal').classList.add('show');
-    window.closeExchangeModal = () => document.getElementById('exchange-modal').classList.remove('show');
-    window.openReceiptModal = () => document.getElementById('receipt-modal').classList.add('show');
-    window.closeReceiptModal = () => document.getElementById('receipt-modal').classList.remove('show');
-
-    let currentManicure = null;
-    const manicureId = new URLSearchParams(window.location.search).get('id');
-
-    if (!manicureId) window.location.href = 'manicures.html';
-
+    // Utilitários da Página
     const PageUtils = {
       showLoading: (show) => document.getElementById('loading-spinner').classList.toggle('show', show),
       showToast: (msg) => {
@@ -216,45 +209,73 @@
       }
     };
 
-    async function init() {
-      await authManager.requireAuth();
-      loadData();
-    }
+    // Variáveis de Controle
+    let currentManicure = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const manicureId = urlParams.get('id');
+
+    // 3. VIGIA DE AUTENTICAÇÃO (Resolve o erro "Usuário não autenticado")
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        console.log("Autenticado como:", user.email);
+        if (!manicureId) {
+          window.location.href = 'manicures.html';
+          return;
+        }
+        await loadData();
+      } else {
+        console.warn("Sessão expirada. Redirecionando...");
+        window.location.href = 'login.html';
+      }
+    });
 
     async function loadData() {
       PageUtils.showLoading(true);
       try {
         currentManicure = await dbManager.getManicureById(manicureId);
-        if (!currentManicure) return window.location.href = 'manicures.html';
+        if (!currentManicure) {
+          alert("Manicure não encontrada!");
+          window.location.href = 'manicures.html';
+          return;
+        }
         
         renderHeader();
         renderInfo();
         await renderHistory();
-      } catch (e) { console.error(e); }
-      PageUtils.showLoading(false);
+      } catch (e) { 
+        console.error("Erro ao carregar dados:", e);
+        PageUtils.showToast("Erro ao carregar informações.");
+      } finally {
+        PageUtils.showLoading(false);
+      }
     }
 
+    // --- FUNÇÕES DE RENDERIZAÇÃO ---
     function renderHeader() {
-      document.getElementById('manicure-name').textContent = currentManicure.name;
-      document.getElementById('manicure-phone').textContent = currentManicure.phone;
-      document.getElementById('manicure-address').textContent = currentManicure.address;
-      document.getElementById('plan-badge').textContent = `Plano ${currentManicure.planType}`;
+      document.getElementById('manicure-name').textContent = currentManicure.name || 'Sem nome';
+      document.getElementById('manicure-phone').textContent = currentManicure.phone || '-';
+      document.getElementById('manicure-address').textContent = currentManicure.address || 'Endereço não informado';
+      document.getElementById('plan-badge').textContent = `Plano ${currentManicure.planType || '15'} dias`;
       
       const statusBadge = document.getElementById('status-badge');
-      statusBadge.textContent = currentManicure.status === 'active' ? 'Ativa' : 'Inativa';
-      statusBadge.className = `badge ${currentManicure.status === 'active' ? 'badge-success' : 'badge-secondary'}`;
+      const isActive = currentManicure.status === 'active';
+      statusBadge.textContent = isActive ? 'Ativa' : 'Inativa';
+      statusBadge.className = `badge ${isActive ? 'badge-success' : 'badge-secondary'}`;
       
-      const diff = Math.ceil((currentManicure.nextExchangeDate - Date.now()) / (1000 * 60 * 60 * 24));
-      document.getElementById('days-until').textContent = diff;
-      document.getElementById('next-exchange').textContent = new Date(currentManicure.nextExchangeDate).toLocaleDateString();
-      document.getElementById('due-soon-badge').style.display = diff <= 2 ? 'inline-block' : 'none';
+      // Cálculo de dias para troca
+      if (currentManicure.nextExchangeDate) {
+        const diff = Math.ceil((currentManicure.nextExchangeDate - Date.now()) / (1000 * 60 * 60 * 24));
+        document.getElementById('days-until').textContent = diff > 0 ? diff : 0;
+        document.getElementById('next-exchange').textContent = new Date(currentManicure.nextExchangeDate).toLocaleDateString('pt-BR');
+        document.getElementById('due-soon-badge').style.display = diff <= 2 ? 'inline-block' : 'none';
+      }
     }
 
     function renderInfo() {
       document.getElementById('info-name').textContent = currentManicure.name;
-      document.getElementById('info-phone').textContent = currentManicure.phone;
-      document.getElementById('info-plan').textContent = `${currentManicure.planType} dias`;
-      document.getElementById('info-start-date').textContent = new Date(currentManicure.startDate).toLocaleDateString();
+      document.getElementById('info-phone').textContent = currentManicure.phone || '-';
+      document.getElementById('info-plan').textContent = `${currentManicure.planType || '15'} dias`;
+      document.getElementById('info-start-date').textContent = currentManicure.createdAt ? new Date(currentManicure.createdAt).toLocaleDateString('pt-BR') : '-';
       
       const toggle = document.getElementById('toggle-switch');
       toggle.classList.toggle('active', currentManicure.status === 'active');
@@ -262,51 +283,79 @@
     }
 
     async function renderHistory() {
-      const history = await dbManager.getKitExchanges(manicureId);
-      const container = document.getElementById('exchange-history');
-      if (!history || history.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#999;">Nenhuma troca registrada.</p>';
-        return;
+      try {
+        const history = await dbManager.getKitExchanges(manicureId);
+        const container = document.getElementById('exchange-history');
+        
+        if (!history || history.length === 0) {
+          container.innerHTML = '<p style="text-align:center; color:#999;">Nenhuma troca registrada.</p>';
+          return;
+        }
+        
+        container.innerHTML = history.reverse().map(ex => `
+          <div class="history-item">
+            <strong>${new Date(ex.date).toLocaleDateString('pt-BR')}</strong>
+            <p style="font-size:0.85rem; color:#666;">${ex.notes || 'Sem observações'}</p>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error("Erro histórico:", err);
       }
-      container.innerHTML = history.reverse().map(ex => `
-        <div class="history-item">
-          <strong>${new Date(ex.date).toLocaleDateString()}</strong>
-          <p style="font-size:0.85rem; color:#666;">${ex.notes || 'Sem observações'}</p>
-        </div>
-      `).join('');
     }
+
+    // --- FUNÇÕES GLOBAIS (EXPOSTAS PARA O WINDOW) ---
+    window.openExchangeModal = () => document.getElementById('exchange-modal').classList.add('show');
+    window.closeExchangeModal = () => document.getElementById('exchange-modal').classList.remove('show');
+    window.openReceiptModal = () => document.getElementById('receipt-modal').classList.add('show');
+    window.closeReceiptModal = () => document.getElementById('receipt-modal').classList.remove('show');
 
     window.toggleStatus = async () => {
       const newStatus = currentManicure.status === 'active' ? 'inactive' : 'active';
-      await dbManager.updateManicure(manicureId, { status: newStatus });
-      loadData();
+      try {
+        await dbManager.updateManicure(manicureId, { status: newStatus });
+        await loadData();
+        PageUtils.showToast("Status atualizado!");
+      } catch (e) {
+        PageUtils.showToast("Erro ao atualizar status.");
+      }
     };
 
     window.submitExchange = async () => {
       const notes = document.getElementById('exchange-notes').value;
       PageUtils.showLoading(true);
-      await dbManager.addExchange(manicureId, { notes });
-      closeExchangeModal();
-      loadData();
-      PageUtils.showToast("Troca registrada!");
+      try {
+        await dbManager.addExchange(manicureId, { notes });
+        document.getElementById('exchange-notes').value = "";
+        closeExchangeModal();
+        await loadData();
+        PageUtils.showToast("Troca registrada com sucesso!");
+      } catch (e) {
+        PageUtils.showToast("Erro ao registrar troca.");
+      } finally {
+        PageUtils.showLoading(false);
+      }
     };
 
     window.previewFile = () => {
       const file = document.getElementById('file-input').files[0];
-      document.getElementById('file-preview').textContent = file ? file.name : '';
+      document.getElementById('file-preview').textContent = file ? `Selecionado: ${file.name}` : '';
     };
 
     window.submitReceipt = async () => {
       const file = document.getElementById('file-input').files[0];
-      if (!file) return PageUtils.showToast("Selecione um arquivo");
+      if (!file) return PageUtils.showToast("Selecione um arquivo primeiro");
+      
       PageUtils.showLoading(true);
-      await dbManager.uploadReceipt(manicureId, file);
-      closeReceiptModal();
-      PageUtils.showLoading(false);
-      PageUtils.showToast("Comprovante enviado!");
+      try {
+        await dbManager.uploadReceipt(manicureId, file);
+        closeReceiptModal();
+        PageUtils.showToast("Comprovante enviado com sucesso!");
+      } catch (e) {
+        PageUtils.showToast("Erro ao enviar arquivo.");
+      } finally {
+        PageUtils.showLoading(false);
+      }
     };
-
-    init();
   </script>
 </body>
 </html>
