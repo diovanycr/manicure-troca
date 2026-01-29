@@ -140,9 +140,7 @@
     <button class="fab" onclick="window.location.href='new-manicure.html'">+</button>
 
 
-  <a href="new-manicure.html" class="fab">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-  </a>
+  <a href="new-manicure.html" class="fab">+</a>
 
   <script type="module">
     import { authManager } from '../js/auth.js';
@@ -152,27 +150,35 @@
 
     async function init() {
       try {
+        // Verifica login
         await authManager.requireAuth();
-        loadManicures();
-      } catch (e) { window.location.href = '../login.html'; }
+        await loadManicures();
+      } catch (e) { 
+        console.error("Erro na inicialização:", e);
+        window.location.href = '../login.html'; 
+      }
     }
 
     async function loadManicures() {
-      const listElement = document.getElementById('manicure-list');
-      
+      const container = document.getElementById('manicures-container');
       try {
-        // Busca os dados do Firebase
         const data = await dbManager.getAllManicures();
+        // Converte o objeto do Firebase em Array
         allManicures = data ? Object.entries(data).map(([id, val]) => ({ id, ...val })) : [];
         
         renderList(allManicures);
       } catch (error) {
-        listElement.innerHTML = '<div class="loading">Erro ao carregar dados.</div>';
+        console.error("Erro ao buscar dados:", error);
+        container.innerHTML = '<div class="loading">Erro ao carregar do banco de dados.</div>';
       }
     }
 
     function renderList(list) {
-      const container = document.getElementById('manicure-list');
+      const container = document.getElementById('manicures-container');
+      const countLabel = document.getElementById('results-count');
+      
+      countLabel.textContent = list.length;
+
       if (list.length === 0) {
         container.innerHTML = '<div class="loading">Nenhuma manicure encontrada.</div>';
         return;
@@ -184,8 +190,8 @@
           <a href="manicure-details.html?id=${m.id}" class="card">
             <div class="info">
               <h3>${m.name}</h3>
-              <p>${m.phone}</p>
-              <p>Troca: ${new Date(m.nextExchangeDate).toLocaleDateString('pt-BR')}</p>
+              <p>${m.phone || 'Sem telefone'}</p>
+              <p>Próxima Troca: ${m.nextExchangeDate ? new Date(m.nextExchangeDate).toLocaleDateString('pt-BR') : 'Não definida'}</p>
             </div>
             <div class="status-badge ${status.class}">
               ${status.text}
@@ -196,23 +202,30 @@
     }
 
     function calculateStatus(nextDate) {
+      if (!nextDate) return { text: 'Sem Data', class: 'status-warning' };
+      
       const today = new Date().setHours(0,0,0,0);
       const target = new Date(nextDate).setHours(0,0,0,0);
       const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
 
-      if (diffDays <= 0) return { text: 'Atrásada', class: 'status-urgent' };
+      if (diffDays <= 0) return { text: 'Atrasada', class: 'status-urgent' };
       if (diffDays <= 2) return { text: 'Trocar Agora', class: 'status-warning' };
       return { text: 'Em dia', class: 'status-ok' };
     }
 
-    // Filtro de Busca
-    document.getElementById('search').addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      const filtered = allManicures.filter(m => m.name.toLowerCase().includes(term));
-      renderList(filtered);
-    });
+    // Filtro de Busca CORRIGIDO
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allManicures.filter(m => 
+                (m.name && m.name.toLowerCase().includes(term)) || 
+                (m.phone && m.phone.includes(term))
+            );
+            renderList(filtered);
+        });
+    }
 
     init();
   </script>
 </body>
-</html>
