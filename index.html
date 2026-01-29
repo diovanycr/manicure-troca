@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:,">
   <style>
-  /* AJUSTE DE UX MOBILE - DASHBOARD EM DESTAQUE */
+  /* AJUSTE DE UX MOBILE - 3 BOTÕES ALINHADOS E IGUAIS */
   @media (max-width: 768px) {
     body { flex-direction: column; }
     
@@ -19,63 +19,64 @@
     }
 
     .sidebar-header {
-      margin-bottom: 0.6rem;
+      margin-bottom: 0.8rem;
       padding-bottom: 0.6rem;
     }
 
-    /* Menu lateral no mobile em linha */
+    /* MENU EM GRID: 3 COLUNAS IGUAIS */
     .nav-menu {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-      align-items: center; /* Alinha os botões verticalmente */
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* Divide em 3 partes idênticas */
+      gap: 8px; /* Espaço entre eles */
+      padding: 0;
+      margin: 0;
+      list-style: none;
     }
 
-    .nav-item { flex-shrink: 0; }
+    .nav-item { width: 100%; }
     
-    /* ESTILO GERAL DOS LINKS */
     .nav-link {
-      padding: 10px 14px;
-      font-size: 0.85rem;
       display: flex;
+      flex-direction: column; /* Ícone em cima, texto embaixo */
       align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.05);
+      justify-content: center;
+      padding: 10px 5px;
+      font-size: 0.75rem; /* Ajuste para caber o texto em telas pequenas */
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 10px;
       color: white;
+      text-align: center;
+      min-height: 60px; /* Altura fixa para ficarem alinhados */
+      border: 1px solid transparent;
     }
 
-    /* DESTAQUE ESPECIAL NO BOTÃO DASHBOARD (O primeiro da lista) */
-    .nav-item:first-child .nav-link {
-      padding: 12px 24px; /* Mais gordinho */
-      font-size: 1rem;     /* Texto maior */
-      font-weight: 700;    /* Texto em negrito */
-      background: rgba(255, 255, 255, 0.2); /* Fundo mais visível */
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      min-width: 130px;    /* Garante que seja o maior botão */
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+      font-weight: bold;
     }
 
-    .nav-item:first-child svg {
-      width: 22px; /* Ícone do dashboard maior */
-      height: 22px;
+    .nav-link svg {
+      width: 20px;
+      height: 20px;
+      margin-bottom: 4px;
     }
 
-    /* RODAPÉ COMPACTO */
+    /* RODAPÉ COMPACTO E LIMPO */
     .sidebar-footer {
-      margin-top: 0.4rem; 
+      margin-top: 1rem; 
       padding-top: 0.8rem; 
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 10px;
     }
 
     #user-info { 
       margin-bottom: 0 !important; 
-      font-size: 0.8rem;
-      max-width: 65%;
+      font-size: 0.75rem;
+      max-width: 60%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -83,9 +84,9 @@
     
     #logout-btn { 
       width: auto !important; 
-      margin-top: 0 !important; 
-      padding: 8px 14px !important;
-      font-size: 0.8rem;
+      padding: 6px 12px !important;
+      font-size: 0.75rem;
+      flex-shrink: 0;
     }
 
     .main-content { 
