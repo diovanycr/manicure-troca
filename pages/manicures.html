@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    /* ... (Mantive seus estilos originais para não alterar o visual) ... */
+    /* ... (Mantive seus estilos originais) ... */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --color-primary: #d946ef; --color-primary-dark: #a21caf; --color-secondary: #fbbf24;
@@ -142,8 +142,9 @@
   <script type="module">
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
+    import { auth } from '../config/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    // Utilitários
     const Utils = {
       formatDate: (date) => {
         if (!date) return 'Não definida';
@@ -153,7 +154,7 @@
 
     let allManicures = [];
 
-    // Funções Globais expostas para o Window (necessário para eventos inline se houver)
+    // Funções Globais
     window.toggleNav = () => {
       document.getElementById('navDrawer').classList.toggle('open');
       document.getElementById('overlay').classList.toggle('open');
@@ -163,15 +164,23 @@
       return name ? name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : '?';
     }
 
+    // --- CORREÇÃO: MONITOR DE AUTENTICAÇÃO ---
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById('user-info').textContent = user.email;
+        await loadManicures();
+      } else {
+        window.location.href = 'login.html';
+      }
+    });
+
     async function loadManicures() {
       try {
         allManicures = await dbManager.getAllManicures();
-        const user = authManager.currentUser;
-        if (user) document.getElementById('user-info').textContent = user.email;
         filterManicures();
       } catch (error) {
         console.error('Erro:', error);
-        document.getElementById('manicures-list').innerHTML = 'Erro ao carregar dados.';
+        document.getElementById('manicures-list').innerHTML = '<div style="text-align:center; padding:2rem; color:red;">Erro ao carregar dados.</div>';
       }
     }
 
@@ -180,9 +189,10 @@
       const status = document.getElementById('status-filter').value;
 
       const filtered = allManicures.filter(m => {
-        const matchSearch = m.name.toLowerCase().includes(query) || (m.phone && m.phone.includes(query));
-        const matchStatus = !status || m.status === status;
-        return matchSearch && matchStatus;
+        const nameMatch = m.name?.toLowerCase().includes(query);
+        const phoneMatch = m.phone?.includes(query);
+        const statusMatch = !status || m.status === status;
+        return (nameMatch || phoneMatch) && statusMatch;
       });
 
       renderList(filtered);
@@ -216,19 +226,12 @@
       `).join('');
     }
 
-    // Inicialização
-    document.addEventListener('DOMContentLoaded', () => {
-      // Configura eventos
-      document.getElementById('menuBtn').onclick = window.toggleNav;
-      document.getElementById('overlay').onclick = window.toggleNav;
-      document.getElementById('logout-btn').onclick = () => authManager.signOut();
-      document.getElementById('search-input').oninput = filterManicures;
-      document.getElementById('status-filter').onchange = filterManicures;
-
-      // Proteção de Rota e Carga de dados
-      authManager.requireAuth();
-      setTimeout(loadManicures, 500);
-    });
+    // Eventos
+    document.getElementById('menuBtn').onclick = window.toggleNav;
+    document.getElementById('overlay').onclick = window.toggleNav;
+    document.getElementById('logout-btn').onclick = () => authManager.signOut();
+    document.getElementById('search-input').oninput = filterManicures;
+    document.getElementById('status-filter').onchange = filterManicures;
   </script>
 </body>
 </html>
