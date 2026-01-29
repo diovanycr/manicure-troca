@@ -929,11 +929,11 @@
     <div class="toast-message"></div>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
+  <!-- Firebase - VERSÃO COMPAT (compatível com script tags normais) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
   <!-- Config -->
   <script src="../config/firebase-config.js"></script>
@@ -960,8 +960,8 @@
       window.location.href = 'manicures.html';
     }
 
-    // Utils functions
-    const Utils = {
+    // Utils functions locais (renomeado para evitar conflito)
+    const PageUtils = {
       showLoading: () => {
         document.getElementById('loading-spinner').classList.add('show');
       },
@@ -1021,18 +1021,18 @@
     // Load manicure details
     async function loadManicureDetails() {
       try {
-        Utils.showLoading();
+        PageUtils.showLoading();
         
         if (typeof dbManager === 'undefined') {
           console.error('Database manager not loaded');
-          Utils.hideLoading();
+          PageUtils.hideLoading();
           return;
         }
 
         currentManicure = await dbManager.getManicureById(manicureId);
         
         if (!currentManicure) {
-          Utils.showToast('Manicure não encontrada', 'danger');
+          PageUtils.showToast('Manicure não encontrada', 'danger');
           setTimeout(() => window.location.href = 'manicures.html', 1000);
           return;
         }
@@ -1060,7 +1060,7 @@
         document.getElementById('info-phone').textContent = currentManicure.phone;
         document.getElementById('info-address').textContent = currentManicure.address;
         document.getElementById('info-plan').textContent = `Plano ${currentManicure.planType} dias`;
-        document.getElementById('info-start-date').textContent = Utils.formatDate(currentManicure.startDate);
+        document.getElementById('info-start-date').textContent = PageUtils.formatDate(currentManicure.startDate);
         document.getElementById('plan-interval').textContent = `${currentManicure.planType} dias`;
 
         // Update status toggle
@@ -1075,12 +1075,12 @@
         }
 
         // Update exchange info
-        const daysUntil = Utils.calculateDaysUntilExchange(currentManicure.nextExchangeDate);
-        document.getElementById('next-exchange').textContent = Utils.formatDate(currentManicure.nextExchangeDate);
+        const daysUntil = PageUtils.calculateDaysUntilExchange(currentManicure.nextExchangeDate);
+        document.getElementById('next-exchange').textContent = PageUtils.formatDate(currentManicure.nextExchangeDate);
         document.getElementById('days-until').textContent = daysUntil;
 
         if (currentManicure.lastExchangeDate) {
-          document.getElementById('last-exchange').textContent = Utils.formatDate(currentManicure.lastExchangeDate);
+          document.getElementById('last-exchange').textContent = PageUtils.formatDate(currentManicure.lastExchangeDate);
         }
 
         // Load exchange history
@@ -1098,7 +1098,7 @@
                     </svg>
                     <span>Troca de Kit</span>
                   </div>
-                  <div class="history-item-date">${Utils.formatDateTime(e.exchangeDate)}</div>
+                  <div class="history-item-date">${PageUtils.formatDateTime(e.exchangeDate)}</div>
                   ${e.notes ? `<div class="history-item-notes">${e.notes}</div>` : ''}
                 </div>
               `).join('')}
@@ -1122,7 +1122,7 @@
                     </svg>
                     <span>${r.fileName}</span>
                   </div>
-                  <div class="history-item-date">${Utils.formatDateTime(r.uploadedAt)}</div>
+                  <div class="history-item-date">${PageUtils.formatDateTime(r.uploadedAt)}</div>
                   <a href="${r.fileUrl}" target="_blank" class="btn btn-secondary btn-full" style="margin-top: 0.75rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -1136,26 +1136,26 @@
           `;
         }
 
-        Utils.hideLoading();
+        PageUtils.hideLoading();
       } catch (error) {
         console.error('Error loading manicure:', error);
-        Utils.hideLoading();
-        Utils.showToast('Erro ao carregar detalhes', 'danger');
+        PageUtils.hideLoading();
+        PageUtils.showToast('Erro ao carregar detalhes', 'danger');
       }
     }
 
     // Toggle status
     async function toggleStatus() {
       try {
-        Utils.showLoading();
+        PageUtils.showLoading();
         const newStatus = await dbManager.toggleManicureStatus(manicureId);
-        Utils.hideLoading();
-        Utils.showToast(`Status alterado para ${newStatus === 'active' ? 'Ativa' : 'Inativa'}`, 'success');
+        PageUtils.hideLoading();
+        PageUtils.showToast(`Status alterado para ${newStatus === 'active' ? 'Ativa' : 'Inativa'}`, 'success');
         loadManicureDetails();
       } catch (error) {
         console.error('Error toggling status:', error);
-        Utils.hideLoading();
-        Utils.showToast('Erro ao alterar status', 'danger');
+        PageUtils.hideLoading();
+        PageUtils.showToast('Erro ao alterar status', 'danger');
       }
     }
 
@@ -1175,25 +1175,25 @@
         const submitBtn = document.getElementById('exchange-submit');
         submitBtn.disabled = true;
         submitBtn.textContent = 'Registrando...';
-        Utils.showLoading();
+        PageUtils.showLoading();
 
         await dbManager.recordKitExchange(manicureId, notes);
 
-        const nextExchangeDate = Utils.calculateNextExchangeDate(Date.now());
+        const nextExchangeDate = PageUtils.calculateNextExchangeDate(Date.now());
         await dbManager.updateManicure(manicureId, {
           lastExchangeDate: Date.now(),
           nextExchangeDate,
-          isDueSoon: Utils.isDueSoon(nextExchangeDate)
+          isDueSoon: PageUtils.isDueSoon(nextExchangeDate)
         });
 
-        Utils.hideLoading();
-        Utils.showToast('Troca de kit registrada com sucesso!', 'success');
+        PageUtils.hideLoading();
+        PageUtils.showToast('Troca de kit registrada com sucesso!', 'success');
         closeExchangeModal();
         loadManicureDetails();
       } catch (error) {
         console.error('Error recording exchange:', error);
-        Utils.hideLoading();
-        Utils.showToast('Erro ao registrar troca', 'danger');
+        PageUtils.hideLoading();
+        PageUtils.showToast('Erro ao registrar troca', 'danger');
         document.getElementById('exchange-submit').disabled = false;
         document.getElementById('exchange-submit').textContent = 'Confirmar';
       }
@@ -1249,7 +1249,7 @@
 
     async function submitReceipt() {
       if (!selectedFile) {
-        Utils.showToast('Selecione um arquivo', 'warning');
+        PageUtils.showToast('Selecione um arquivo', 'warning');
         return;
       }
 
@@ -1257,18 +1257,18 @@
         const submitBtn = document.getElementById('receipt-submit');
         submitBtn.disabled = true;
         submitBtn.textContent = 'Enviando...';
-        Utils.showLoading();
+        PageUtils.showLoading();
 
         await dbManager.uploadPaymentReceipt(manicureId, selectedFile);
         
-        Utils.hideLoading();
-        Utils.showToast('Comprovante enviado com sucesso!', 'success');
+        PageUtils.hideLoading();
+        PageUtils.showToast('Comprovante enviado com sucesso!', 'success');
         closeReceiptModal();
         loadManicureDetails();
       } catch (error) {
         console.error('Error uploading receipt:', error);
-        Utils.hideLoading();
-        Utils.showToast('Erro ao enviar comprovante', 'danger');
+        PageUtils.hideLoading();
+        PageUtils.showToast('Erro ao enviar comprovante', 'danger');
         document.getElementById('receipt-submit').disabled = false;
         document.getElementById('receipt-submit').textContent = 'Enviar';
       }
