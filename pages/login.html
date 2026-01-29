@@ -432,61 +432,59 @@
   <script type="module" src="js/auth.js"></script>
 
   <script type="module">
-    // Importações modernas (v9) via CDN oficial do Google
+    // Importações oficiais do Google (CDN)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-    // --- CONFIGURAÇÃO (Substitua pelos seus dados reais) ---
+    // Suas credenciais reais (Já configuradas)
     const firebaseConfig = {
-  apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
-  authDomain: "parceiro-be3e9.firebaseapp.com",
-  databaseURL: "https://parceiro-be3e9-default-rtdb.firebaseio.com",
-  projectId: "parceiro-be3e9",
-  storageBucket: "parceiro-be3e9.firebasestorage.app",
-  messagingSenderId: "619982778395",
-  appId: "1:619982778395:web:25c141958b7c06da02c8be"
-};
+      apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
+      authDomain: "parceiro-be3e9.firebaseapp.com",
+      databaseURL: "https://parceiro-be3e9-default-rtdb.firebaseio.com",
+      projectId: "parceiro-be3e9",
+      storageBucket: "parceiro-be3e9.firebasestorage.app",
+      messagingSenderId: "619982778395",
+      appId: "1:619982778395:web:25c141958b7c06da02c8be"
+    };
 
-    // Inicialização do Firebase
+    // Inicialização
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // Referências do DOM
+    // Elementos da Interface
     const loginBtn = document.getElementById('login-btn');
     const loginSection = document.getElementById('login-section');
     const loadingState = document.getElementById('loading-state');
 
-    // Função de Login (Global para funcionar com onclick="handleLogin()")
+    // Função de Login exposta para o botão HTML
     window.handleLogin = async function() {
       try {
         loginBtn.disabled = true;
         loginBtn.querySelector('span').textContent = 'Conectando...';
-        
         await signInWithPopup(auth, provider);
-        
       } catch (error) {
         console.error('Erro no login:', error);
         loginBtn.disabled = false;
         loginBtn.querySelector('span').textContent = 'Entrar com Google';
-        alert('Erro ao fazer login. Verifique se o pop-up não foi bloqueado.');
+        alert('Erro ao fazer login. Verifique se os pop-ups estão permitidos.');
       }
     };
 
-    // Monitor de Sessão (Verifica se já está logado e redireciona)
+    // Monitor de Sessão: Se logar, esconde o botão e redireciona
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        loginSection.style.display = 'none';
-        loadingState.classList.add('show');
+        if (loginSection) loginSection.style.display = 'none';
+        if (loadingState) loadingState.classList.add('show');
         
-        // Redireciona para o index na raiz
         setTimeout(() => {
+          // Certifique-se de que o index.html está realmente uma pasta acima
           window.location.href = '../index.html';
         }, 800);
       }
     });
 
-    // Suporte para tecla Enter
+    // Atalho tecla Enter
     document.addEventListener('keypress', (e) => {
       if (e.key === 'Enter' && !loginBtn.disabled) {
         window.handleLogin();
@@ -494,3 +492,4 @@
     });
   </script>
 </body>
+</html>
