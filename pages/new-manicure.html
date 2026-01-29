@@ -95,7 +95,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      max-width: 600px;
+      max-width: 700px;
       margin-left: auto;
       margin-right: auto;
       width: 100%;
@@ -133,6 +133,30 @@
       padding: 1.5rem;
     }
 
+    .form-section {
+      margin-bottom: 2rem;
+    }
+
+    .form-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--color-bg);
+    }
+
+    .section-title svg {
+      color: var(--color-primary);
+    }
+
     .form-group {
       margin-bottom: 1.5rem;
     }
@@ -164,7 +188,6 @@
     }
 
     .form-group input,
-    .form-group textarea,
     .form-group select {
       width: 100%;
       padding: 0.875rem 1rem;
@@ -182,16 +205,10 @@
     }
 
     .form-group input:focus,
-    .form-group textarea:focus,
     .form-group select:focus {
       outline: none;
       border-color: var(--color-primary);
       box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.1);
-    }
-
-    .form-group textarea {
-      resize: vertical;
-      min-height: 100px;
     }
 
     .form-group select {
@@ -207,6 +224,14 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 1rem;
+    }
+
+    .form-row-2 {
+      grid-template-columns: 2fr 1fr;
+    }
+
+    .form-row-3 {
+      grid-template-columns: 3fr 2fr;
     }
 
     .helper-text {
@@ -468,104 +493,222 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="name">
-              Nome Completo
-              <span class="required">*</span>
-            </label>
-            <div class="input-wrapper">
-              <span class="input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-              </span>
+          <!-- Dados Pessoais -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Dados Pessoais
+            </h3>
+
+            <div class="form-group">
+              <label for="name">
+                Nome Completo
+                <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </span>
+                <input 
+                  type="text" 
+                  id="name" 
+                  name="name" 
+                  class="with-icon"
+                  placeholder="Digite o nome completo" 
+                  required
+                  autocomplete="name"
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">
+                Telefone
+                <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </span>
+                <input 
+                  type="tel" 
+                  id="phone" 
+                  name="phone" 
+                  class="with-icon"
+                  placeholder="(00) 00000-0000" 
+                  required
+                  autocomplete="tel"
+                >
+              </div>
+              <p class="helper-text">Formato: (11) 98765-4321</p>
+            </div>
+          </div>
+
+          <!-- Endereço -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Endereço
+            </h3>
+
+            <div class="form-row form-row-2">
+              <div class="form-group">
+                <label for="street">
+                  Rua/Avenida
+                  <span class="required">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="street" 
+                  name="street" 
+                  placeholder="Nome da rua" 
+                  required
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="number">
+                  Número
+                  <span class="required">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="number" 
+                  name="number" 
+                  placeholder="Nº" 
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="neighborhood">
+                Bairro
+                <span class="required">*</span>
+              </label>
               <input 
                 type="text" 
-                id="name" 
-                name="name" 
-                class="with-icon"
-                placeholder="Digite o nome completo" 
+                id="neighborhood" 
+                name="neighborhood" 
+                placeholder="Nome do bairro" 
                 required
-                autocomplete="name"
               >
             </div>
-          </div>
 
-          <div class="form-group">
-            <label for="phone">
-              Telefone
-              <span class="required">*</span>
-            </label>
-            <div class="input-wrapper">
-              <span class="input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                </svg>
-              </span>
-              <input 
-                type="tel" 
-                id="phone" 
-                name="phone" 
-                class="with-icon"
-                placeholder="(00) 00000-0000" 
-                required
-                autocomplete="tel"
-              >
-            </div>
-            <p class="helper-text">Formato: (11) 98765-4321</p>
-          </div>
+            <div class="form-row form-row-3">
+              <div class="form-group">
+                <label for="city">
+                  Cidade
+                  <span class="required">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="city" 
+                  name="city" 
+                  placeholder="Nome da cidade" 
+                  required
+                >
+              </div>
 
-          <div class="form-group">
-            <label for="address">
-              Endereço Completo
-              <span class="required">*</span>
-            </label>
-            <div class="input-wrapper">
-              <span class="input-icon" style="top: 1.25rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                  <circle cx="12" cy="10" r="3"/>
-                </svg>
-              </span>
-              <textarea 
-                id="address" 
-                name="address" 
-                class="with-icon"
-                placeholder="" 
-                required
-              ></textarea>
-              <span style="position: absolute; left: 3rem; top: 2.5rem; color: var(--color-text-muted); font-size: 1rem; pointer-events: none;">Rua, número, bairro, cidade, estado</span>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="plan-type">
-                Tipo de Plano
-                <span class="required">*</span>
-              </label>
-              <select id="plan-type" name="planType" required>
-                <option value="">Selecione um plano</option>
-                <option value="12">Plano 12</option>
-                <option value="15">Plano 15</option>
-                <option value="18">Plano 18</option>
-              </select>
-              <p class="helper-text">Intervalo entre trocas de kit</p>
+              <div class="form-group">
+                <label for="state">
+                  Estado
+                  <span class="required">*</span>
+                </label>
+                <select id="state" name="state" required>
+                  <option value="">Selecione</option>
+                  <option value="AC">Acre</option>
+                  <option value="AL">Alagoas</option>
+                  <option value="AP">Amapá</option>
+                  <option value="AM">Amazonas</option>
+                  <option value="BA">Bahia</option>
+                  <option value="CE">Ceará</option>
+                  <option value="DF">Distrito Federal</option>
+                  <option value="ES">Espírito Santo</option>
+                  <option value="GO">Goiás</option>
+                  <option value="MA">Maranhão</option>
+                  <option value="MT">Mato Grosso</option>
+                  <option value="MS">Mato Grosso do Sul</option>
+                  <option value="MG">Minas Gerais</option>
+                  <option value="PA">Pará</option>
+                  <option value="PB">Paraíba</option>
+                  <option value="PR">Paraná</option>
+                  <option value="PE">Pernambuco</option>
+                  <option value="PI">Piauí</option>
+                  <option value="RJ">Rio de Janeiro</option>
+                  <option value="RN">Rio Grande do Norte</option>
+                  <option value="RS">Rio Grande do Sul</option>
+                  <option value="RO">Rondônia</option>
+                  <option value="RR">Roraima</option>
+                  <option value="SC">Santa Catarina</option>
+                  <option value="SP">São Paulo</option>
+                  <option value="SE">Sergipe</option>
+                  <option value="TO">Tocantins</option>
+                </select>
+              </div>
             </div>
 
             <div class="form-group">
-              <label for="start-date">
-                Data de Início
-                <span class="required">*</span>
-              </label>
+              <label for="complement">Complemento (opcional)</label>
               <input 
-                type="date" 
-                id="start-date" 
-                name="startDate" 
-                required
+                type="text" 
+                id="complement" 
+                name="complement" 
+                placeholder="Apartamento, bloco, etc." 
               >
-              <p class="helper-text">Data do primeiro kit</p>
+            </div>
+          </div>
+
+          <!-- Plano -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 3h12l4 6-10 12L2 9z"/>
+                <path d="M11 3 8 9l4 12 4-12-3-6z"/>
+                <path d="M2 9h20"/>
+              </svg>
+              Plano e Data
+            </h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="plan-type">
+                  Tipo de Plano
+                  <span class="required">*</span>
+                </label>
+                <select id="plan-type" name="planType" required>
+                  <option value="">Selecione um plano</option>
+                  <option value="12">Plano 12 dias</option>
+                  <option value="15">Plano 15 dias</option>
+                  <option value="18">Plano 18 dias</option>
+                </select>
+                <p class="helper-text">Intervalo entre trocas de kit</p>
+              </div>
+
+              <div class="form-group">
+                <label for="start-date">
+                  Data de Início
+                  <span class="required">*</span>
+                </label>
+                <input 
+                  type="date" 
+                  id="start-date" 
+                  name="startDate" 
+                  required
+                >
+                <p class="helper-text">Data do primeiro kit</p>
+              </div>
             </div>
           </div>
         </form>
@@ -608,16 +751,16 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
-    // Firebase Config - Substitua com suas credenciais
+    // Firebase Config
     const firebaseConfig = {
-  apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
-  authDomain: "parceiro-be3e9.firebaseapp.com",
-  databaseURL: "https://parceiro-be3e9-default-rtdb.firebaseio.com",
-  projectId: "parceiro-be3e9",
-  storageBucket: "parceiro-be3e9.firebasestorage.app",
-  messagingSenderId: "619982778395",
-  appId: "1:619982778395:web:25c141958b7c06da02c8be"
-};
+      apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
+      authDomain: "parceiro-be3e9.firebaseapp.com",
+      databaseURL: "https://parceiro-be3e9-default-rtdb.firebaseio.com",
+      projectId: "parceiro-be3e9",
+      storageBucket: "parceiro-be3e9.firebasestorage.app",
+      messagingSenderId: "619982778395",
+      appId: "1:619982778395:web:25c141958b7c06da02c8be"
+    };
 
     // Inicializar Firebase
     if (!firebase.apps.length) {
@@ -694,40 +837,23 @@
       }
     });
 
-    // Hide address placeholder when typing
-    const addressTextarea = document.getElementById('address');
-    const addressPlaceholder = addressTextarea.nextElementSibling;
-    
-    addressTextarea.addEventListener('input', () => {
-      if (addressTextarea.value.length > 0) {
-        addressPlaceholder.style.display = 'none';
-      } else {
-        addressPlaceholder.style.display = 'block';
-      }
-    });
-
-    addressTextarea.addEventListener('focus', () => {
-      if (addressTextarea.value.length === 0) {
-        addressPlaceholder.style.opacity = '0.5';
-      }
-    });
-
-    addressTextarea.addEventListener('blur', () => {
-      addressPlaceholder.style.opacity = '1';
-    });
-
     // Handle form submission
     document.getElementById('manicure-form').addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
-      const address = document.getElementById('address').value.trim();
+      const street = document.getElementById('street').value.trim();
+      const number = document.getElementById('number').value.trim();
+      const neighborhood = document.getElementById('neighborhood').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const state = document.getElementById('state').value;
+      const complement = document.getElementById('complement').value.trim();
       const planType = document.getElementById('plan-type').value;
       const startDateValue = document.getElementById('start-date').value;
 
-      // Validate
-      if (!name || !phone || !address || !planType || !startDateValue) {
+      // Validate required fields
+      if (!name || !phone || !street || !number || !neighborhood || !city || !state || !planType || !startDateValue) {
         Utils.showToast('Preencha todos os campos obrigatórios', 'warning');
         return;
       }
@@ -745,6 +871,13 @@
         submitBtn.querySelector('span').textContent = 'Cadastrando...';
         Utils.showLoading();
 
+        // Build full address
+        const addressParts = [street, number, neighborhood, city, state];
+        if (complement) {
+          addressParts.splice(2, 0, complement);
+        }
+        const fullAddress = addressParts.join(', ');
+
         // Create date
         const [year, month, day] = startDateValue.split('-');
         const startDate = new Date(year, month - 1, day, 12, 0, 0);
@@ -754,11 +887,11 @@
         nextExchangeDate.setDate(nextExchangeDate.getDate() + parseInt(planType));
 
         // Check if due soon
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0);
         const exchangeDateCheck = new Date(nextExchangeDate);
         exchangeDateCheck.setHours(0, 0, 0, 0);
-        const diff = Math.ceil((exchangeDateCheck - today) / (1000 * 60 * 60 * 24));
+        const diff = Math.ceil((exchangeDateCheck - todayDate) / (1000 * 60 * 60 * 24));
         const isDueSoon = diff <= 2;
 
         // Save to Firebase
@@ -766,7 +899,15 @@
         await newManicureRef.set({
           name,
           phone,
-          address,
+          address: fullAddress,
+          addressDetails: {
+            street,
+            number,
+            complement,
+            neighborhood,
+            city,
+            state
+          },
           planType,
           startDate: startDate.toISOString(),
           nextExchangeDate: nextExchangeDate.toISOString(),
