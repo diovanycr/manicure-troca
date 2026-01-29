@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
+    /* Mantendo seu CSS original que está excelente */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --color-primary: #d946ef;
@@ -158,11 +159,11 @@
     <div class="modal-content">
       <div style="padding: 1.5rem; border-bottom: 1px solid var(--color-border);"><h2>Registrar Troca</h2></div>
       <div style="padding: 1.5rem;">
-        <textarea id="exchange-notes" placeholder="Observações..." style="width:100%; height:100px; padding:10px; border-radius:8px; border:1px solid #ddd;"></textarea>
+        <textarea id="exchange-notes" placeholder="Alguma observação sobre os esmaltes?" style="width:100%; height:100px; padding:10px; border-radius:8px; border:1px solid #ddd; font-family: inherit;"></textarea>
       </div>
       <div style="padding: 1.5rem; display: flex; gap: 10px;">
         <button class="btn btn-secondary btn-full" onclick="closeExchangeModal()">Cancelar</button>
-        <button class="btn btn-primary btn-full" onclick="submitExchange()">Confirmar</button>
+        <button class="btn btn-primary btn-full" onclick="submitExchange()">Confirmar Troca</button>
       </div>
     </div>
   </div>
@@ -172,8 +173,8 @@
       <div style="padding: 1.5rem;"><h2>Enviar Comprovante</h2></div>
       <div style="padding: 1.5rem; text-align: center;">
         <input type="file" id="file-input" style="display: none;" onchange="previewFile()">
-        <button class="btn btn-secondary btn-full" onclick="document.getElementById('file-input').click()">Selecionar Arquivo</button>
-        <div id="file-preview" style="margin-top: 10px; font-size: 0.8rem;"></div>
+        <button class="btn btn-secondary btn-full" onclick="document.getElementById('file-input').click()">Selecionar Foto/PDF</button>
+        <div id="file-preview" style="margin-top: 10px; font-size: 0.8rem; color: var(--color-primary); font-weight: 600;"></div>
       </div>
       <div style="padding: 1.5rem; display: flex; gap: 10px;">
         <button class="btn btn-secondary btn-full" onclick="closeReceiptModal()">Cancelar</button>
@@ -185,20 +186,11 @@
   <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
   <div class="toast" id="toast"><div class="toast-message"></div></div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  <script src="../config/firebase-config.js"></script>
-
- <script type="module">
-    // 2. IMPORTAÇÕES CORRETAS (SDK v10)
+  <script type="module">
     import { auth } from '../config/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
 
-    // Utilitários da Página
     const PageUtils = {
       showLoading: (show) => document.getElementById('loading-spinner').classList.toggle('show', show),
       showToast: (msg) => {
@@ -209,23 +201,20 @@
       }
     };
 
-    // Variáveis de Controle
     let currentManicure = null;
     const urlParams = new URLSearchParams(window.location.search);
     const manicureId = urlParams.get('id');
 
-    // 3. VIGIA DE AUTENTICAÇÃO (Resolve o erro "Usuário não autenticado")
+    // Observador de Autenticação
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        console.log("Autenticado como:", user.email);
         if (!manicureId) {
           window.location.href = 'manicures.html';
           return;
         }
         await loadData();
       } else {
-        console.warn("Sessão expirada. Redirecionando...");
-        window.location.href = 'login.html';
+        window.location.href = '../login.html';
       }
     });
 
@@ -243,14 +232,13 @@
         renderInfo();
         await renderHistory();
       } catch (e) { 
-        console.error("Erro ao carregar dados:", e);
-        PageUtils.showToast("Erro ao carregar informações.");
+        console.error("Erro ao carregar:", e);
+        PageUtils.showToast("Erro ao carregar dados.");
       } finally {
         PageUtils.showLoading(false);
       }
     }
 
-    // --- FUNÇÕES DE RENDERIZAÇÃO ---
     function renderHeader() {
       document.getElementById('manicure-name').textContent = currentManicure.name || 'Sem nome';
       document.getElementById('manicure-phone').textContent = currentManicure.phone || '-';
@@ -262,20 +250,30 @@
       statusBadge.textContent = isActive ? 'Ativa' : 'Inativa';
       statusBadge.className = `badge ${isActive ? 'badge-success' : 'badge-secondary'}`;
       
-      // Cálculo de dias para troca
+      // Cálculo de dias
       if (currentManicure.nextExchangeDate) {
-        const diff = Math.ceil((currentManicure.nextExchangeDate - Date.now()) / (1000 * 60 * 60 * 24));
-        document.getElementById('days-until').textContent = diff > 0 ? diff : 0;
+        const today = new Date().setHours(0,0,0,0);
+        const next = new Date(currentManicure.nextExchangeDate).setHours(0,0,0,0);
+        const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24));
+        
+        document.getElementById('days-until').textContent = diff;
         document.getElementById('next-exchange').textContent = new Date(currentManicure.nextExchangeDate).toLocaleDateString('pt-BR');
+        
+        // Alerta visual se estiver perto ou atrasado
+        const daysLabel = document.getElementById('days-until');
+        if (diff <= 0) daysLabel.style.color = 'var(--color-danger)';
+        else if (diff <= 2) daysLabel.style.color = 'var(--color-warning)';
+        else daysLabel.style.color = 'var(--color-primary)';
+
         document.getElementById('due-soon-badge').style.display = diff <= 2 ? 'inline-block' : 'none';
       }
     }
 
     function renderInfo() {
       document.getElementById('info-name').textContent = currentManicure.name;
-      document.getElementById('info-phone').textContent = currentManicure.phone || '-';
-      document.getElementById('info-plan').textContent = `${currentManicure.planType || '15'} dias`;
-      document.getElementById('info-start-date').textContent = currentManicure.createdAt ? new Date(currentManicure.createdAt).toLocaleDateString('pt-BR') : '-';
+      document.getElementById('info-phone').textContent = currentManicure.phone;
+      document.getElementById('info-plan').textContent = `${currentManicure.planType} dias`;
+      document.getElementById('info-start-date').textContent = new Date(currentManicure.startDate).toLocaleDateString('pt-BR');
       
       const toggle = document.getElementById('toggle-switch');
       toggle.classList.toggle('active', currentManicure.status === 'active');
@@ -288,13 +286,16 @@
         const container = document.getElementById('exchange-history');
         
         if (!history || history.length === 0) {
-          container.innerHTML = '<p style="text-align:center; color:#999;">Nenhuma troca registrada.</p>';
+          container.innerHTML = '<p style="text-align:center; color:#999; padding: 20px;">Nenhuma troca registrada ainda.</p>';
           return;
         }
         
-        container.innerHTML = history.reverse().map(ex => `
+        container.innerHTML = history.sort((a,b) => b.date - a.date).map(ex => `
           <div class="history-item">
-            <strong>${new Date(ex.date).toLocaleDateString('pt-BR')}</strong>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                <strong>${new Date(ex.date).toLocaleDateString('pt-BR')}</strong>
+                <small style="color:var(--color-primary)">Kit Trocado</small>
+            </div>
             <p style="font-size:0.85rem; color:#666;">${ex.notes || 'Sem observações'}</p>
           </div>
         `).join('');
@@ -303,7 +304,7 @@
       }
     }
 
-    // --- FUNÇÕES GLOBAIS (EXPOSTAS PARA O WINDOW) ---
+    // --- FUNÇÕES DE AÇÃO ---
     window.openExchangeModal = () => document.getElementById('exchange-modal').classList.add('show');
     window.closeExchangeModal = () => document.getElementById('exchange-modal').classList.remove('show');
     window.openReceiptModal = () => document.getElementById('receipt-modal').classList.add('show');
@@ -324,12 +325,27 @@
       const notes = document.getElementById('exchange-notes').value;
       PageUtils.showLoading(true);
       try {
-        await dbManager.addExchange(manicureId, { notes });
+        // 1. Registra a troca no histórico
+        await dbManager.addExchange(manicureId, { 
+            notes, 
+            date: Date.now() 
+        });
+
+        // 2. Calcula nova data (Hoje + Dias do Plano)
+        const planDays = parseInt(currentManicure.planType);
+        const newNextDate = Date.now() + (planDays * 24 * 60 * 60 * 1000);
+
+        // 3. Atualiza a manicure com a nova data de troca
+        await dbManager.updateManicure(manicureId, { 
+            nextExchangeDate: newNextDate 
+        });
+
         document.getElementById('exchange-notes').value = "";
         closeExchangeModal();
-        await loadData();
-        PageUtils.showToast("Troca registrada com sucesso!");
+        await loadData(); // Recarrega a tela
+        PageUtils.showToast("Troca registrada e nova data calculada!");
       } catch (e) {
+        console.error(e);
         PageUtils.showToast("Erro ao registrar troca.");
       } finally {
         PageUtils.showLoading(false);
@@ -338,7 +354,7 @@
 
     window.previewFile = () => {
       const file = document.getElementById('file-input').files[0];
-      document.getElementById('file-preview').textContent = file ? `Selecionado: ${file.name}` : '';
+      document.getElementById('file-preview').textContent = file ? `✓ ${file.name}` : '';
     };
 
     window.submitReceipt = async () => {
