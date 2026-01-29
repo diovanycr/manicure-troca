@@ -3,111 +3,161 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detalhes - Gestão de Manicures</title>
+  <title>Detalhes da Manicure - Gestão de Manicures</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="icon" href="data:,">
   <style>
-    .container-page { max-width: 800px; margin: 0 auto; padding: 2rem; font-family: sans-serif; }
-    .back-link { display: block; margin-bottom: 2rem; color: #7c3aed; text-decoration: none; font-weight: bold; }
-    .card { background: white; padding: 2rem; border-radius: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .header-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; }
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: bold; }
-    .value { font-size: 1.1rem; color: #1e293b; margin-top: 0.25rem; }
-    .badge { padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.8rem; font-weight: bold; }
-    .active { background: #dcfce7; color: #166534; }
-    .btn-exchange { background: #7c3aed; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: bold; }
-    .btn-exchange:hover { background: #6d28d9; }
+    /* Estilos recuperados e organizados */
+    .container-page { max-width: 900px; margin: 0 auto; padding: 2rem; }
+    .header-card { background: white; padding: 2rem; border-radius: 1rem; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; margin-bottom: 2rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+    .card { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; margin-bottom: 2rem; }
+    .card-header { padding: 1.5rem; border-bottom: 1px solid #e2e8f0; font-weight: bold; }
+    .card-body { padding: 1.5rem; }
+    
+    /* Toggle Status Style */
+    .status-toggle { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; cursor: pointer; }
+    .toggle-switch { width: 40px; height: 20px; background: #cbd5e1; border-radius: 20px; position: relative; transition: 0.3s; }
+    .toggle-switch.active { background: #22c55e; }
+    .toggle-switch::after { content: ''; position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
+    .toggle-switch.active::after { left: 22px; }
+
+    /* Modal Style */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 500px; }
+    
+    .history-item { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+    .btn-group { display: flex; flex-direction: column; gap: 10px; }
   </style>
 </head>
 <body>
 
   <div class="container-page">
-    <a href="../index.html" class="back-link">← Voltar para Lista</a>
+    <a href="../index.html" style="text-decoration: none; color: #7c3aed; font-weight: bold;">← Voltar</a>
 
-    <div class="card">
-      <div class="header-flex">
-        <div>
-          <h1 id="det-name">Carregando...</h1>
-          <div style="margin-top: 0.5rem;">
-            <span id="det-status" class="badge">---</span>
+    <div class="header-card">
+      <div>
+        <h1 id="det-name">Carregando...</h1>
+        <p id="det-phone">--</p>
+        <span id="det-status-badge" class="badge">---</span>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="open-exchange">🔄 Registrar Troca</button>
+        <button class="btn btn-secondary" id="open-upload">📂 Enviar Comprovante</button>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">Informações</div>
+        <div class="card-body">
+          <p><strong>Endereço:</strong> <span id="det-address">--</span></p>
+          <p><strong>Plano:</strong> <span id="det-plan">--</span></p>
+          <div class="status-toggle" id="btn-toggle-status">
+            <div class="toggle-switch" id="toggle-ui"></div>
+            <span id="status-text">Ativa</span>
           </div>
         </div>
-        <button class="btn-exchange" id="btn-registrar">🔄 Registrar Troca</button>
       </div>
 
-      <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 2rem 0;">
+      <div class="card">
+        <div class="card-header">Ciclo de Troca</div>
+        <div class="card-body">
+          <p><strong>Próxima Troca:</strong> <span id="next-date">--/--/----</span></p>
+          <p><strong>Dias restantes:</strong> <span id="days-left">--</span></p>
+        </div>
+      </div>
+    </div>
 
-      <div class="info-grid">
-        <div>
-          <div class="label">Telefone</div>
-          <div class="value" id="det-phone">---</div>
-        </div>
-        <div>
-          <div class="label">Plano</div>
-          <div class="value" id="det-plan">---</div>
-        </div>
-        <div style="grid-column: span 2;">
-          <div class="label">Endereço</div>
-          <div class="value" id="det-address">---</div>
-        </div>
+    <div class="card">
+      <div class="card-header">Histórico de Trocas</div>
+      <div class="card-body" id="history-list">
+        <p style="color: #64748b;">Nenhuma troca registrada ainda.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-exchange">
+    <div class="modal-content">
+      <h2>Registrar Nova Troca</h2>
+      <p>Confirmar que o kit foi trocado hoje?</p>
+      <textarea id="exchange-notes" placeholder="Observações..." style="width: 100%; margin: 15px 0; padding: 10px;"></textarea>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-secondary" id="close-exchange">Cancelar</button>
+        <button class="btn btn-primary" id="confirm-exchange">Confirmar</button>
       </div>
     </div>
   </div>
 
   <script type="module">
-    // Importamos os gerenciadores que você já tem
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // 1. Bloqueia acesso sem login
     authManager.requireAuth();
 
-    // 2. Pega o ID da URL
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
 
-    if (!id) {
-      window.location.href = '../index.html';
-    }
-
-    async function carregarPagina() {
-      try {
-        // Espera o Firebase autenticar para pegar o UID do usuário
+    async function init() {
         const uid = await dbManager._waitForUser();
         const db = getDatabase();
-        const caminho = `users/${uid}/manicures/${id}`;
-        
-        const snapshot = await get(ref(db, caminho));
+        const mRef = ref(db, `users/${uid}/manicures/${id}`);
 
-        if (snapshot.exists()) {
-          const m = snapshot.val();
-          document.getElementById('det-name').textContent = m.name;
-          document.getElementById('det-phone').textContent = m.phone;
-          document.getElementById('det-plan').textContent = "Plano " + m.planType;
-          document.getElementById('det-address').textContent = m.address || "Não informado";
-          
-          const statusEl = document.getElementById('det-status');
-          statusEl.textContent = m.status === 'active' ? 'ATIVA' : 'INATIVA';
-          statusEl.classList.add(m.status === 'active' ? 'active' : 'inactive');
-        } else {
-          alert("Manicure não encontrada!");
-          window.location.href = '../index.html';
+        // Carregar Dados
+        const snap = await get(mRef);
+        if (snap.exists()) {
+            const data = snap.val();
+            renderData(data);
+            loadHistory(uid);
         }
-      } catch (erro) {
-        console.error("Erro ao carregar:", erro);
-      }
     }
 
-    document.getElementById('btn-registrar').onclick = () => {
-      alert("Troca registrada com sucesso!");
-      // Aqui você pode adicionar o dbManager.recordKitExchange(id) depois
+    function renderData(data) {
+        document.getElementById('det-name').textContent = data.name;
+        document.getElementById('det-phone').textContent = data.phone;
+        document.getElementById('det-address').textContent = data.address || 'Não informado';
+        document.getElementById('det-plan').textContent = data.planType;
+        
+        const isAc = data.status === 'active';
+        document.getElementById('det-status-badge').className = `badge ${isAc ? 'badge-success' : 'badge-secondary'}`;
+        document.getElementById('det-status-badge').textContent = isAc ? 'ATIVA' : 'INATIVA';
+        document.getElementById('toggle-ui').classList.toggle('active', isAc);
+        document.getElementById('status-text').textContent = isAc ? 'Ativa' : 'Inativa';
+    }
+
+    async function loadHistory(uid) {
+        const db = getDatabase();
+        const hRef = ref(db, `users/${uid}/exchanges/${id}`);
+        const snap = await get(hRef);
+        if (snap.exists()) {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            Object.values(snap.val()).reverse().forEach(ex => {
+                list.innerHTML += `<div class="history-item">📅 ${new Date(ex.date).toLocaleDateString()} - ${ex.notes || 'Sem observações'}</div>`;
+            });
+        }
+    }
+
+    // Evento Registrar Troca
+    document.getElementById('confirm-exchange').onclick = async () => {
+        const uid = await dbManager._waitForUser();
+        const db = getDatabase();
+        const notes = document.getElementById('exchange-notes').value;
+        
+        const newExRef = push(ref(db, `users/${uid}/exchanges/${id}`));
+        await set(newExRef, { date: Date.now(), notes: notes });
+        
+        alert("Troca registrada!");
+        location.reload();
     };
 
-    // Inicia a carga
-    carregarPagina();
-  </script>
+    // Abre/Fecha Modal
+    document.getElementById('open-exchange').onclick = () => document.getElementById('modal-exchange').classList.add('show');
+    document.getElementById('close-exchange').onclick = () => document.getElementById('modal-exchange').classList.remove('show');
 
+    init();
+  </script>
 </body>
 </html>
