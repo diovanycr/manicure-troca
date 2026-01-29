@@ -795,7 +795,11 @@
     // Observador de Autenticação
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+        console.log('Usuário autenticado:', user.uid);
+        console.log('Manicure ID da URL:', manicureId);
+        
         if (!manicureId) {
+          console.error('ID da manicure não fornecido na URL');
           PageUtils.showToast('ID da manicure não fornecido', true);
           setTimeout(() => {
             window.location.href = 'manicures.html';
@@ -804,6 +808,7 @@
         }
         await loadData();
       } else {
+        console.log('Usuário não autenticado, redirecionando para login');
         window.location.href = '../login.html';
       }
     });
@@ -813,9 +818,13 @@
       PageUtils.showLoading(true);
       
       try {
+        console.log('Tentando carregar manicure com ID:', manicureId);
         currentManicure = await dbManager.getManicureById(manicureId);
         
+        console.log('Manicure carregada:', currentManicure);
+        
         if (!currentManicure) {
+          console.error('Manicure não encontrada no banco de dados');
           PageUtils.showToast("Manicure não encontrada!", true);
           setTimeout(() => {
             window.location.href = 'manicures.html';
@@ -828,6 +837,7 @@
         await renderHistory();
       } catch (error) { 
         console.error("Erro ao carregar dados:", error);
+        console.error("Stack trace:", error.stack);
         PageUtils.showToast("Erro ao carregar dados da manicure", true);
       } finally {
         PageUtils.showLoading(false);
