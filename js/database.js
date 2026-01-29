@@ -29,29 +29,24 @@ const dbManager = {
 
   // --- LISTAGEM (O que estava faltando) ---
 
-  // Busca todas as manicures (Usado no manicures.html)
-  getAllManicures: async function() {
-    try {
-      const mRef = this.getManicuresRef();
-      if (!mRef) throw new Error('Usuário não autenticado');
+  // Dentro do seu dbManager em js/database.js
 
-      const snapshot = await get(mRef);
-      const manicures = [];
-      
-      if (snapshot.exists()) {
-        snapshot.forEach((childSnapshot) => {
-          manicures.push({
-            id: childSnapshot.key,
-            ...childSnapshot.val()
-          });
-        });
-      }
-      return manicures;
-    } catch (error) {
-      console.error('Erro ao listar manicures:', error);
-      throw error;
-    }
-  },
+async function getAllManicures() {
+  // Aguarda até 3 segundos para garantir que o Firebase reconheça o usuário
+  await new Promise((resolve, reject) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe();
+      if (user) resolve(user);
+      else reject(new Error("Usuário não autenticado"));
+    });
+    setTimeout(() => reject(new Error("Tempo limite de autenticação excedido")), 3000);
+  });
+
+  const user = auth.currentUser;
+  const dbRef = ref(db, `users/${user.uid}/manicures`);
+  const snapshot = await get(dbRef);
+  return snapshot.val();
+}
 
   // Busca uma única manicure (Usado no manicure-details.html)
   getManicureById: async function(manicureId) {
