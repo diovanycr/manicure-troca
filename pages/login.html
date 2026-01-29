@@ -431,53 +431,65 @@
   <script type="module" src="js/firebase-config.js"></script>
   <script type="module" src="js/auth.js"></script>
 
-  <script>
-    // Handle login
-    async function handleLogin() {
+  <script type="module">
+    // Importações modernas (v9) via CDN oficial do Google
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+    // --- CONFIGURAÇÃO (Substitua pelos seus dados reais) ---
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_PROJETO.firebaseapp.com",
+      databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+      projectId: "SEU_PROJETO",
+      storageBucket: "SEU_PROJETO.appspot.com",
+      messagingSenderId: "SEU_ID",
+      appId: "SEU_APP_ID"
+    };
+
+    // Inicialização do Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Referências do DOM
+    const loginBtn = document.getElementById('login-btn');
+    const loginSection = document.getElementById('login-section');
+    const loadingState = document.getElementById('loading-state');
+
+    // Função de Login (Global para funcionar com onclick="handleLogin()")
+    window.handleLogin = async function() {
       try {
-        const loginBtn = document.getElementById('login-btn');
         loginBtn.disabled = true;
         loginBtn.querySelector('span').textContent = 'Conectando...';
-
-        if (typeof authManager !== 'undefined') {
-          await authManager.signInWithGoogle();
-        } else {
-          console.error('Auth manager not loaded');
-          loginBtn.disabled = false;
-          loginBtn.querySelector('span').textContent = 'Entrar com Google';
-        }
+        
+        await signInWithPopup(auth, provider);
+        
       } catch (error) {
-        console.error('Login error:', error);
-        const loginBtn = document.getElementById('login-btn');
+        console.error('Erro no login:', error);
         loginBtn.disabled = false;
         loginBtn.querySelector('span').textContent = 'Entrar com Google';
-        alert('Erro ao fazer login. Tente novamente.');
+        alert('Erro ao fazer login. Verifique se o pop-up não foi bloqueado.');
       }
-    }
+    };
 
-    // Check if user is already logged in
-    if (typeof firebase !== 'undefined' && firebase.auth) {
-      firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-          // User is signed in, show loading state
-          document.getElementById('login-section').style.display = 'none';
-          document.getElementById('loading-state').classList.add('show');
+    // Monitor de Sessão (Verifica se já está logado e redireciona)
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginSection.style.display = 'none';
+        loadingState.classList.add('show');
+        
+        // Redireciona para o index na raiz
+        setTimeout(() => {
+          window.location.href = '../index.html';
+        }, 800);
+      }
+    });
 
-          // Redirect to dashboard after a short delay
-          setTimeout(() => {
-            window.location.href = '../index.html';
-          }, 500);
-        }
-      });
-    }
-
-    // Add keyboard support for Enter key
+    // Suporte para tecla Enter
     document.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        const loginBtn = document.getElementById('login-btn');
-        if (!loginBtn.disabled) {
-          handleLogin();
-        }
+      if (e.key === 'Enter' && !loginBtn.disabled) {
+        window.handleLogin();
       }
     });
   </script>
