@@ -90,7 +90,7 @@
       background: rgba(255, 255, 255, 0.1);
     }
 
-    /* Mobile Navigation Drawer */
+    /* Navigation Drawer */
     .nav-drawer {
       position: fixed;
       top: 0;
@@ -379,6 +379,35 @@
       color: var(--color-text-muted);
     }
 
+    /* Alert Banner */
+    .alert-banner {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-left: 4px solid var(--color-warning);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: start;
+      gap: 0.75rem;
+    }
+
+    .alert-banner-icon {
+      flex-shrink: 0;
+      color: var(--color-warning);
+    }
+
+    .alert-banner-content h4 {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: #92400e;
+    }
+
+    .alert-banner-content p {
+      font-size: 0.875rem;
+      color: #78350f;
+    }
+
     /* Badges */
     .badge {
       padding: 0.375rem 0.75rem;
@@ -397,6 +426,11 @@
     .badge-warning {
       background: #fef3c7;
       color: #92400e;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #991b1b;
     }
 
     .badge-secondary {
@@ -516,35 +550,6 @@
       font-weight: 500;
     }
 
-    /* Alert Banner */
-    .alert-banner {
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
-      border-left: 4px solid var(--color-warning);
-      padding: 1rem;
-      border-radius: 12px;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: start;
-      gap: 0.75rem;
-    }
-
-    .alert-banner-icon {
-      flex-shrink: 0;
-      color: var(--color-warning);
-    }
-
-    .alert-banner-content h4 {
-      font-size: 0.9375rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-      color: #92400e;
-    }
-
-    .alert-banner-content p {
-      font-size: 0.875rem;
-      color: #78350f;
-    }
-
     /* Empty State */
     .empty-state {
       text-align: center;
@@ -565,6 +570,48 @@
     .empty-state p {
       color: var(--color-text-muted);
       margin-bottom: 1.5rem;
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .loading-spinner.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Loading Animation */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .loading {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 
     /* Tablet Styles */
@@ -651,16 +698,6 @@
         transform: scale(0.98);
         background: #f3f4f6;
       }
-    }
-
-    /* Loading Animation */
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .loading {
-      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
   </style>
 </head>
@@ -879,6 +916,11 @@
     </button>
   </div>
 
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" id="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+
   <script>
     // Navigation Toggle
     function toggleNav() {
@@ -911,25 +953,80 @@
     });
   </script>
 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
+
+  <!-- Config -->
+  <script src="config/firebase-config.js"></script>
+
+  <!-- Scripts -->
   <script src="js/utils.js"></script>
-  <script type="module">
-    import { authManager } from './js/auth.js';
-    import { dbManager } from './js/database.js';
+  <script src="js/auth.js"></script>
+  <script src="js/database.js"></script>
 
-    authManager.requireAuth();
-    document.getElementById('logout-btn').onclick = () => authManager.signOut();
+  <script>
+    // Require authentication
+    if (typeof authManager !== 'undefined') {
+      authManager.requireAuth();
+      document.getElementById('logout-btn').onclick = () => authManager.signOut();
+    }
 
+    // Utils functions
+    const Utils = {
+      showLoading: () => {
+        document.getElementById('loading-spinner').classList.add('show');
+      },
+      hideLoading: () => {
+        document.getElementById('loading-spinner').classList.remove('show');
+      },
+      formatDate: (date) => {
+        return new Date(date).toLocaleDateString('pt-BR');
+      },
+      calculateDaysUntilExchange: (date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const exchangeDate = new Date(date);
+        exchangeDate.setHours(0, 0, 0, 0);
+        const diff = Math.ceil((exchangeDate - today) / (1000 * 60 * 60 * 24));
+        return diff;
+      },
+      getAlerts: (manicures) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        return manicures.filter(m => {
+          if (m.status !== 'active' || !m.nextExchangeDate) return false;
+          const exchangeDate = new Date(m.nextExchangeDate);
+          exchangeDate.setHours(0, 0, 0, 0);
+          const diff = Math.ceil((exchangeDate - today) / (1000 * 60 * 60 * 24));
+          return diff <= 2;
+        }).sort((a, b) => new Date(a.nextExchangeDate) - new Date(b.nextExchangeDate));
+      }
+    };
+
+    // Load dashboard data
     async function loadDashboard() {
       try {
-        const manicures = await dbManager.getAllManicures();
-        const user = authManager.currentUser;
+        if (typeof Utils !== 'undefined') Utils.showLoading();
         
-        if(user) {
+        if (typeof dbManager === 'undefined') {
+          console.error('Database manager not loaded');
+          if (typeof Utils !== 'undefined') Utils.hideLoading();
+          return;
+        }
+
+        const manicures = await dbManager.getAllManicures();
+        const user = typeof authManager !== 'undefined' ? authManager.currentUser : null;
+        
+        if (user) {
           document.getElementById('user-info').textContent = user.email;
         }
 
         const activeCount = manicures.filter(m => m.status === 'active').length;
-        const alerts = window.Utils && Utils.getAlerts ? Utils.getAlerts(manicures) : [];
+        const alerts = Utils.getAlerts(manicures);
 
         document.getElementById('total-manicures').textContent = manicures.length;
         document.getElementById('total-desc').textContent = `${activeCount} ativas`;
@@ -945,7 +1042,7 @@
             <div class="list-item" onclick="window.location.href='pages/manicure-details.html?id=${a.id}'">
               <div class="item-info">
                 <h3>${a.name}</h3>
-                <p>${a.phone}</p>
+                <p>${a.phone} • ${Utils.calculateDaysUntilExchange(a.nextExchangeDate)} dia${Utils.calculateDaysUntilExchange(a.nextExchangeDate) !== 1 ? 's' : ''}</p>
               </div>
               <span class="badge badge-warning">Troca</span>
             </div>
@@ -968,7 +1065,7 @@
         } else {
           recentList.innerHTML = `
             <div class="empty-state">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.2; margin-bottom: 1rem;">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
               </svg>
@@ -984,14 +1081,23 @@
             </div>
           `;
         }
+
+        if (typeof Utils !== 'undefined') Utils.hideLoading();
       } catch (e) { 
         console.error(e);
         document.getElementById('recent-manicures').innerHTML = 
           '<div style="color: var(--color-danger); text-align: center; padding: 2rem;">Erro ao carregar dados. Tente novamente.</div>';
+        if (typeof Utils !== 'undefined') Utils.hideLoading();
       }
     }
 
-    window.onload = loadDashboard;
+    // Load dashboard on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(loadDashboard, 500);
+    });
+
+    // Refresh dashboard every 30 seconds
+    setInterval(loadDashboard, 30000);
   </script>
 </body>
 </html>
