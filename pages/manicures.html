@@ -3,150 +3,361 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manicures - Gestão de Kits</title>
+  <title>Manicures - Gestão de Manicures</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --color-primary: #d946ef; --color-primary-dark: #a21caf; 
+      --color-primary: #d946ef; --color-primary-dark: #a21caf;
       --color-bg: #fafafa; --color-surface: #ffffff; --color-text: #1f2937;
       --color-text-muted: #6b7280; --color-border: #e5e7eb; --color-success: #10b981;
       --color-warning: #f59e0b; --color-danger: #ef4444; --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
       --radius: 16px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); padding-bottom: 80px; }
-    
-    .mobile-header { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; z-index: 100; }
-    .mobile-header h1 { font-family: 'Playfair Display', serif; font-size: 1.25rem; }
-
-    .main-content { margin-top: 80px; padding: 1rem; max-width: 800px; margin-left: auto; margin-right: auto; }
-    
-    .filter-section { background: var(--color-surface); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.5rem; border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); }
-    .filter-input { width: 100%; padding: 0.875rem; border: 1.5px solid var(--color-border); border-radius: 10px; outline: none; font-size: 1rem; }
-
-    .manicures-list { display: grid; gap: 0.75rem; }
-    .card { 
-      background: var(--color-surface); border-radius: 12px; padding: 1.25rem; border: 1px solid var(--color-border); 
-      text-decoration: none; color: inherit; display: flex; justify-content: space-between; align-items: center; transition: var(--transition);
+    body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    .app-container { min-height: 100vh; display: flex; flex-direction: column; }
+    .mobile-header { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; z-index: 100; box-shadow: 0 2px 8px rgba(217, 70, 239, 0.2); }
+    .mobile-header h1 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; }
+    .menu-toggle { background: none; border: none; color: white; cursor: pointer; padding: 0.5rem; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: var(--transition); }
+    .menu-toggle:active { background: rgba(255, 255, 255, 0.1); }
+    .nav-drawer { position: fixed; top: 0; left: -100%; width: 280px; height: 100vh; background: var(--color-surface); box-shadow: var(--shadow-lg); z-index: 200; transition: left 0.3s ease; overflow-y: auto; }
+    .nav-drawer.open { left: 0; }
+    .nav-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 150; opacity: 0; visibility: hidden; transition: var(--transition); }
+    .nav-overlay.open { opacity: 1; visibility: visible; }
+    .drawer-header { background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; padding: 2rem 1.5rem 1.5rem; }
+    .drawer-logo { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .drawer-logo svg { animation: sparkle 2s ease-in-out infinite; }
+    @keyframes sparkle { 0%, 100% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.1); } }
+    .drawer-title h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .drawer-title p { font-size: 0.875rem; opacity: 0.9; }
+    .drawer-nav { padding: 1rem 0; }
+    .nav-item { list-style: none; }
+    .nav-link { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; color: var(--color-text); text-decoration: none; transition: var(--transition); font-weight: 500; border-left: 3px solid transparent; }
+    .nav-link:active { background: rgba(217, 70, 239, 0.05); }
+    .nav-link.active { background: rgba(217, 70, 239, 0.1); color: var(--color-primary); border-left-color: var(--color-primary); }
+    .drawer-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 1.5rem; border-top: 1px solid var(--color-border); background: var(--color-surface); }
+    .user-info { font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 1rem; padding: 0.75rem; background: var(--color-bg); border-radius: 8px; }
+    .main-content { margin-top: 64px; padding: 1.5rem 1rem; padding-bottom: 80px; flex: 1; }
+    .page-header { margin-bottom: 1.5rem; }
+    .page-title { font-family: 'Playfair Display', serif; font-size: 1.75rem; margin-bottom: 0.25rem; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .page-subtitle { color: var(--color-text-muted); font-size: 0.875rem; }
+    .search-section { background: var(--color-surface); border-radius: var(--radius); padding: 1rem; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); margin-bottom: 1.5rem; }
+    .search-input-wrapper { position: relative; }
+    .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); pointer-events: none; }
+    .search-input { width: 100%; padding: 0.875rem 1rem 0.875rem 3rem; border: 1px solid var(--color-border); border-radius: 12px; font-size: 1rem; font-family: 'Outfit', sans-serif; transition: var(--transition); }
+    .search-input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.1); }
+    .search-results { margin-top: 0.75rem; font-size: 0.875rem; color: var(--color-text-muted); }
+    .item-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .list-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--color-surface); border-radius: 12px; transition: var(--transition); cursor: pointer; border: 1px solid var(--color-border); text-decoration: none; color: inherit; }
+    .list-item:active { transform: scale(0.98); background: #f3f4f6; }
+    .item-info h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .item-info p { font-size: 0.875rem; color: var(--color-text-muted); }
+    .badge { padding: 0.375rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-success { background: #d1fae5; color: #065f46; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+    .badge-secondary { background: #e5e7eb; color: #4b5563; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem 1.5rem; border: none; border-radius: 12px; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: var(--transition); text-decoration: none; font-family: 'Outfit', sans-serif; }
+    .btn-primary { background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; box-shadow: 0 4px 12px rgba(217, 70, 239, 0.3); }
+    .btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 8px rgba(217, 70, 239, 0.3); }
+    .btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+    .btn-secondary:active { background: var(--color-bg); }
+    .btn-full { width: 100%; }
+    .fab { position: fixed; bottom: 80px; right: 1rem; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; border: none; box-shadow: 0 4px 12px rgba(217, 70, 239, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); z-index: 50; text-decoration: none; }
+    .fab:active { transform: scale(0.9); }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: var(--color-surface); border-top: 1px solid var(--color-border); display: flex; justify-content: space-around; align-items: center; z-index: 100; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05); }
+    .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; color: var(--color-text-muted); text-decoration: none; transition: var(--transition); flex: 1; max-width: 100px; }
+    .bottom-nav-item:active { background: rgba(217, 70, 239, 0.05); }
+    .bottom-nav-item.active { color: var(--color-primary); }
+    .bottom-nav-item svg { stroke: currentColor; }
+    .bottom-nav-item span { font-size: 0.75rem; font-weight: 500; }
+    .empty-state { text-align: center; padding: 3rem 1rem; }
+    .empty-state svg { opacity: 0.2; margin-bottom: 1rem; }
+    .empty-state h3 { font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--color-text); }
+    .empty-state p { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+    .loading-spinner { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 999; }
+    .loading-spinner.show { display: flex; }
+    .spinner { width: 50px; height: 50px; border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @media (min-width: 768px) {
+      .mobile-header h1 { font-size: 1.5rem; }
+      .page-title { font-size: 2rem; }
+      .main-content { padding: 2rem; }
+      .fab { bottom: 2rem; right: 2rem; width: 64px; height: 64px; }
     }
-    .card:active { transform: scale(0.98); }
-
-    .status-badge { padding: 0.4rem 0.8rem; border-radius: 10px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-    .status-urgent { background: #fee2e2; color: var(--color-danger); }
-    .status-warning { background: #fef3c7; color: var(--color-warning); }
-    .status-ok { background: #dcfce7; color: var(--color-success); }
-
-    .fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--color-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(217, 70, 239, 0.4); text-decoration: none; font-size: 1.5rem; z-index: 200; }
+    @media (min-width: 1024px) {
+      .mobile-header, .bottom-nav, .fab { display: none; }
+      .app-container { flex-direction: row; }
+      .nav-drawer { position: relative; left: 0; width: 280px; height: 100vh; box-shadow: none; border-right: 1px solid var(--color-border); }
+      .nav-overlay { display: none; }
+      .drawer-footer { position: sticky; }
+      .main-content { margin-top: 0; flex: 1; max-width: 1200px; margin-left: auto; margin-right: auto; padding: 2.5rem; }
+      .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+      .list-item:hover { transform: scale(0.98); background: #f3f4f6; }
+    }
   </style>
 </head>
 <body>
+  <div class="app-container">
+    <header class="mobile-header">
+      <button class="menu-toggle" onclick="toggleNav()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <h1>Manicures</h1>
+      <div style="width: 40px;"></div>
+    </header>
 
-  <header class="mobile-header">
-    <div style="width: 24px;"></div>
-    <h1>Minhas Parceiras</h1>
-    <a href="new-manicure.html" style="color: white; text-decoration: none;">
-       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </a>
-  </header>
+    <div class="nav-overlay" onclick="toggleNav()"></div>
 
-  <main class="main-content">
-    <div class="filter-section">
-      <input type="text" id="search-input" class="filter-input" placeholder="Buscar por nome ou telefone...">
-      <div id="results-count-container" style="margin-top: 8px; font-size: 0.85rem; color: var(--color-text-muted);">
-        <span id="results-count">0</span> manicures cadastradas
+    <aside class="nav-drawer" id="navDrawer">
+      <div class="drawer-header">
+        <div class="drawer-logo">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+          </svg>
+          <div class="drawer-title">
+            <h2>Gestão Manicures</h2>
+            <p>Controle de Kits</p>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="manicures-list" id="manicures-container">
-      <div style="text-align: center; padding: 2rem; color: #666;">Carregando lista...</div>
-    </div>
-  </main>
+      <nav class="drawer-nav">
+        <ul style="list-style: none; padding: 0;">
+          <li class="nav-item">
+            <a href="../index.html" class="nav-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+              </svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="manicures.html" class="nav-link active">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              </svg>
+              <span>Manicures</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="alerts.html" class="nav-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              <span>Alertas</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
 
-  <a href="new-manicure.html" class="fab">+</a>
+      <div class="drawer-footer">
+        <div class="user-info" id="user-info">Carregando...</div>
+        <button class="btn btn-secondary btn-full" id="logout-btn">Sair</button>
+      </div>
+    </aside>
 
-  <script type="module">
-    import { authManager } from '../js/auth.js';
-    import { dbManager } from '../js/database.js';
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Manicures</h1>
+          <p class="page-subtitle">Gerencie suas manicures cadastradas</p>
+        </div>
+        <button class="btn btn-primary" onclick="window.location.href='new-manicure.html'" style="display: none;" id="desktop-add-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>Nova Manicure</span>
+        </button>
+      </div>
 
+      <div class="search-section">
+        <div class="search-input-wrapper">
+          <span class="search-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </span>
+          <input type="text" id="search-input" class="search-input" placeholder="Buscar por nome ou telefone...">
+        </div>
+        <div class="search-results">
+          <span id="results-count">0</span> manicures encontradas
+        </div>
+      </div>
+
+      <div class="item-list" id="manicures-list">
+        <div class="loading" style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
+          Carregando manicures...
+        </div>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="../index.html" class="bottom-nav-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="manicures.html" class="bottom-nav-item active">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        </svg>
+        <span>Manicures</span>
+      </a>
+      <a href="alerts.html" class="bottom-nav-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span>Alertas</span>
+      </a>
+    </nav>
+
+    <a href="new-manicure.html" class="fab">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </a>
+  </div>
+
+  <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
+
+  <script>
+    function toggleNav() {
+      document.getElementById('navDrawer').classList.toggle('open');
+      document.querySelector('.nav-overlay').classList.toggle('open');
+    }
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 1024) toggleNav();
+      });
+    });
+    if (window.innerWidth >= 1024) document.getElementById('desktop-add-btn').style.display = 'inline-flex';
+    window.addEventListener('resize', () => {
+      document.getElementById('desktop-add-btn').style.display = window.innerWidth >= 1024 ? 'inline-flex' : 'none';
+    });
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
+      authDomain: "parceiro-be3e9.firebaseapp.com",
+      databaseURL: "https://parceiro-be3e9-default-rtdb.firebaseio.com",
+      projectId: "parceiro-be3e9",
+      storageBucket: "parceiro-be3e9.firebasestorage.app",
+      messagingSenderId: "619982778395",
+      appId: "1:619982778395:web:25c141958b7c06da02c8be"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
     let allManicures = [];
 
-    async function init() {
-      try {
-        await authManager.requireAuth();
-        await loadManicures();
-      } catch (e) {
-        console.error("Não autenticado:", e);
-        window.location.href = '/manicure-troca/login.html';
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('user-info').textContent = user.email;
+      } else {
+        console.log('Usuário não autenticado');
       }
+    });
+
+    document.getElementById('logout-btn').onclick = () => {
+      auth.signOut().then(() => window.location.href = 'login.html');
+    };
+
+    const App = {
+      showLoading: () => document.getElementById('loading-spinner').classList.add('show'),
+      hideLoading: () => document.getElementById('loading-spinner').classList.remove('show'),
+      formatDate: (d) => new Date(d).toLocaleDateString('pt-BR'),
+      calcDays: (d) => {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const target = new Date(d); target.setHours(0,0,0,0);
+        return Math.ceil((target - today) / 86400000);
+      }
+    };
+
+    function getStatus(date) {
+      if (!date) return { text: 'Pendente', class: 'badge-secondary' };
+      const days = App.calcDays(date);
+      if (days < 0) return { text: 'Atrasada', class: 'badge-danger' };
+      if (days <= 2) return { text: 'Urgente', class: 'badge-warning' };
+      return { text: 'Em Dia', class: 'badge-success' };
     }
 
     async function loadManicures() {
-      const container = document.getElementById('manicures-container');
       try {
-        const data = await dbManager.getAllManicures();
-        // Converte o objeto do Firebase para array e filtra nulos
-        allManicures = data ? Object.entries(data).map(([id, val]) => ({ id, ...val })) : [];
+        App.showLoading();
+        const snap = await database.ref('manicures').once('value');
+        const data = snap.val();
+        allManicures = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
         renderList(allManicures);
-      } catch (error) {
-        console.error("Erro ao carregar:", error);
-        container.innerHTML = '<div style="text-align:center; color:red;">Erro ao carregar dados do banco.</div>';
+        App.hideLoading();
+      } catch (e) {
+        console.error(e);
+        App.hideLoading();
+        document.getElementById('manicures-list').innerHTML = '<div style="color: var(--color-danger); text-align: center; padding: 2rem;">Erro ao carregar</div>';
       }
     }
 
     function renderList(list) {
-      const container = document.getElementById('manicures-container');
-      const countLabel = document.getElementById('results-count');
-      
-      countLabel.textContent = list.length;
+      const container = document.getElementById('manicures-list');
+      document.getElementById('results-count').textContent = list.length;
 
       if (list.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:2rem; color: #666;">Nenhuma manicure encontrada.</div>';
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            </svg>
+            <h3>Nenhuma manicure encontrada</h3>
+            <p>Comece adicionando sua primeira manicure</p>
+            <button class="btn btn-primary" onclick="window.location.href='new-manicure.html'">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span>Adicionar Manicure</span>
+            </button>
+          </div>
+        `;
         return;
       }
 
       container.innerHTML = list.map(m => {
-        const status = calculateStatus(m.nextExchangeDate);
+        const status = getStatus(m.nextExchangeDate);
         return `
-          <a href="manicure-details.html?id=${m.id}" class="card">
-            <div>
-              <h3 style="font-family: 'Playfair Display', serif;">${m.name}</h3>
-              <p style="font-size: 0.85rem; color: var(--color-text-muted);">${m.phone || 'Sem telefone'}</p>
-              <p style="font-size: 0.8rem; margin-top: 4px;">Troca: ${m.nextExchangeDate ? new Date(m.nextExchangeDate).toLocaleDateString('pt-BR') : 'Não agendada'}</p>
+          <a href="manicure-details.html?id=${m.id}" class="list-item">
+            <div class="item-info">
+              <h3>${m.name}</h3>
+              <p>${m.phone || 'Sem telefone'} • Plano ${m.planType || '-'}</p>
+              ${m.nextExchangeDate ? `<p style="font-size: 0.8125rem; margin-top: 0.25rem;">Próxima troca: ${App.formatDate(m.nextExchangeDate)}</p>` : ''}
             </div>
-            <div class="status-badge ${status.class}">${status.text}</div>
+            <span class="badge ${status.class}">${status.text}</span>
           </a>
         `;
       }).join('');
     }
 
-    function calculateStatus(nextDate) {
-      if (!nextDate) return { text: 'Pendente', class: 'status-warning' };
-      
-      const today = new Date().setHours(0,0,0,0);
-      const target = new Date(nextDate).setHours(0,0,0,0);
-      const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = allManicures.filter(m => 
+        (m.name && m.name.toLowerCase().includes(term)) || 
+        (m.phone && m.phone.includes(term))
+      );
+      renderList(filtered);
+    });
 
-      if (diffDays <= 0) return { text: 'Atrasada', class: 'status-urgent' };
-      if (diffDays <= 2) return { text: 'Trocar Agora', class: 'status-warning' };
-      return { text: 'Em dia', class: 'status-ok' };
-    }
-
-    // Filtro de Busca corrigido
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = allManicures.filter(m => 
-          (m.name && m.name.toLowerCase().includes(term)) || 
-          (m.phone && m.phone.includes(term))
-        );
-        renderList(filtered);
-      });
-    }
-
-    init();
+    document.addEventListener('DOMContentLoaded', () => setTimeout(loadManicures, 500));
   </script>
 </body>
 </html>
