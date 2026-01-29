@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:,">
   <style>
-  /* Ajuste de UX para Mobile */
+  /* AJUSTE PARA MANTER O USUÁRIO PADRÃO "TELA CHEIA" NO MOBILE */
   @media (max-width: 768px) {
     body { flex-direction: column; }
     
@@ -15,7 +15,7 @@
       width: 100%; 
       height: auto; 
       position: relative; 
-      padding: 1rem;
+      padding: 1.5rem 1rem;
     }
 
     .sidebar-header {
@@ -24,60 +24,54 @@
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
-    /* MENU MAIOR NO MOBILE */
+    /* Menu com botões maiores e scroll horizontal */
     .nav-menu {
       display: flex;
-      gap: 12px; /* Mais espaço entre os botões */
+      gap: 12px;
       overflow-x: auto;
-      padding-bottom: 12px;
-      scrollbar-width: none; /* Esconde barra de rolagem no Firefox */
+      padding-bottom: 15px;
+      -webkit-overflow-scrolling: touch;
     }
-    .nav-menu::-webkit-scrollbar { display: none; } /* Esconde no Chrome/Safari */
 
-    .nav-item { margin-bottom: 0; flex-shrink: 0; }
+    .nav-item { flex-shrink: 0; }
     
     .nav-link {
-      padding: 12px 20px; /* Aumentado: era 8px 12px */
-      font-size: 1rem;     /* Fonte maior para leitura rápida */
-      background: rgba(255, 255, 255, 0.05); /* Fundo sutil para destacar o botão */
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      background: rgba(255, 255, 255, 0.05);
       border-radius: 12px;
       display: flex;
-      flex-direction: column; /* Ícone em cima do texto para ganhar altura */
+      flex-direction: column;
       align-items: center;
       gap: 6px;
-      min-width: 100px; /* Garante um tamanho robusto */
+      min-width: 110px;
     }
 
-    .nav-link svg {
-      width: 22px; /* Ícones maiores */
-      height: 22px;
-    }
+    .nav-link svg { width: 22px; height: 22px; }
 
-    .nav-link.active {
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
+    /* RODAPÉ IGUAL AO DESKTOP (EMPILHADO) */
     .sidebar-footer {
       margin-top: 1rem;
-      padding-top: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: block; /* Força o empilhamento em vez de flex side-by-side */
+      position: static;
     }
 
     #user-info { 
-      margin-bottom: 0 !important; 
-      font-size: 0.8rem; 
-      max-width: 180px;
+      margin-bottom: 1rem !important; /* Espaço entre e-mail e botão */
+      font-size: 0.9rem; 
+      color: white;
+      display: block;
+      font-weight: 500;
+      word-break: break-all; /* Garante que e-mails longos não quebrem o layout */
     }
     
     #logout-btn { 
-      width: auto !important; 
-      margin-top: 0 !important; 
-      padding: 10px 16px !important; /* Botão sair também maior */
-      font-size: 0.8rem;
+      width: 100% !important; /* Botão Sair ocupa a largura toda como no PC */
+      padding: 12px !important;
+      font-size: 0.9rem;
+      justify-content: center;
     }
 
     .main-content { 
