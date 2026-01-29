@@ -132,7 +132,7 @@
       <nav class="drawer-nav">
         <ul style="list-style: none; padding: 0;">
           <li class="nav-item">
-            <a href="../index.html" class="nav-link">
+            <a href="index.html" class="nav-link">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
               </svg>
@@ -200,7 +200,7 @@
     </main>
 
     <nav class="bottom-nav">
-      <a href="../index.html" class="bottom-nav-item">
+      <a href="index.html" class="bottom-nav-item">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
         </svg>
@@ -246,8 +246,16 @@
   </script>
 
   <script type="module">
-    import { authManager } from '../js/auth.js';
-    import { dbManager } from '../js/database.js';
+    // CORREÇÃO: Definir o caminho base dependendo se está em produção ou local
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const basePath = isGitHubPages ? '/manicure-troca' : '';
+    
+    // Importar módulos com o caminho correto
+    const authModule = await import(`${basePath}/js/auth.js`);
+    const dbModule = await import(`${basePath}/js/database.js`);
+    
+    const authManager = authModule.authManager;
+    const dbManager = dbModule.dbManager;
 
     let allManicures = [];
 
@@ -277,7 +285,6 @@
         console.log('🔄 Iniciando carregamento de manicures...');
         App.showLoading();
         
-        // CORREÇÃO: Usar dbManager que já inclui o userId
         const data = await dbManager.getAllManicures();
         
         console.log('📦 Dados do Firebase:', data);
@@ -369,24 +376,22 @@
         document.getElementById('user-info').textContent = user.email;
         console.log('✅ Usuário autenticado:', user.email);
         
-        // Carregar manicures após autenticação
         await loadManicures();
       } catch (e) {
         console.log('⚠️ Usuário não autenticado, redirecionando...');
-        window.location.href = '../login.html';
+        window.location.href = `${basePath}/login.html`;
       }
     }
 
     document.getElementById('logout-btn').onclick = async () => {
       try {
         await authManager.logout();
-        window.location.href = '../login.html';
+        window.location.href = `${basePath}/login.html`;
       } catch (e) {
         console.error('Erro ao fazer logout:', e);
       }
     };
 
-    // Iniciar quando a página carregar
     init();
   </script>
 </body>
