@@ -245,43 +245,11 @@
     });
   </script>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script type="module">
+    import { authManager } from '../js/auth.js';
+    import { dbManager } from '../js/database.js';
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
-      authDomain: "parceiro-be3e9.firebaseapp.com",
-      databaseURL: "https://parceiro-be3e9-default-rtdb.firebaseio.com",
-      projectId: "parceiro-be3e9",
-      storageBucket: "parceiro-be3e9.firebasestorage.app",
-      messagingSenderId: "619982778395",
-      appId: "1:619982778395:web:25c141958b7c06da02c8be"
-    };
-
-    // Initialize Firebase
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-
-    const auth = firebase.auth();
-    const database = firebase.database();
     let allManicures = [];
-
-    // Auth state
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById('user-info').textContent = user.email;
-        console.log('✅ Usuário autenticado:', user.email);
-      } else {
-        console.log('⚠️ Usuário não autenticado');
-      }
-    });
-
-    document.getElementById('logout-btn').onclick = () => {
-      auth.signOut().then(() => window.location.href = 'login.html');
-    };
 
     const App = {
       showLoading: () => document.getElementById('loading-spinner').classList.add('show'),
@@ -309,8 +277,8 @@
         console.log('🔄 Iniciando carregamento de manicures...');
         App.showLoading();
         
-        const snap = await database.ref('manicures').once('value');
-        const data = snap.val();
+        // CORREÇÃO: Usar dbManager que já inclui o userId
+        const data = await dbManager.getAllManicures();
         
         console.log('📦 Dados do Firebase:', data);
         
@@ -332,7 +300,10 @@
         console.error('❌ Erro ao carregar manicures:', e);
         App.hideLoading();
         document.getElementById('manicures-list').innerHTML = 
-          '<div style="color: var(--color-danger); text-align: center; padding: 2rem;">❌ Erro ao carregar manicures. Verifique o console para mais detalhes.</div>';
+          `<div style="color: var(--color-danger); text-align: center; padding: 2rem;">
+            ❌ Erro ao carregar manicures<br>
+            <small style="font-size: 0.875rem; opacity: 0.8;">${e.message}</small>
+          </div>`;
       }
     }
 
@@ -364,7 +335,7 @@
       container.innerHTML = list.map(m => {
         const status = getStatus(m.nextExchangeDate);
         return `
-          <a href="manicure-details.html?id=${m.id}" class="list-item">
+          <a href="manicure-details.html?id=${encodeURIComponent(m.id)}" class="list-item">
             <div class="item-info">
               <h3>${m.name}</h3>
               <p>${m.phone || 'Sem telefone'} • Plano ${m.planType || '-'} dias</p>
@@ -391,11 +362,32 @@
       renderList(filtered);
     });
 
-    // Load on page ready
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('🚀 Página carregada, iniciando em 500ms...');
-      setTimeout(loadManicures, 500);
-    });
+    // Auth and logout
+    async function init() {
+      try {
+        const user = await authManager.requireAuth();
+        document.getElementById('user-info').textContent = user.email;
+        console.log('✅ Usuário autenticado:', user.email);
+        
+        // Carregar manicures após autenticação
+        await loadManicures();
+      } catch (e) {
+        console.log('⚠️ Usuário não autenticado, redirecionando...');
+        window.location.href = '../login.html';
+      }
+    }
+
+    document.getElementById('logout-btn').onclick = async () => {
+      try {
+        await authManager.logout();
+        window.location.href = '../login.html';
+      } catch (e) {
+        console.error('Erro ao fazer logout:', e);
+      }
+    };
+
+    // Iniciar quando a página carregar
+    init();
   </script>
 </body>
 </html>
