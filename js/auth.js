@@ -7,7 +7,7 @@ import {
   signOut 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// CORREÇÃO: Usando caminho absoluto para o config
+// CORREÇÃO: Importando o auth configurado
 import { auth as firebaseAuth } from 'https://diovanycr.github.io/manicure-troca/config/firebase-config.js'; 
 
 class AuthManager {
@@ -26,6 +26,13 @@ class AuthManager {
 
   signInWithGoogle() {
     const provider = new GoogleAuthProvider();
+    
+    // --- NOVIDADE AQUI: FORÇAR SELEÇÃO DE CONTA ---
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
+    // ----------------------------------------------
+
     provider.addScope('profile');
     provider.addScope('email');
 
@@ -36,7 +43,10 @@ class AuthManager {
       })
       .catch((error) => {
         console.error('Erro ao entrar:', error);
-        alert('Erro ao fazer login: ' + error.message);
+        // Não mostramos alerta se o usuário apenas fechou a janela (cancelled-popup-request)
+        if (error.code !== 'auth/popup-closed-by-user') {
+          alert('Erro ao fazer login: ' + error.message);
+        }
       });
   }
 
@@ -70,7 +80,6 @@ class AuthManager {
     }
   }
 
-  // CORREÇÃO: Links absolutos para o GitHub Pages não se perder
   redirectToDashboard() {
     window.location.href = 'https://diovanycr.github.io/manicure-troca/index.html';
   }
@@ -88,5 +97,5 @@ class AuthManager {
   }
 }
 
-// exportamos a instância
+// Exportamos a instância única
 export const authManager = new AuthManager();
