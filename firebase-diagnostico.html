@@ -10,6 +10,15 @@
       padding: 2rem;
       background: #1e1e1e;
       color: #d4d4d4;
+      line-height: 1.6;
+    }
+    h1 { color: #4ec9b0; margin-bottom: 2rem; }
+    .status-box {
+      background: #252526;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      border-left: 4px solid #007acc;
     }
     .log {
       background: #252526;
@@ -30,28 +39,57 @@
       cursor: pointer;
       font-size: 1rem;
       margin: 0.5rem 0.5rem 0.5rem 0;
+      font-family: 'Courier New', monospace;
     }
     button:hover { background: #1177bb; }
+    button:disabled { 
+      background: #555; 
+      cursor: not-allowed; 
+      opacity: 0.5;
+    }
     pre {
       background: #1e1e1e;
       padding: 1rem;
       border-radius: 4px;
       overflow-x: auto;
+      font-size: 0.875rem;
+    }
+    .loading {
+      display: inline-block;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
     }
   </style>
 </head>
 <body>
-  <h1>🔍 Diagnóstico Firebase</h1>
+  <h1>🔍 Diagnóstico Firebase - Gestão de Manicures</h1>
   
-  <div class="log">
-    <strong>Status:</strong> <span id="status">Aguardando...</span>
+  <div class="status-box">
+    <strong>📊 Status do Sistema:</strong><br>
+    <div style="margin-top: 0.5rem;">
+      Firebase: <span id="firebase-status" class="loading">Carregando...</span><br>
+      Autenticação: <span id="auth-status" class="loading">Verificando...</span><br>
+      Conexão: <span id="connection-status">Aguardando teste...</span>
+    </div>
   </div>
 
-  <button onclick="testConnection()">🔄 Testar Conexão</button>
-  <button onclick="testAuth()">👤 Testar Autenticação</button>
-  <button onclick="testRead()">📖 Testar Leitura</button>
-  <button onclick="testWrite()">✍️ Testar Escrita (Manicure Teste)</button>
-  <button onclick="viewData()">👁️ Ver Todos os Dados</button>
+  <div class="btn-group">
+    <button onclick="testConnection()" id="btn-connection">🔄 Testar Conexão</button>
+    <button onclick="testAuth()" id="btn-auth">👤 Login com Google</button>
+    <button onclick="testRead()" id="btn-read">📖 Ler Dados</button>
+    <button onclick="testWrite()" id="btn-write">✍️ Criar Teste</button>
+    <button onclick="viewAllData()" id="btn-view">👁️ Ver Tudo</button>
+    <button onclick="clearLogs()" style="background: #7a3e3e;">🗑️ Limpar Logs</button>
+  </div>
 
   <div id="output"></div>
 
@@ -60,6 +98,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
+    console.log('Iniciando diagnostico...');
+
     const firebaseConfig = {
       apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
       authDomain: "parceiro-be3e9.firebaseapp.com",
@@ -70,143 +110,229 @@
       appId: "1:619982778395:web:25c141958b7c06da02c8be"
     };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+    let auth, database;
+    const output = document.getElementById('output');
+
+    // Initialize Firebase
+    try {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log('Firebase inicializado');
+      }
+      auth = firebase.auth();
+      database = firebase.database();
+      
+      document.getElementById('firebase-status').innerHTML = '<strong style="color: #4ec9b0;">Carregado</strong>';
+      document.getElementById('firebase-status').classList.remove('loading');
+      
+      log('Firebase SDK carregado com sucesso!', 'success');
+    } catch (error) {
+      console.error('Erro ao inicializar Firebase:', error);
+      document.getElementById('firebase-status').innerHTML = '<strong style="color: #f48771;">Erro</strong>';
+      document.getElementById('firebase-status').classList.remove('loading');
+      log('ERRO ao carregar Firebase: ' + error.message, 'error');
     }
 
-    const auth = firebase.auth();
-    const database = firebase.database();
-    const output = document.getElementById('output');
-    const status = document.getElementById('status');
-
-    function log(message, type = 'log') {
+    function log(message, type) {
+      type = type || 'log';
       const div = document.createElement('div');
       div.className = 'log ' + type;
-      div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+      const time = new Date().toLocaleTimeString();
+      div.innerHTML = '<strong>[' + time + ']</strong> ' + message;
       output.insertBefore(div, output.firstChild);
+      console.log('[' + time + '] ' + message.replace(/<[^>]*>/g, ''));
     }
 
-    auth.onAuthStateChanged(user => {
+    function clearLogs() {
+      output.innerHTML = '';
+      log('Logs limpos', 'log');
+    }
+
+    // Monitor auth state
+    auth.onAuthStateChanged(function(user) {
       if (user) {
-        status.innerHTML = `✅ Conectado como: <strong>${user.email}</strong>`;
+        document.getElementById('auth-status').innerHTML = '<strong style="color: #4ec9b0;">' + user.email + '</strong>';
+        document.getElementById('auth-status').classList.remove('loading');
+        log('Usuario autenticado: ' + user.email, 'success');
+        console.log('User UID:', user.uid);
       } else {
-        status.innerHTML = '⚠️ Não autenticado';
+        document.getElementById('auth-status').innerHTML = '<strong style="color: #dcdcaa;">Nao logado</strong>';
+        document.getElementById('auth-status').classList.remove('loading');
+        log('Nenhum usuario autenticado. Clique em Login com Google', 'warning');
       }
     });
 
-    function testConnection() {
-      log('🔄 Testando conexão com Firebase...', 'log');
+    async function testConnection() {
+      log('Testando conexao com Firebase Realtime Database...', 'log');
+      document.getElementById('connection-status').innerHTML = '<span class="loading">Testando...</span>';
       
-      database.ref('.info/connected').once('value', (snapshot) => {
+      try {
+        const connectedRef = database.ref('.info/connected');
+        const snapshot = await connectedRef.once('value');
+        
         if (snapshot.val() === true) {
-          log('✅ Conexão com Firebase estabelecida!', 'success');
+          document.getElementById('connection-status').innerHTML = '<strong style="color: #4ec9b0;">Conectado</strong>';
+          log('SUCESSO! Conexao estabelecida com Firebase Realtime Database', 'success');
+          log('Database URL: ' + firebaseConfig.databaseURL, 'success');
         } else {
-          log('❌ Não foi possível conectar ao Firebase', 'error');
+          document.getElementById('connection-status').innerHTML = '<strong style="color: #f48771;">Falhou</strong>';
+          log('Falha na conexao com o banco de dados', 'error');
         }
-      });
+      } catch (error) {
+        document.getElementById('connection-status').innerHTML = '<strong style="color: #f48771;">Erro</strong>';
+        log('Erro ao testar conexao: ' + error.message, 'error');
+        console.error(error);
+      }
     }
 
-    function testAuth() {
+    async function testAuth() {
       const user = auth.currentUser;
+      
       if (user) {
-        log(`✅ Usuário autenticado:<br>
-             Email: ${user.email}<br>
-             UID: ${user.uid}`, 'success');
-      } else {
-        log('⚠️ Nenhum usuário autenticado. Fazendo login...', 'warning');
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider)
-          .then(() => log('✅ Login realizado com sucesso!', 'success'))
-          .catch(err => log(`❌ Erro no login: ${err.message}`, 'error'));
+        log('Voce ja esta autenticado como: ' + user.email, 'log');
+        log('UID: ' + user.uid, 'log');
+        return;
+      }
+
+      log('Iniciando processo de autenticacao...', 'log');
+      const provider = new firebase.auth.GoogleAuthProvider();
+      
+      try {
+        const result = await auth.signInWithPopup(provider);
+        log('Login realizado com sucesso!<br>Email: ' + result.user.email + '<br>UID: ' + result.user.uid, 'success');
+      } catch (error) {
+        log('Erro no login: ' + error.message + '<br>Codigo: ' + error.code, 'error');
+        console.error('Erro completo:', error);
       }
     }
 
     async function testRead() {
-      log('📖 Tentando ler dados de /manicures...', 'log');
+      log('Lendo dados de /manicures...', 'log');
       
+      if (!auth.currentUser) {
+        log('Voce precisa estar autenticado! Clique em Login com Google primeiro.', 'warning');
+        return;
+      }
+
       try {
         const snapshot = await database.ref('manicures').once('value');
         const data = snapshot.val();
         
-        if (data) {
+        console.log('Dados retornados:', data);
+        
+        if (data === null) {
+          log('O caminho /manicures existe mas esta VAZIO (retornou null)', 'warning');
+          log('Isso significa que nao ha nenhuma manicure cadastrada ainda.', 'warning');
+          log('Use o botao Criar Teste para adicionar uma manicure de exemplo.', 'warning');
+        } else if (typeof data === 'object') {
           const count = Object.keys(data).length;
-          log(`✅ Dados encontrados! ${count} manicures no banco.<br>
-               <pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
-        } else {
-          log('⚠️ Caminho existe mas está vazio (null)', 'warning');
-          log('💡 Dica: Adicione dados manualmente no console do Firebase ou use o botão "Testar Escrita"', 'warning');
+          log('SUCESSO! Encontradas ' + count + ' manicure(s) no banco!', 'success');
+          
+          Object.keys(data).forEach(function(key) {
+            const m = data[key];
+            log('<strong>ID:</strong> ' + key + '<br><strong>Nome:</strong> ' + (m.name || 'N/A') + '<br><strong>Telefone:</strong> ' + (m.phone || 'N/A') + '<br><strong>Plano:</strong> ' + (m.planType || 'N/A') + ' dias', 'success');
+          });
+          
+          log('<strong>Dados completos:</strong><pre>' + JSON.stringify(data, null, 2) + '</pre>', 'log');
         }
       } catch (error) {
-        log(`❌ Erro ao ler dados: ${error.message}<br>
-             Código: ${error.code}`, 'error');
+        log('ERRO ao ler dados: ' + error.message, 'error');
+        log('Codigo do erro: ' + error.code, 'error');
+        console.error('Erro completo:', error);
         
         if (error.code === 'PERMISSION_DENIED') {
-          log('💡 Verifique as regras do Realtime Database:<br>
-               <pre>{
-  "rules": {
-    "manicures": {
-      ".read": "auth != null",
-      ".write": "auth != null"
-    }
-  }
-}</pre>', 'warning');
+          log('PERMISSAO NEGADA! Suas regras do Firebase nao permitem leitura.', 'error');
+          log('Va em Firebase Console → Realtime Database → Rules e configure as permissoes', 'warning');
         }
       }
     }
 
     async function testWrite() {
-      log('✍️ Criando manicure de teste...', 'log');
+      log('Criando manicure de teste...', 'log');
       
+      if (!auth.currentUser) {
+        log('Voce precisa estar autenticado! Clique em Login com Google primeiro.', 'warning');
+        return;
+      }
+
       try {
+        const now = new Date();
+        const nextExchange = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000);
+        
         const testData = {
-          name: 'Teste Maria',
+          name: 'Maria Teste',
           phone: '(11) 99999-9999',
-          address: 'Rua Teste, 123, Centro, São Paulo, SP',
+          address: 'Rua Teste, 123, Centro, Sao Paulo, SP',
+          addressDetails: {
+            street: 'Rua Teste',
+            number: '123',
+            complement: '',
+            neighborhood: 'Centro',
+            city: 'Sao Paulo',
+            state: 'SP'
+          },
           planType: '15',
-          startDate: new Date().toISOString(),
-          nextExchangeDate: new Date(Date.now() + 15 * 86400000).toISOString(),
+          startDate: now.toISOString(),
+          nextExchangeDate: nextExchange.toISOString(),
           status: 'active',
-          createdAt: new Date().toISOString()
+          isDueSoon: false,
+          lastExchangeDate: null,
+          createdAt: now.toISOString()
         };
 
         const ref = await database.ref('manicures').push(testData);
         
-        log(`✅ Manicure de teste criada com sucesso!<br>
-             ID: ${ref.key}<br>
-             <pre>${JSON.stringify(testData, null, 2)}</pre>`, 'success');
+        log('SUCESSO! Manicure de teste criada!<br><strong>ID gerado:</strong> ' + ref.key + '<br><strong>Nome:</strong> ' + testData.name + '<br><strong>Telefone:</strong> ' + testData.phone + '<br><strong>Plano:</strong> ' + testData.planType + ' dias', 'success');
+        
+        log('<strong>Dados completos:</strong><pre>' + JSON.stringify(testData, null, 2) + '</pre>', 'log');
+        
+        log('Agora tente clicar em Ler Dados para verificar!', 'success');
       } catch (error) {
-        log(`❌ Erro ao criar manicure: ${error.message}<br>
-             Código: ${error.code}`, 'error');
+        log('ERRO ao criar manicure: ' + error.message, 'error');
+        log('Codigo do erro: ' + error.code, 'error');
+        console.error('Erro completo:', error);
         
         if (error.code === 'PERMISSION_DENIED') {
-          log('💡 Permissão negada. Verifique as regras de escrita no Firebase.', 'warning');
+          log('PERMISSAO NEGADA! Suas regras do Firebase nao permitem escrita.', 'error');
+          log('Configure as regras no Firebase Console.', 'warning');
         }
       }
     }
 
-    async function viewData() {
-      log('👁️ Buscando TODOS os dados do banco...', 'log');
+    async function viewAllData() {
+      log('Buscando TODA a estrutura do banco...', 'log');
       
+      if (!auth.currentUser) {
+        log('Voce precisa estar autenticado!', 'warning');
+        return;
+      }
+
       try {
         const snapshot = await database.ref().once('value');
         const data = snapshot.val();
         
-        if (data) {
-          log(`✅ Estrutura completa do banco:<br>
-               <pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+        if (data === null) {
+          log('O banco de dados esta completamente VAZIO!', 'warning');
+          log('Use Criar Teste para adicionar dados.', 'warning');
         } else {
-          log('⚠️ O banco de dados está completamente vazio!', 'warning');
+          log('Estrutura completa do banco:', 'success');
+          log('<pre>' + JSON.stringify(data, null, 2) + '</pre>', 'log');
         }
       } catch (error) {
-        log(`❌ Erro: ${error.message}`, 'error');
+        log('Erro: ' + error.message, 'error');
+        console.error(error);
       }
     }
 
-    // Auto-test on load
-    setTimeout(() => {
-      testConnection();
-      testRead();
-    }, 1000);
+    // Auto-run tests on page load
+    window.addEventListener('load', function() {
+      log('Pagina carregada. Executando testes automaticos...', 'log');
+      setTimeout(function() {
+        testConnection();
+      }, 1000);
+    });
+
+    console.log('Script carregado completamente');
   </script>
 </body>
 </html>
