@@ -3,17 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minhas Manicures - Gestão</title>
   <title>Manicures - Gestão de Manicures</title>
+  <title>Minhas Manicures - Gestão</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <style>
-    /* ... (Mantive seus estilos originais para não alterar o visual) ... */
     /* ... (Mantive seus estilos originais) ... */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
+      --color-primary: #d946ef; --color-primary-dark: #a21caf; --color-secondary: #fbbf24;
+      --color-bg: #fafafa; --color-surface: #ffffff; --color-text: #1f2937;
+      --color-text-muted: #6b7280; --color-border: #e5e7eb; --color-success: #10b981;
+      --color-warning: #f59e0b; --color-danger: #ef4444; --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+      --radius: 16px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       --color-primary: #d946ef;
       --color-primary-dark: #a21caf;
       --color-bg: #fafafa;
@@ -26,21 +31,7 @@
       --color-success: #10b981;
       --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
       --radius: 16px;
-      --color-primary: #d946ef; --color-primary-dark: #a21caf; --color-secondary: #fbbf24;
-      --color-bg: #fafafa; --color-surface: #ffffff; --color-text: #1f2937;
-      --color-text-muted: #6b7280; --color-border: #e5e7eb; --color-success: #10b981;
-      --color-warning: #f59e0b; --color-danger: #ef4444; --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-      --radius: 16px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); padding-bottom: 80px; }
-    
-    .header {
-      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-      color: white;
-      padding: 2rem 1rem;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(217, 70, 239, 0.2);
     body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
     .app-container { min-height: 100vh; display: flex; flex-direction: column; }
     .mobile-header { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; z-index: 100; box-shadow: 0 2px 8px rgba(217, 70, 239, 0.2); }
@@ -77,6 +68,14 @@
       .mobile-header, .bottom-nav, .fab, .nav-overlay { display: none; }
       .main-content { margin-top: 0; padding: 2.5rem; }
       .manicures-list { grid-template-columns: repeat(2, 1fr); display: grid; }
+    body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); padding-bottom: 80px; }
+    
+    .header {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(217, 70, 239, 0.2);
     }
     .header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; }
 
@@ -251,9 +250,26 @@
   <script type="module">
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
+    import { auth } from '../config/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const Utils = {
+      formatDate: (date) => {
+        if (!date) return 'Não definida';
+        return new Date(date).toLocaleDateString('pt-BR');
+      }
+    };
 
     let allManicures = [];
 
+    // Funções Globais
+    window.toggleNav = () => {
+      document.getElementById('navDrawer').classList.toggle('open');
+      document.getElementById('overlay').classList.toggle('open');
+    };
+
+    function getInitials(name) {
+      return name ? name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : '?';
     async function init() {
       try {
         await authManager.requireAuth();
@@ -261,20 +277,54 @@
       } catch (e) { window.location.href = '../login.html'; }
     }
 
+    // --- CORREÇÃO: MONITOR DE AUTENTICAÇÃO ---
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById('user-info').textContent = user.email;
+        await loadManicures();
+      } else {
+        window.location.href = 'login.html';
+      }
+    });
+
     async function loadManicures() {
       const listElement = document.getElementById('manicure-list');
-
+      
       try {
+        allManicures = await dbManager.getAllManicures();
+        filterManicures();
         // Busca os dados do Firebase
         const data = await dbManager.getAllManicures();
         allManicures = data ? Object.entries(data).map(([id, val]) => ({ id, ...val })) : [];
-
+        
         renderList(allManicures);
       } catch (error) {
+        console.error('Erro:', error);
+        document.getElementById('manicures-list').innerHTML = '<div style="text-align:center; padding:2rem; color:red;">Erro ao carregar dados.</div>';
         listElement.innerHTML = '<div class="loading">Erro ao carregar dados.</div>';
       }
     }
 
+    function filterManicures() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const status = document.getElementById('status-filter').value;
+
+      const filtered = allManicures.filter(m => {
+        const nameMatch = m.name?.toLowerCase().includes(query);
+        const phoneMatch = m.phone?.includes(query);
+        const statusMatch = !status || m.status === status;
+        return (nameMatch || phoneMatch) && statusMatch;
+      });
+
+      renderList(filtered);
+    }
+
+    function renderList(manicures) {
+      const list = document.getElementById('manicures-list');
+      document.getElementById('results-count').textContent = manicures.length;
+
+      if (manicures.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:2rem;">Nenhuma manicure encontrada.</div>';
     function renderList(list) {
       const container = document.getElementById('manicure-list');
       if (list.length === 0) {
@@ -282,6 +332,13 @@
         return;
       }
 
+      list.innerHTML = manicures.map(m => `
+        <div class="manicure-card" onclick="window.location.href='manicure-details.html?id=${m.id}'">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="manicure-avatar">${getInitials(m.name)}</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600;">${m.name}</div>
+              <div style="font-size: 0.8rem; color: var(--color-text-muted);">${m.phone || 'Sem telefone'} | Plano ${m.planType || '-'}</div>
       container.innerHTML = list.map(m => {
         const status = calculateStatus(m.nextExchangeDate);
         return `
@@ -294,11 +351,26 @@
             <div class="status-badge ${status.class}">
               ${status.text}
             </div>
+          </div>
+          <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem;">📅 Troca: ${Utils.formatDate(m.nextExchangeDate)}</span>
+            <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}">
+              ${m.status === 'active' ? 'Ativa' : 'Inativa'}
+            </span>
+          </div>
+        </div>
+      `).join('');
           </a>
         `;
       }).join('');
     }
 
+    // Eventos
+    document.getElementById('menuBtn').onclick = window.toggleNav;
+    document.getElementById('overlay').onclick = window.toggleNav;
+    document.getElementById('logout-btn').onclick = () => authManager.signOut();
+    document.getElementById('search-input').oninput = filterManicures;
+    document.getElementById('status-filter').onchange = filterManicures;
     function calculateStatus(nextDate) {
       const today = new Date().setHours(0,0,0,0);
       const target = new Date(nextDate).setHours(0,0,0,0);
@@ -318,7 +390,7 @@
 
     init();
   </script>
-
 </body>
+
 
 </html>
