@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="icon" href="data:,">
   <style>
-    /* CSS IGUAL AO INDEX PARA MOBILE */
+    /* PADRONIZAÇÃO UX MOBILE - GRID DE 3 BOTÕES */
     @media (max-width: 768px) {
       body { flex-direction: column; }
       
@@ -15,46 +15,75 @@
         width: 100%; 
         height: auto; 
         position: relative; 
-        padding: 1rem;
+        padding: 0.8rem 1rem;
+        background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
       }
 
       .sidebar-header {
-        padding-bottom: 1rem;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       }
 
+      /* MENU EM GRID: 3 BOTÕES IGUAIS E ALINHADOS */
       .nav-menu {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
         gap: 8px;
-        overflow-x: auto;
-        padding-bottom: 10px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
       }
 
-      .nav-item { margin-bottom: 0; flex-shrink: 0; }
+      .nav-item { width: 100%; }
       
       .nav-link {
-        padding: 8px 12px;
-        font-size: 0.85rem;
+        display: flex;
+        flex-direction: column; 
+        align-items: center;
+        justify-content: center;
+        padding: 10px 5px;
+        font-size: 0.75rem; 
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+        min-height: 65px;
+        border: 1px solid transparent;
+        transition: all 0.2s;
       }
 
+      .nav-link.active {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.4);
+        font-weight: bold;
+      }
+
+      .nav-link svg {
+        width: 20px;
+        height: 20px;
+        margin-bottom: 4px;
+      }
+
+      /* RODAPÉ COMPACTO: E-MAIL E BOTÃO PRÓXIMOS */
       .sidebar-footer {
-        margin-top: 1rem;
-        padding-top: 1rem;
+        margin-top: 1rem; 
+        padding-top: 0.8rem; 
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
-        position: static; /* Garante que não flutue no mobile */
+        gap: 8px;
       }
 
       #user-info { 
         margin-bottom: 0 !important; 
-        font-size: 0.75rem; 
-        max-width: 180px;
+        font-size: 0.75rem;
+        color: white;
+        max-width: 65%;
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
       }
       
       #logout-btn { 
@@ -62,16 +91,18 @@
         margin-top: 0 !important; 
         padding: 6px 12px !important;
         font-size: 0.75rem;
+        flex-shrink: 0;
       }
 
       .main-content { 
         margin-left: 0; 
-        padding: 1.5rem; 
+        padding: 1rem; 
       }
-      
-      .filters-grid { 
-        grid-template-columns: 1fr !important; 
-        gap: 0.5rem !important;
+
+      /* Ajuste dos filtros no mobile para não esmagar */
+      .filters-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
       }
     }
   </style>
