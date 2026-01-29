@@ -3,235 +3,194 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manicures - Gestão de Manicures</title>
+  <title>Minhas Manicures - Gestão</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <style>
-    /* ... (Mantive seus estilos originais) ... */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --color-primary: #d946ef; --color-primary-dark: #a21caf; --color-secondary: #fbbf24;
-      --color-bg: #fafafa; --color-surface: #ffffff; --color-text: #1f2937;
-      --color-text-muted: #6b7280; --color-border: #e5e7eb; --color-success: #10b981;
-      --color-warning: #f59e0b; --color-danger: #ef4444; --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-      --radius: 16px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --color-primary: #d946ef;
+      --color-primary-dark: #a21caf;
+      --color-bg: #fafafa;
+      --color-surface: #ffffff;
+      --color-text: #1f2937;
+      --color-text-muted: #6b7280;
+      --color-border: #e5e7eb;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      --color-success: #10b981;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --radius: 16px;
     }
-    body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-    .app-container { min-height: 100vh; display: flex; flex-direction: column; }
-    .mobile-header { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; z-index: 100; box-shadow: 0 2px 8px rgba(217, 70, 239, 0.2); }
-    .mobile-header h1 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; }
-    .menu-toggle, .header-btn { background: none; border: none; color: white; cursor: pointer; padding: 0.5rem; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: var(--transition); }
-    .nav-drawer { position: fixed; top: 0; left: -100%; width: 280px; height: 100vh; background: var(--color-surface); box-shadow: var(--shadow-lg); z-index: 200; transition: left 0.3s ease; overflow-y: auto; }
-    .nav-drawer.open { left: 0; }
-    .nav-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 150; opacity: 0; visibility: hidden; transition: var(--transition); }
-    .nav-overlay.open { opacity: 1; visibility: visible; }
-    .drawer-header { background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; padding: 2rem 1.5rem 1.5rem; }
-    .drawer-logo { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
-    .drawer-title h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.25rem; }
-    .nav-link { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; color: var(--color-text); text-decoration: none; transition: var(--transition); font-weight: 500; border-left: 3px solid transparent; }
-    .nav-link.active { background: rgba(217, 70, 239, 0.1); color: var(--color-primary); border-left-color: var(--color-primary); }
-    .main-content { margin-top: 64px; padding: 1rem; padding-bottom: 80px; flex: 1; }
-    .page-title { font-family: 'Playfair Display', serif; font-size: 1.75rem; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .filter-section { background: var(--color-surface); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); }
-    .filters-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
-    .filter-input, .filter-select { width: 100%; padding: 0.875rem; border: 1.5px solid var(--color-border); border-radius: 10px; outline: none; font-family: 'Outfit', sans-serif; }
-    .manicures-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .manicure-card { background: var(--color-surface); border-radius: 12px; padding: 1rem; border: 1px solid var(--color-border); cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm); }
-    .manicure-avatar { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-family: 'Playfair Display', serif; }
-    .badge { padding: 0.375rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-    .badge-success { background: #d1fae5; color: #065f46; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-    .badge-secondary { background: #e5e7eb; color: #4b5563; }
-    .fab { position: fixed; bottom: 80px; right: 1rem; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; border: none; display: flex; align-items: center; justify-content: center; z-index: 50; }
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: var(--color-surface); border-top: 1px solid var(--color-border); display: flex; justify-content: space-around; align-items: center; z-index: 100; }
-    .bottom-nav-item { display: flex; flex-direction: column; align-items: center; color: var(--color-text-muted); text-decoration: none; font-size: 0.75rem; }
-    .bottom-nav-item.active { color: var(--color-primary); }
-    @media (min-width: 1024px) {
-      .app-container { flex-direction: row; }
-      .nav-drawer { position: relative; left: 0; width: 280px; height: 100vh; box-shadow: none; border-right: 1px solid var(--color-border); }
-      .mobile-header, .bottom-nav, .fab, .nav-overlay { display: none; }
-      .main-content { margin-top: 0; padding: 2.5rem; }
-      .manicures-list { grid-template-columns: repeat(2, 1fr); display: grid; }
+    body { font-family: 'Outfit', sans-serif; background: var(--color-bg); color: var(--color-text); padding-bottom: 80px; }
+    
+    .header {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(217, 70, 239, 0.2);
     }
+    .header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; }
+
+    .search-container {
+      padding: 1rem;
+      max-width: 600px;
+      margin: -25px auto 0;
+    }
+    .search-input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border-radius: 50px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .list-container {
+      padding: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--color-surface);
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s;
+    }
+    .card:active { transform: scale(0.98); }
+
+    .info h3 { font-size: 1.1rem; margin-bottom: 0.25rem; color: var(--color-text); }
+    .info p { font-size: 0.85rem; color: var(--color-text-muted); }
+
+    .status-badge {
+      padding: 0.5rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .status-urgent { background: #fee2e2; color: var(--color-danger); }
+    .status-warning { background: #fef3c7; color: var(--color-warning); }
+    .status-ok { background: #dcfce7; color: var(--color-success); }
+
+    .fab {
+      position: fixed;
+      bottom: 2rem;
+      right: 1.5rem;
+      width: 60px;
+      height: 60px;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(217, 70, 239, 0.4);
+      text-decoration: none;
+      font-size: 1.5rem;
+    }
+
+    .loading { text-align: center; padding: 2rem; color: var(--color-text-muted); }
   </style>
 </head>
 <body>
-  <div class="app-container">
-    <header class="mobile-header">
-      <button class="menu-toggle" id="menuBtn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-      <h1>Manicures</h1>
-      <button class="header-btn" onclick="window.location.href='new-manicure.html'">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
-    </header>
 
-    <div class="nav-overlay" id="overlay"></div>
+  <header class="header">
+    <h1>Minhas Parceiras</h1>
+  </header>
 
-    <aside class="nav-drawer" id="navDrawer">
-      <div class="drawer-header">
-        <div class="drawer-logo">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-          <div class="drawer-title">
-            <h2>Gestão Manicures</h2>
-            <p>Controle de Kits</p>
-          </div>
-        </div>
-      </div>
-
-      <nav class="drawer-nav">
-        <ul style="list-style: none; padding: 0;">
-          <li class="nav-item"><a href="../index.html" class="nav-link">Dashboard</a></li>
-          <li class="nav-item"><a href="manicures.html" class="nav-link active">Manicures</a></li>
-          <li class="nav-item"><a href="alerts.html" class="nav-link">Alertas</a></li>
-        </ul>
-      </nav>
-
-      <div class="drawer-footer" style="padding: 1.5rem; border-top: 1px solid var(--color-border);">
-        <div class="user-info" id="user-info" style="font-size: 0.875rem; margin-bottom: 1rem; color: var(--color-text-muted);">Carregando...</div>
-        <button class="btn-secondary" id="logout-btn" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--color-border); cursor: pointer;">Sair</button>
-      </div>
-    </aside>
-
-    <main class="main-content">
-      <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <div>
-          <h1 class="page-title">Manicures</h1>
-          <p class="page-subtitle">Gerencie todas as manicures cadastradas</p>
-        </div>
-      </div>
-
-      <div class="filter-section">
-        <div class="filters-grid">
-          <div class="filter-group">
-            <label style="font-size: 0.75rem; font-weight: 600;">BUSCAR</label>
-            <input type="text" id="search-input" class="filter-input" placeholder="Nome ou telefone...">
-          </div>
-          <div class="filter-group">
-            <label style="font-size: 0.75rem; font-weight: 600;">STATUS</label>
-            <select id="status-filter" class="filter-select">
-              <option value="">Todos</option>
-              <option value="active">Ativas</option>
-              <option value="inactive">Inativas</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="results-header" style="margin-bottom: 1rem; font-size: 0.875rem;">
-        <span id="results-count">0</span> resultado(s)
-      </div>
-
-      <div class="manicures-list" id="manicures-list">
-        <div style="text-align: center; padding: 3rem;">Carregando dados...</div>
-      </div>
-    </main>
-
-    <nav class="bottom-nav">
-      <a href="../index.html" class="bottom-nav-item">Dashboard</a>
-      <a href="manicures.html" class="bottom-nav-item active">Manicures</a>
-      <a href="alerts.html" class="bottom-nav-item">Alertas</a>
-    </nav>
-
-    <button class="fab" onclick="window.location.href='new-manicure.html'">+</button>
+  <div class="search-container">
+    <input type="text" id="search" class="search-input" placeholder="Buscar por nome...">
   </div>
+
+  <main class="list-container" id="manicure-list">
+    <div class="loading">Carregando manicures...</div>
+  </main>
+
+  <a href="new-manicure.html" class="fab">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </a>
 
   <script type="module">
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
-    import { auth } from '../config/firebase-config.js';
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-    const Utils = {
-      formatDate: (date) => {
-        if (!date) return 'Não definida';
-        return new Date(date).toLocaleDateString('pt-BR');
-      }
-    };
 
     let allManicures = [];
 
-    // Funções Globais
-    window.toggleNav = () => {
-      document.getElementById('navDrawer').classList.toggle('open');
-      document.getElementById('overlay').classList.toggle('open');
-    };
-
-    function getInitials(name) {
-      return name ? name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : '?';
+    async function init() {
+      try {
+        await authManager.requireAuth();
+        loadManicures();
+      } catch (e) { window.location.href = '../login.html'; }
     }
-
-    // --- CORREÇÃO: MONITOR DE AUTENTICAÇÃO ---
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        document.getElementById('user-info').textContent = user.email;
-        await loadManicures();
-      } else {
-        window.location.href = 'login.html';
-      }
-    });
 
     async function loadManicures() {
+      const listElement = document.getElementById('manicure-list');
+      
       try {
-        allManicures = await dbManager.getAllManicures();
-        filterManicures();
+        // Busca os dados do Firebase
+        const data = await dbManager.getAllManicures();
+        allManicures = data ? Object.entries(data).map(([id, val]) => ({ id, ...val })) : [];
+        
+        renderList(allManicures);
       } catch (error) {
-        console.error('Erro:', error);
-        document.getElementById('manicures-list').innerHTML = '<div style="text-align:center; padding:2rem; color:red;">Erro ao carregar dados.</div>';
+        listElement.innerHTML = '<div class="loading">Erro ao carregar dados.</div>';
       }
     }
 
-    function filterManicures() {
-      const query = document.getElementById('search-input').value.toLowerCase();
-      const status = document.getElementById('status-filter').value;
-
-      const filtered = allManicures.filter(m => {
-        const nameMatch = m.name?.toLowerCase().includes(query);
-        const phoneMatch = m.phone?.includes(query);
-        const statusMatch = !status || m.status === status;
-        return (nameMatch || phoneMatch) && statusMatch;
-      });
-
-      renderList(filtered);
-    }
-
-    function renderList(manicures) {
-      const list = document.getElementById('manicures-list');
-      document.getElementById('results-count').textContent = manicures.length;
-
-      if (manicures.length === 0) {
-        list.innerHTML = '<div style="text-align:center; padding:2rem;">Nenhuma manicure encontrada.</div>';
+    function renderList(list) {
+      const container = document.getElementById('manicure-list');
+      if (list.length === 0) {
+        container.innerHTML = '<div class="loading">Nenhuma manicure encontrada.</div>';
         return;
       }
 
-      list.innerHTML = manicures.map(m => `
-        <div class="manicure-card" onclick="window.location.href='manicure-details.html?id=${m.id}'">
-          <div style="display: flex; align-items: center; gap: 1rem;">
-            <div class="manicure-avatar">${getInitials(m.name)}</div>
-            <div style="flex: 1;">
-              <div style="font-weight: 600;">${m.name}</div>
-              <div style="font-size: 0.8rem; color: var(--color-text-muted);">${m.phone || 'Sem telefone'} | Plano ${m.planType || '-'}</div>
+      container.innerHTML = list.map(m => {
+        const status = calculateStatus(m.nextExchangeDate);
+        return `
+          <a href="manicure-details.html?id=${m.id}" class="card">
+            <div class="info">
+              <h3>${m.name}</h3>
+              <p>${m.phone}</p>
+              <p>Troca: ${new Date(m.nextExchangeDate).toLocaleDateString('pt-BR')}</p>
             </div>
-          </div>
-          <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.8rem;">📅 Troca: ${Utils.formatDate(m.nextExchangeDate)}</span>
-            <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}">
-              ${m.status === 'active' ? 'Ativa' : 'Inativa'}
-            </span>
-          </div>
-        </div>
-      `).join('');
+            <div class="status-badge ${status.class}">
+              ${status.text}
+            </div>
+          </a>
+        `;
+      }).join('');
     }
 
-    // Eventos
-    document.getElementById('menuBtn').onclick = window.toggleNav;
-    document.getElementById('overlay').onclick = window.toggleNav;
-    document.getElementById('logout-btn').onclick = () => authManager.signOut();
-    document.getElementById('search-input').oninput = filterManicures;
-    document.getElementById('status-filter').onchange = filterManicures;
+    function calculateStatus(nextDate) {
+      const today = new Date().setHours(0,0,0,0);
+      const target = new Date(nextDate).setHours(0,0,0,0);
+      const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+
+      if (diffDays <= 0) return { text: 'Atrásada', class: 'status-urgent' };
+      if (diffDays <= 2) return { text: 'Trocar Agora', class: 'status-warning' };
+      return { text: 'Em dia', class: 'status-ok' };
+    }
+
+    // Filtro de Busca
+    document.getElementById('search').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = allManicures.filter(m => m.name.toLowerCase().includes(term));
+      renderList(filtered);
+    });
+
+    init();
   </script>
 </body>
 </html>
