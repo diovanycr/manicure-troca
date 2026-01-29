@@ -7,67 +7,85 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:,">
   <style>
-    /* Ajuste de UX para Mobile: Evita que o usuário fique "em cima" do conteúdo */
-    @media (max-width: 768px) {
-      body { flex-direction: column; }
-      
-      .sidebar { 
-        width: 100%; 
-        height: auto; 
-        position: relative; 
-        padding: 1rem;
-      }
-
-      .sidebar-header {
-        padding-bottom: 1rem;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-      }
-
-      .nav-menu {
-        display: flex;
-        gap: 8px;
-        overflow-x: auto; /* Permite deslizar o menu se for grande */
-        padding-bottom: 10px;
-      }
-
-      .nav-item { margin-bottom: 0; flex-shrink: 0; }
-      
-      .nav-link {
-        padding: 8px 12px;
-        font-size: 0.85rem;
-      }
-
-      .sidebar-footer {
-        margin-top: 1rem;
-        padding-top: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-      }
-
-      #user-info { 
-        margin-bottom: 0 !important; 
-        font-size: 0.75rem; 
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      
-      #logout-btn { 
-        width: auto !important; 
-        margin-top: 0 !important; 
-        padding: 6px 12px !important;
-        font-size: 0.75rem;
-      }
-
-      .main-content { 
-        margin-left: 0; 
-        padding: 1.5rem; 
-      }
+  /* Ajuste de UX para Mobile */
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    
+    .sidebar { 
+      width: 100%; 
+      height: auto; 
+      position: relative; 
+      padding: 1rem;
     }
-  </style>
+
+    .sidebar-header {
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* MENU MAIOR NO MOBILE */
+    .nav-menu {
+      display: flex;
+      gap: 12px; /* Mais espaço entre os botões */
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scrollbar-width: none; /* Esconde barra de rolagem no Firefox */
+    }
+    .nav-menu::-webkit-scrollbar { display: none; } /* Esconde no Chrome/Safari */
+
+    .nav-item { margin-bottom: 0; flex-shrink: 0; }
+    
+    .nav-link {
+      padding: 12px 20px; /* Aumentado: era 8px 12px */
+      font-size: 1rem;     /* Fonte maior para leitura rápida */
+      background: rgba(255, 255, 255, 0.05); /* Fundo sutil para destacar o botão */
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column; /* Ícone em cima do texto para ganhar altura */
+      align-items: center;
+      gap: 6px;
+      min-width: 100px; /* Garante um tamanho robusto */
+    }
+
+    .nav-link svg {
+      width: 22px; /* Ícones maiores */
+      height: 22px;
+    }
+
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .sidebar-footer {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    #user-info { 
+      margin-bottom: 0 !important; 
+      font-size: 0.8rem; 
+      max-width: 180px;
+    }
+    
+    #logout-btn { 
+      width: auto !important; 
+      margin-top: 0 !important; 
+      padding: 10px 16px !important; /* Botão sair também maior */
+      font-size: 0.8rem;
+    }
+
+    .main-content { 
+      margin-left: 0; 
+      padding: 1.5rem; 
+    }
+  }
+</style>
 </head>
 <body>
   <aside class="sidebar">
