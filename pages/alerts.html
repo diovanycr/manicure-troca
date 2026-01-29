@@ -6,146 +6,111 @@
   <title>Alertas - Gestão de Manicures</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="icon" href="data:,">
-  <style>
-    /* Estilos para manter a consistência visual com a Index */
-    :root {
-      --primary: #7c3aed;
-      --primary-dark: #6d28d9;
-      --bg-main: #f8fafc;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-    }
-
-    body { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-main); display: flex; }
-
-    /* Sidebar idêntica à Index */
-    .sidebar { width: 260px; height: 100vh; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; position: fixed; display: flex; flex-direction: column; padding: 1.5rem; box-sizing: border-box; }
-    .sidebar-header { display: flex; align-items: center; gap: 12px; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem; }
-    .sidebar-logo { width: 40px; height: 40px; background: rgba(255, 255, 255, 0.2); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
-    
-    .nav-menu { flex: 1; list-style: none; padding: 0; margin: 0; }
-    .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px; color: rgba(255,255,255,0.8); text-decoration: none; border-radius: 8px; margin-bottom: 8px; transition: 0.3s; }
-    .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
-    
-    /* Área de Conteúdo */
-    .main-content { margin-left: 260px; flex: 1; padding: 2.5rem; min-height: 100vh; }
-    .header-page { margin-bottom: 2.5rem; }
-    .header-page h1 { font-size: 1.875rem; color: #1e293b; margin: 0; }
-    .header-page p { color: #64748b; margin-top: 0.5rem; }
-
-    /* Cards de Status (Estilo Index) */
-    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-    .stat-card { background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0; position: relative; overflow: hidden; }
-    .stat-card::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; }
-    .stat-card.danger::after { background: var(--danger); }
-    .stat-card.warning::after { background: var(--warning); }
-    
-    .stat-label { font-size: 0.875rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.025em; }
-    .stat-value { font-size: 2.25rem; font-weight: 700; color: #1e293b; margin-top: 0.5rem; }
-
-    /* Itens de Alerta */
-    .alert-item { background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; transition: 0.2s; cursor: pointer; }
-    .alert-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    
-    .alert-main h3 { margin: 0; font-size: 1.125rem; color: #1e293b; }
-    .alert-sub { color: #64748b; font-size: 0.875rem; margin: 4px 0 0; display: flex; align-items: center; gap: 8px; }
-
-    .badge { padding: 6px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-    .badge-danger { background: #fee2e2; color: #991b1b; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-
-    .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; margin-top: auto; }
-    .btn-logout { width: 100%; background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-    .btn-logout:hover { background: rgba(255,255,255,0.2); }
-
-    @media (max-width: 768px) {
-      body { flex-direction: column; }
-      .sidebar { width: 100%; height: auto; position: static; }
-      .main-content { margin-left: 0; padding: 1.5rem; }
-    }
-  </style>
 </head>
 <body>
 
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">📦</div>
+      <div class="sidebar-logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+      </div>
       <div class="sidebar-title">
-        <h2 style="margin:0; font-size: 1.1rem;">Gestão Manicures</h2>
-        <p style="margin:0; font-size: 0.75rem; opacity: 0.8;">Controle de Kits</p>
+        <h2>Gestão Manicures</h2>
+        <p>Controle de Kits</p>
       </div>
     </div>
 
-    <nav class="nav-menu">
-      <a href="../index.html" class="nav-link">
-        <span>📊</span> <span>Dashboard</span>
-      </a>
-      <a href="manicures.html" class="nav-link">
-        <span>👥</span> <span>Manicures</span>
-      </a>
-      <a href="alerts.html" class="nav-link active">
-        <span>🔔</span> <span>Alertas</span>
-      </a>
+    <nav>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="../index.html" class="nav-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="manicures.html" class="nav-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Manicures</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="alerts.html" class="nav-link active">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span>Alertas</span>
+          </a>
+        </li>
+      </ul>
     </nav>
 
     <div class="sidebar-footer">
-      <div id="user-info-display" style="margin-bottom: 1rem; font-size: 0.85rem; opacity: 0.9;"></div>
-      <button class="btn-logout" id="logout-btn">🚪 Sair da Conta</button>
+      <div class="user-profile" id="user-info"></div>
+      <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" id="logout-btn">
+        Sair
+      </button>
     </div>
   </aside>
 
   <main class="main-content">
-    <div class="header-page">
-      <h1>⚠️ Alertas de Troca</h1>
-      <p>Manicures com troca de kit pendente ou próxima do vencimento.</p>
-    </div>
-
-    <div class="summary-grid">
-      <div class="stat-card danger">
-        <div class="stat-label">🔴 Trocas Atrasadas</div>
-        <div class="stat-value" id="overdue-count">0</div>
-      </div>
-      <div class="stat-card warning">
-        <div class="stat-label">🟡 Próximos (5 dias)</div>
-        <div class="stat-value" id="upcoming-count">0</div>
+    <div class="header">
+      <div>
+        <h1>Alertas de Troca</h1>
+        <p class="text-muted">Acompanhamento de prazos e vencimentos</p>
       </div>
     </div>
 
-    <div id="alerts-list">
-      <p style="text-align: center; color: #64748b; padding: 2rem;">Carregando alertas...</p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-card-title">Trocas Atrasadas</span>
+          <span class="stat-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </span>
+        </div>
+        <div class="stat-card-value" id="overdue-count">0</div>
+        <div class="stat-card-desc">Atraso na devolução</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-card-title">Próximos (5 dias)</span>
+          <span class="stat-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </span>
+        </div>
+        <div class="stat-card-value" id="upcoming-count">0</div>
+        <div class="stat-card-desc">Vencem em breve</div>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <div class="section-header">
+        <h2 style="display: flex; align-items: center; gap: 8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Lista de Prioridade
+        </h2>
+      </div>
+      <div class="section-body" id="alerts-list">
+        </div>
     </div>
   </main>
 
   <script type="module">
     import { authManager } from '../js/auth.js';
     import { dbManager } from '../js/database.js';
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // Proteção de Rota
     authManager.requireAuth();
 
-    // Logout
     document.getElementById('logout-btn').onclick = () => authManager.signOut();
 
     async function loadAlerts() {
       try {
-        const uid = await dbManager._waitForUser();
-        const db = getDatabase();
-        
-        // Mostrar email do usuário
-        const user = authManager.currentUser;
-        if(user) document.getElementById('user-info-display').textContent = user.email;
-
-        const snapshot = await get(ref(db, `users/${uid}/manicures`));
+        const manicures = await dbManager.getAllManicures();
         const container = document.getElementById('alerts-list');
-        container.innerHTML = '';
+        const user = authManager.currentUser;
+        
+        if(user) document.getElementById('user-info').textContent = user.email;
 
-        if (!snapshot.exists()) {
-          container.innerHTML = '<p style="text-align:center;">Nenhuma manicure cadastrada.</p>';
-          return;
-        }
-
-        const manicures = snapshot.val();
         const hoje = new Date();
         hoje.setHours(0,0,0,0);
 
@@ -153,32 +118,30 @@
         let upcoming = 0;
         let html = '';
 
-        // Filtrar e Ordenar
-        const lista = Object.entries(manicures)
-          .map(([id, data]) => ({ id, ...data }))
+        // Filtra e ordena (mesmo estilo da lista da index)
+        const lista = manicures
           .filter(m => m.status === 'active' && m.nextExchangeDate)
-          .sort((a, b) => a.nextExchangeDate - b.nextExchangeDate);
+          .sort((a, b) => new Date(a.nextExchangeDate) - new Date(b.nextExchangeDate));
 
         lista.forEach(m => {
           const dataTroca = new Date(m.nextExchangeDate);
           dataTroca.setHours(0,0,0,0);
-          
-          const diffTime = dataTroca - hoje;
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          const diffDays = Math.ceil((dataTroca - hoje) / (1000 * 60 * 60 * 24));
 
           if (diffDays <= 5) {
             const atrasado = diffDays < 0;
             if (atrasado) overdue++; else upcoming++;
 
             html += `
-              <div class="alert-item" onclick="window.location.href='manicure-details.html?id=${m.id}'">
-                <div class="alert-main">
+              <div class="manicure-item" onclick="window.location.href='manicure-details.html?id=${m.id}'">
+                <div class="manicure-info">
                   <h3>${m.name}</h3>
-                  <p class="alert-sub"><span>📍</span> ${m.address || 'Sem endereço'}</p>
-                  <p class="alert-sub"><span>📅</span> Prevista: ${new Date(m.nextExchangeDate).toLocaleDateString()}</p>
+                  <p>${m.phone} • Previsto: ${new Date(m.nextExchangeDate).toLocaleDateString()}</p>
                 </div>
-                <div class="badge ${atrasado ? 'badge-danger' : 'badge-warning'}">
-                  ${atrasado ? 'Atrasado ' + Math.abs(diffDays) + 'd' : 'Faltam ' + diffDays + ' dias'}
+                <div class="manicure-meta">
+                  <span class="badge ${atrasado ? 'badge-danger' : 'badge-warning'}">
+                    ${atrasado ? 'Atrasado ' + Math.abs(diffDays) + 'd' : 'Faltam ' + diffDays + ' dias'}
+                  </span>
                 </div>
               </div>
             `;
@@ -189,16 +152,17 @@
         document.getElementById('upcoming-count').textContent = upcoming;
         
         container.innerHTML = html || `
-          <div style="text-align: center; padding: 4rem; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
-            <h3 style="margin:0; color: #1e293b;">Tudo em dia!</h3>
-            <p style="color: #64748b;">Nenhuma troca urgente para os próximos 5 dias.</p>
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <p>Nenhuma troca pendente para os próximos dias.</p>
           </div>
         `;
 
       } catch (err) {
         console.error(err);
-        container.innerHTML = '<p style="text-align:center; color:red;">Erro ao carregar dados.</p>';
+        container.innerHTML = '<p style="text-align:center; padding: 2rem;">Erro ao carregar dados.</p>';
       }
     }
 
