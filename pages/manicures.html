@@ -246,7 +246,9 @@
   </script>
 
   <script type="module">
-    import { authManager } from '../js/auth.js';
+    // ✅ IMPORTA DIRETAMENTE DO FIREBASE, SEM DEPENDER DE auth.js
+    import { auth } from '../config/firebase-config.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { dbManager } from '../js/database.js';
 
     let allManicures = [];
@@ -333,7 +335,6 @@
 
       container.innerHTML = list.map(m => {
         const status = getStatus(m.nextExchangeDate);
-        // ✅ CODIFICA O ID PARA A URL
         const encodedId = encodeURIComponent(m.id);
         return `
           <a href="manicure-details.html?id=${encodedId}" class="list-item">
@@ -352,36 +353,33 @@
 
     document.getElementById('search-input').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
-      console.log('🔍 Buscando por:', term);
-      
       const filtered = allManicures.filter(m => 
         (m.name && m.name.toLowerCase().includes(term)) || 
         (m.phone && m.phone.includes(term))
       );
-      
-      console.log(`📊 ${filtered.length} resultados encontrados`);
       renderList(filtered);
     });
 
-    // ✅ INICIALIZAÇÃO COM TRATAMENTO DE ERRO
-    async function init() {
-      try {
-        console.log('🔐 Verificando autenticação...');
+    // ✅ USA onAuthStateChanged DIRETAMENTE
+    console.log('🔐 Verificando autenticação...');
+    
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // ✅ USUÁRIO AUTENTICADO
+        console.log('✅ Usuário autenticado:', user.email);
+        console.log('UID:', user.uid);
         
-        // Tenta autenticar
-        currentUser = await authManager.requireAuth();
+        currentUser = user;
+        document.getElementById('user-info').textContent = user.email;
         
-        console.log('✅ Usuário autenticado:', currentUser.email);
-        document.getElementById('user-info').textContent = currentUser.email;
-        
-        // Se autenticou, carrega as manicures
+        // Carrega as manicures
         await loadManicures();
         
-      } catch (error) {
-        console.log('⚠️ Usuário não autenticado:', error.message);
-        
-        // Mostra tela de acesso restrito SEM redirecionar
+      } else {
+        // ❌ NÃO AUTENTICADO
+        console.log('⚠️ Usuário não autenticado');
         document.getElementById('user-info').textContent = 'Não autenticado';
+        
         document.getElementById('manicures-list').innerHTML = `
           <div class="empty-state">
             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.3; color: var(--color-warning);">
@@ -402,19 +400,17 @@
           </div>
         `;
       }
-    }
+    });
 
+    // Logout
     document.getElementById('logout-btn').onclick = async () => {
       try {
-        await authManager.logout();
+        await signOut(auth);
         window.location.href = 'login.html';
       } catch (e) {
         console.error('Erro ao fazer logout:', e);
       }
     };
-
-    // Inicia a aplicação
-    init();
   </script>
 </body>
 </html>
