@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Firebase - Debug</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Courier New', monospace; 
+      padding: 2rem; 
+      background: #1a1a1a; 
+      color: #00ff00;
+      line-height: 1.6;
+    }
+    h1 { 
+      color: #00ff00; 
+      margin-bottom: 2rem; 
+      border-bottom: 2px solid #00ff00;
+      padding-bottom: 0.5rem;
+    }
+    .log { 
+      background: #0a0a0a; 
+      padding: 1rem; 
+      margin: 1rem 0; 
+      border-left: 4px solid #00ff00;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .error { border-left-color: #ff0000; color: #ff0000; }
+    .success { border-left-color: #00ff00; color: #00ff00; }
+    .info { border-left-color: #00bfff; color: #00bfff; }
+    .warning { border-left-color: #ffaa00; color: #ffaa00; }
+    button {
+      background: #00ff00;
+      color: #000;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 0.5rem;
+      font-family: 'Courier New', monospace;
+    }
+    button:hover { background: #00dd00; }
+    #results { margin-top: 2rem; }
+  </style>
+</head>
+<body>
+  <h1>🔥 TESTE DE CONEXÃO FIREBASE - DEBUG MODE</h1>
+  
+  <button onclick="testAuth()">1. Testar Autenticação</button>
+  <button onclick="testDatabase()">2. Testar Database</button>
+  <button onclick="testManicures()">3. Buscar Manicures</button>
+  <button onclick="clearLogs()">Limpar Logs</button>
+  
+  <div id="results"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
+      authDomain: "parceiro-be3e9.firebaseapp.com",
+      databaseURL: "https://parceiro-be3e9-default-rtdb.firebaseio.com",
+      projectId: "parceiro-be3e9",
+      storageBucket: "parceiro-be3e9.firebasestorage.app",
+      messagingSenderId: "619982778395",
+      appId: "1:619982778395:web:25c141958b7c06da02c8be"
+    };
+
+    // Initialize Firebase
+    log('🚀 Inicializando Firebase...', 'info');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+    log('✅ Firebase inicializado com sucesso!', 'success');
+
+    // Helper function to log
+    function log(message, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `log ${type}`;
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      document.getElementById('results').appendChild(div);
+      console.log(message);
+      
+      // Auto scroll
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    // Test Authentication
+    window.testAuth = function() {
+      log('='.repeat(60), 'info');
+      log('🔐 TESTANDO AUTENTICAÇÃO', 'info');
+      log('='.repeat(60), 'info');
+      
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          log('✅ USUÁRIO AUTENTICADO!', 'success');
+          log(`📧 Email: ${user.email}`, 'success');
+          log(`🆔 UID: ${user.uid}`, 'success');
+          log(`📛 Nome: ${user.displayName || 'N/A'}`, 'success');
+        } else {
+          log('❌ USUÁRIO NÃO AUTENTICADO', 'error');
+          log('Você precisa fazer login primeiro!', 'warning');
+        }
+      });
+    };
+
+    // Test Database Connection
+    window.testDatabase = async function() {
+      log('='.repeat(60), 'info');
+      log('💾 TESTANDO CONEXÃO COM DATABASE', 'info');
+      log('='.repeat(60), 'info');
+      
+      try {
+        const dbRef = ref(database);
+        log('✅ Database reference criada', 'success');
+        log(`Database URL: ${database._repoInternal.repoInfo_.host}`, 'info');
+        log(`Database path: /`, 'info');
+        
+        log('⏳ Tentando buscar dados raiz...', 'info');
+        const snapshot = await get(child(dbRef, '/'));
+        
+        if (snapshot.exists()) {
+          log('✅ DADOS ENCONTRADOS!', 'success');
+          const data = snapshot.val();
+          log(`Chaves no banco: ${Object.keys(data).join(', ')}`, 'info');
+          log(`Dados completos: ${JSON.stringify(data, null, 2)}`, 'info');
+        } else {
+          log('⚠️ Nenhum dado encontrado no banco', 'warning');
+        }
+      } catch (error) {
+        log('❌ ERRO ao conectar com database', 'error');
+        log(`Erro: ${error.message}`, 'error');
+        log(`Stack: ${error.stack}`, 'error');
+      }
+    };
+
+    // Test Manicures Query
+    window.testManicures = async function() {
+      log('='.repeat(60), 'info');
+      log('👩‍🎨 BUSCANDO MANICURES', 'info');
+      log('='.repeat(60), 'info');
+      
+      try {
+        const dbRef = ref(database);
+        log('📍 Buscando em: /manicures', 'info');
+        
+        const snapshot = await get(child(dbRef, 'manicures'));
+        
+        if (!snapshot.exists()) {
+          log('⚠️ A coleção "manicures" não existe ou está vazia', 'warning');
+          return;
+        }
+        
+        const data = snapshot.val();
+        log('✅ MANICURES ENCONTRADAS!', 'success');
+        
+        const manicures = Object.keys(data).map(key => ({
+          id: key,
+          ...data[key]
+        }));
+        
+        log(`📊 Total: ${manicures.length} manicures`, 'success');
+        log('='.repeat(60), 'info');
+        
+        manicures.forEach((m, index) => {
+          log(`\n[${index + 1}] ${m.name}`, 'success');
+          log(`    ID: ${m.id}`, 'info');
+          log(`    Telefone: ${m.phone || 'N/A'}`, 'info');
+          log(`    Status: ${m.status || 'N/A'}`, 'info');
+          log(`    Plano: ${m.planType || 'N/A'} dias`, 'info');
+          log(`    Próxima troca: ${m.nextExchangeDate || 'N/A'}`, 'info');
+        });
+        
+        log('='.repeat(60), 'info');
+        log('📋 DADOS BRUTOS:', 'info');
+        log(JSON.stringify(data, null, 2), 'info');
+        
+      } catch (error) {
+        log('❌ ERRO ao buscar manicures', 'error');
+        log(`Erro: ${error.message}`, 'error');
+        log(`Stack: ${error.stack}`, 'error');
+      }
+    };
+
+    // Clear logs
+    window.clearLogs = function() {
+      document.getElementById('results').innerHTML = '';
+    };
+
+    // Auto test on load
+    log('🎯 Página carregada! Clique nos botões acima para testar.', 'success');
+    log('💡 Recomendação: Execute na ordem 1 → 2 → 3', 'info');
+  </script>
+</body>
+</html>
