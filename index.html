@@ -955,10 +955,14 @@
   </script>
 
   <script type="module">
+    console.log('🚀 Iniciando aplicação...');
+    
     // ✅ IMPORTA DIRETAMENTE DO FIREBASE SDK MODULAR (mesma versão do manicures.html)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    console.log('✅ Imports do Firebase carregados');
 
     // Firebase configuration
     const firebaseConfig = {
@@ -971,38 +975,57 @@
       appId: "1:619982778395:web:25c141958b7c06da02c8be"
     };
 
+    console.log('🔧 Configuração do Firebase:', firebaseConfig);
+
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const database = getDatabase(app);
+
+    console.log('✅ Firebase inicializado');
+    console.log('🔑 Auth:', auth);
+    console.log('💾 Database:', database);
 
     let currentUser = null;
 
     // Database Manager (compatível com manicures.html)
     const dbManager = {
       async getAllManicures() {
+        console.log('🔍 Iniciando getAllManicures...');
         try {
           const dbRef = ref(database);
-          const snapshot = await get(child(dbRef, 'manicures'));
-          const data = snapshot.val();
+          console.log('📍 Database ref criada:', dbRef);
           
+          console.log('⏳ Buscando dados em "manicures"...');
+          const snapshot = await get(child(dbRef, 'manicures'));
+          console.log('📸 Snapshot recebido:', snapshot);
+          console.log('📸 Snapshot existe?:', snapshot.exists());
+          
+          const data = snapshot.val();
           console.log('📦 Dados do Firebase (index.html):', data);
+          console.log('📦 Tipo de dados:', typeof data);
           
           if (!data) {
             console.log('⚠️ Nenhuma manicure encontrada no banco');
             return [];
           }
           
-          const manicures = Object.keys(data).map(key => {
+          const keys = Object.keys(data);
+          console.log('🔑 Chaves encontradas:', keys);
+          console.log('🔢 Total de chaves:', keys.length);
+          
+          const manicures = keys.map(key => {
             const manicure = { id: key, ...data[key] };
-            console.log('✅ Manicure carregada:', manicure.name, '| ID:', key);
+            console.log('✅ Manicure carregada:', manicure.name, '| ID:', key, '| Status:', manicure.status);
             return manicure;
           });
           
           console.log(`✅ Total de ${manicures.length} manicures carregadas`);
+          console.log('📋 Lista completa:', manicures);
           return manicures;
         } catch (error) {
-          console.error('❌ Error getting manicures:', error);
+          console.error('❌ ERRO ao buscar manicures:', error);
+          console.error('❌ Stack trace:', error.stack);
           return [];
         }
       }
@@ -1043,24 +1066,38 @@
 
     // Load dashboard data
     async function loadDashboard() {
+      console.log('='.repeat(60));
+      console.log('🔄 INICIANDO CARREGAMENTO DO DASHBOARD');
+      console.log('='.repeat(60));
+      
       try {
-        console.log('🔄 Carregando dashboard...');
         Utils.showLoading();
+        console.log('⏳ Loading spinner ativado');
         
+        console.log('📞 Chamando dbManager.getAllManicures()...');
         const manicures = await dbManager.getAllManicures();
+        console.log('✅ Dados retornados:', manicures);
+        console.log('📊 Quantidade de manicures:', manicures.length);
         
         if (currentUser) {
+          console.log('👤 Atualizando info do usuário:', currentUser.email);
           document.getElementById('user-info').textContent = currentUser.email;
         }
 
+        console.log('📈 Calculando estatísticas...');
         const activeCount = manicures.filter(m => m.status === 'active').length;
+        console.log('✅ Manicures ativas:', activeCount);
+        
         const alerts = Utils.getAlerts(manicures);
+        console.log('⚠️ Alertas encontrados:', alerts.length);
 
+        console.log('🎨 Atualizando cards de estatísticas...');
         document.getElementById('total-manicures').textContent = manicures.length;
         document.getElementById('total-desc').textContent = `${activeCount} ativas`;
         document.getElementById('alerts-count').textContent = alerts.length;
         document.getElementById('active-plans').textContent = activeCount;
 
+        console.log('📋 Renderizando seção de alertas...');
         if (alerts.length > 0) {
           document.getElementById('alerts-section').style.display = 'block';
           document.getElementById('alert-count-text').textContent = 
@@ -1078,13 +1115,19 @@
               </div>
             `;
           }).join('');
+          console.log('✅ Seção de alertas renderizada');
         } else {
           document.getElementById('alerts-section').style.display = 'none';
+          console.log('ℹ️ Nenhum alerta para exibir');
         }
 
+        console.log('📋 Renderizando lista de manicures recentes...');
         const recentList = document.getElementById('recent-manicures');
+        
         if (manicures.length > 0) {
-          recentList.innerHTML = manicures.slice(0, 5).map(m => {
+          console.log(`🎨 Renderizando ${manicures.length} manicures (mostrando até 5)...`);
+          const html = manicures.slice(0, 5).map(m => {
+            console.log(`  - Renderizando: ${m.name} (ID: ${m.id})`);
             const encodedId = encodeURIComponent(m.id);
             return `
               <div class="list-item" onclick="window.location.href='pages/manicure-details.html?id=${encodedId}'">
@@ -1099,7 +1142,12 @@
               </div>
             `;
           }).join('');
+          
+          recentList.innerHTML = html;
+          console.log('✅ Lista de manicures renderizada com sucesso!');
+          console.log('📝 HTML gerado (' + html.length + ' caracteres)');
         } else {
+          console.log('⚠️ Nenhuma manicure para exibir - mostrando empty state');
           recentList.innerHTML = `
             <div class="empty-state">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.2; margin-bottom: 1rem;">
@@ -1120,36 +1168,62 @@
         }
 
         Utils.hideLoading();
-        console.log('✅ Dashboard carregado com sucesso!');
+        console.log('✅ Loading spinner desativado');
+        console.log('='.repeat(60));
+        console.log('✅ DASHBOARD CARREGADO COM SUCESSO!');
+        console.log('='.repeat(60));
       } catch (e) { 
-        console.error('❌ Erro ao carregar dashboard:', e);
+        console.error('='.repeat(60));
+        console.error('❌ ERRO CRÍTICO AO CARREGAR DASHBOARD');
+        console.error('='.repeat(60));
+        console.error('❌ Erro:', e);
+        console.error('❌ Mensagem:', e.message);
+        console.error('❌ Stack:', e.stack);
+        console.error('='.repeat(60));
+        
         document.getElementById('recent-manicures').innerHTML = 
           `<div style="color: var(--color-danger); text-align: center; padding: 2rem;">
             ❌ Erro ao carregar dados<br>
-            <small style="font-size: 0.875rem; opacity: 0.8;">${e.message}</small>
+            <small style="font-size: 0.875rem; opacity: 0.8;">${e.message}</small><br>
+            <small style="font-size: 0.75rem; opacity: 0.6; font-family: monospace;">${e.stack}</small>
           </div>`;
         Utils.hideLoading();
       }
     }
 
     // ✅ USA onAuthStateChanged DIRETAMENTE
-    console.log('🔐 Verificando autenticação...');
+    console.log('='.repeat(60));
+    console.log('🔐 INICIANDO VERIFICAÇÃO DE AUTENTICAÇÃO');
+    console.log('='.repeat(60));
     
     onAuthStateChanged(auth, async (user) => {
+      console.log('🔄 onAuthStateChanged disparado');
+      console.log('👤 Usuário recebido:', user);
+      
       if (user) {
         // ✅ USUÁRIO AUTENTICADO
-        console.log('✅ Usuário autenticado:', user.email);
-        console.log('UID:', user.uid);
+        console.log('='.repeat(60));
+        console.log('✅ USUÁRIO AUTENTICADO!');
+        console.log('='.repeat(60));
+        console.log('📧 Email:', user.email);
+        console.log('🆔 UID:', user.uid);
+        console.log('📛 Display Name:', user.displayName);
+        console.log('🖼️ Photo URL:', user.photoURL);
+        console.log('='.repeat(60));
         
         currentUser = user;
         document.getElementById('user-info').textContent = user.email;
         
+        console.log('📞 Chamando loadDashboard()...');
         // Carrega o dashboard
         await loadDashboard();
         
       } else {
         // ❌ NÃO AUTENTICADO
-        console.log('⚠️ Usuário não autenticado - redirecionando...');
+        console.log('='.repeat(60));
+        console.log('⚠️ USUÁRIO NÃO AUTENTICADO');
+        console.log('='.repeat(60));
+        
         document.getElementById('user-info').textContent = 'Não autenticado';
         
         document.getElementById('recent-manicures').innerHTML = `
@@ -1172,6 +1246,12 @@
           </div>
         `;
         Utils.hideLoading();
+        
+        console.log('⏳ Aguardando 2 segundos antes de redirecionar...');
+        setTimeout(() => {
+          console.log('↪️ Redirecionando para login...');
+          // window.location.href = 'pages/login.html';
+        }, 2000);
       }
     });
 
