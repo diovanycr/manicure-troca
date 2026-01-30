@@ -1073,8 +1073,16 @@
         const recentList = document.getElementById('recent-manicures');
         
         if (allManicures.length > 0) {
-          console.log(`🎨 Renderizando ${allManicures.length} manicures (mostrando até 5)...`);
-          const html = allManicures.slice(0, 5).map(m => {
+          console.log(`🎨 Renderizando ${allManicures.length} manicures (mostrando até 3)...`);
+          
+          // Ordena por data de criação (mais recentes primeiro) e pega as 3 últimas
+          const sortedManicures = [...allManicures].sort((a, b) => {
+            const dateA = new Date(a.createdAt || a.startDate || 0);
+            const dateB = new Date(b.createdAt || b.startDate || 0);
+            return dateB - dateA; // Ordem decrescente (mais recentes primeiro)
+          });
+          
+          const html = sortedManicures.slice(0, 3).map(m => {
             console.log(`  - Renderizando: ${m.name} (ID: ${m.id})`);
             const encodedId = encodeURIComponent(m.id);
             return `
