@@ -875,7 +875,7 @@
         </div>
         <div class="item-list" id="recent-manicures">
           <div class="loading" style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
-            Carregando dados...
+            Verificando autenticação...
           </div>
         </div>
       </div>
@@ -954,181 +954,55 @@
     });
   </script>
 
-  <!-- Firebase SDK v8 (compatible version) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  <script type="module">
+    // ✅ IMPORTA DIRETAMENTE DO FIREBASE SDK MODULAR (mesma versão do manicures.html)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  <!-- Firebase Config -->
-  <script>
     // Firebase configuration
-   const firebaseConfig = {
-  apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
-  authDomain: "parceiro-be3e9.firebaseapp.com",
-  databaseURL: "https://parceiro-be3e9-default-rtdb.firebaseio.com",
-  projectId: "parceiro-be3e9",
-  storageBucket: "parceiro-be3e9.firebasestorage.app",
-  messagingSenderId: "619982778395",
-  appId: "1:619982778395:web:25c141958b7c06da02c8be"
-};
-
-    // Initialize Firebase
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-
-    // Auth Manager
-    const authManager = {
-      currentUser: null,
-
-      async signInWithGoogle() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        try {
-          const result = await firebase.auth().signInWithPopup(provider);
-          this.currentUser = result.user;
-          window.location.href = 'index.html';
-        } catch (error) {
-          console.error('Error signing in:', error);
-          alert('Erro ao fazer login: ' + error.message);
-        }
-      },
-
-      async signOut() {
-        try {
-          await firebase.auth().signOut();
-          window.location.href = 'pages/login.html';
-        } catch (error) {
-          console.error('Error signing out:', error);
-        }
-      },
-
-      requireAuth() {
-        firebase.auth().onAuthStateChanged((user) => {
-          if (user) {
-            this.currentUser = user;
-          } else {
-            window.location.href = 'pages/login.html';
-          }
-        });
-      }
+    const firebaseConfig = {
+      apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
+      authDomain: "parceiro-be3e9.firebaseapp.com",
+      databaseURL: "https://parceiro-be3e9-default-rtdb.firebaseio.com",
+      projectId: "parceiro-be3e9",
+      storageBucket: "parceiro-be3e9.firebasestorage.app",
+      messagingSenderId: "619982778395",
+      appId: "1:619982778395:web:25c141958b7c06da02c8be"
     };
 
-    // Database Manager
-    const dbManager = {
-      db: firebase.database(),
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
 
+    let currentUser = null;
+
+    // Database Manager (compatível com manicures.html)
+    const dbManager = {
       async getAllManicures() {
         try {
-          const snapshot = await this.db.ref('manicures').once('value');
+          const dbRef = ref(database);
+          const snapshot = await get(child(dbRef, 'manicures'));
           const data = snapshot.val();
-          if (!data) return [];
-          return Object.keys(data).map(key => ({ id: key, ...data[key] }));
-        } catch (error) {
-          console.error('Error getting manicures:', error);
-          return [];
-        }
-      },
-
-      async getManicureById(id) {
-        try {
-          const snapshot = await this.db.ref(`manicures/${id}`).once('value');
-          const data = snapshot.val();
-          return data ? { id, ...data } : null;
-        } catch (error) {
-          console.error('Error getting manicure:', error);
-          return null;
-        }
-      },
-
-      async createManicure(data) {
-        try {
-          const ref = await this.db.ref('manicures').push(data);
-          return { id: ref.key, ...data };
-        } catch (error) {
-          console.error('Error creating manicure:', error);
-          throw error;
-        }
-      },
-
-      async updateManicure(id, data) {
-        try {
-          await this.db.ref(`manicures/${id}`).update(data);
-        } catch (error) {
-          console.error('Error updating manicure:', error);
-          throw error;
-        }
-      },
-
-      async toggleManicureStatus(id) {
-        try {
-          const manicure = await this.getManicureById(id);
-          const newStatus = manicure.status === 'active' ? 'inactive' : 'active';
-          await this.updateManicure(id, { status: newStatus });
-          return newStatus;
-        } catch (error) {
-          console.error('Error toggling status:', error);
-          throw error;
-        }
-      },
-
-      async recordKitExchange(manicureId, notes) {
-        try {
-          const exchange = {
-            exchangeDate: Date.now(),
-            notes: notes || ''
-          };
-          await this.db.ref(`exchanges/${manicureId}`).push(exchange);
-        } catch (error) {
-          console.error('Error recording exchange:', error);
-          throw error;
-        }
-      },
-
-      async getKitExchanges(manicureId) {
-        try {
-          const snapshot = await this.db.ref(`exchanges/${manicureId}`).once('value');
-          const data = snapshot.val();
-          if (!data) return [];
-          return Object.keys(data)
-            .map(key => ({ id: key, ...data[key] }))
-            .sort((a, b) => b.exchangeDate - a.exchangeDate);
-        } catch (error) {
-          console.error('Error getting exchanges:', error);
-          return [];
-        }
-      },
-
-      async uploadPaymentReceipt(manicureId, file) {
-        try {
-          const storageRef = firebase.storage().ref();
-          const fileRef = storageRef.child(`receipts/${manicureId}/${Date.now()}_${file.name}`);
-          await fileRef.put(file);
-          const fileUrl = await fileRef.getDownloadURL();
           
-          const receipt = {
-            fileName: file.name,
-            fileUrl: fileUrl,
-            uploadedAt: Date.now()
-          };
+          console.log('📦 Dados do Firebase (index.html):', data);
           
-          await this.db.ref(`receipts/${manicureId}`).push(receipt);
+          if (!data) {
+            console.log('⚠️ Nenhuma manicure encontrada no banco');
+            return [];
+          }
+          
+          const manicures = Object.keys(data).map(key => {
+            const manicure = { id: key, ...data[key] };
+            console.log('✅ Manicure carregada:', manicure.name, '| ID:', key);
+            return manicure;
+          });
+          
+          console.log(`✅ Total de ${manicures.length} manicures carregadas`);
+          return manicures;
         } catch (error) {
-          console.error('Error uploading receipt:', error);
-          throw error;
-        }
-      },
-
-      async getPaymentReceipts(manicureId) {
-        try {
-          const snapshot = await this.db.ref(`receipts/${manicureId}`).once('value');
-          const data = snapshot.val();
-          if (!data) return [];
-          return Object.keys(data)
-            .map(key => ({ id: key, ...data[key] }))
-            .sort((a, b) => b.uploadedAt - a.uploadedAt);
-        } catch (error) {
-          console.error('Error getting receipts:', error);
+          console.error('❌ Error getting manicures:', error);
           return [];
         }
       }
@@ -1167,20 +1041,16 @@
       }
     };
 
-    // Require authentication
-    authManager.requireAuth();
-    document.getElementById('logout-btn').onclick = () => authManager.signOut();
-
     // Load dashboard data
     async function loadDashboard() {
       try {
+        console.log('🔄 Carregando dashboard...');
         Utils.showLoading();
         
         const manicures = await dbManager.getAllManicures();
-        const user = authManager.currentUser;
         
-        if (user) {
-          document.getElementById('user-info').textContent = user.email;
+        if (currentUser) {
+          document.getElementById('user-info').textContent = currentUser.email;
         }
 
         const activeCount = manicures.filter(m => m.status === 'active').length;
@@ -1196,30 +1066,39 @@
           document.getElementById('alert-count-text').textContent = 
             `Você tem ${alerts.length} troca${alerts.length > 1 ? 's' : ''} de kit pendente${alerts.length > 1 ? 's' : ''}`;
           
-          document.getElementById('alerts-list').innerHTML = alerts.slice(0, 3).map(a => `
-            <div class="list-item" onclick="window.location.href='pages/manicure-details.html?id=${a.id}'">
-              <div class="item-info">
-                <h3>${a.name}</h3>
-                <p>${a.phone} • ${Utils.calculateDaysUntilExchange(a.nextExchangeDate)} dia${Utils.calculateDaysUntilExchange(a.nextExchangeDate) !== 1 ? 's' : ''}</p>
+          document.getElementById('alerts-list').innerHTML = alerts.slice(0, 3).map(a => {
+            const encodedId = encodeURIComponent(a.id);
+            return `
+              <div class="list-item" onclick="window.location.href='pages/manicure-details.html?id=${encodedId}'">
+                <div class="item-info">
+                  <h3>${a.name}</h3>
+                  <p>${a.phone || 'Sem telefone'} • ${Utils.calculateDaysUntilExchange(a.nextExchangeDate)} dia${Utils.calculateDaysUntilExchange(a.nextExchangeDate) !== 1 ? 's' : ''}</p>
+                </div>
+                <span class="badge badge-warning">Troca</span>
               </div>
-              <span class="badge badge-warning">Troca</span>
-            </div>
-          `).join('');
+            `;
+          }).join('');
+        } else {
+          document.getElementById('alerts-section').style.display = 'none';
         }
 
         const recentList = document.getElementById('recent-manicures');
         if (manicures.length > 0) {
-          recentList.innerHTML = manicures.slice(0, 5).map(m => `
-            <div class="list-item" onclick="window.location.href='pages/manicure-details.html?id=${m.id}'">
-              <div class="item-info">
-                <h3>${m.name}</h3>
-                <p>Plano ${m.planType}</p>
+          recentList.innerHTML = manicures.slice(0, 5).map(m => {
+            const encodedId = encodeURIComponent(m.id);
+            return `
+              <div class="list-item" onclick="window.location.href='pages/manicure-details.html?id=${encodedId}'">
+                <div class="item-info">
+                  <h3>${m.name}</h3>
+                  <p>${m.phone || 'Sem telefone'} • Plano ${m.planType || '-'} dias</p>
+                  ${m.nextExchangeDate ? `<p style="font-size: 0.8125rem; margin-top: 0.25rem;">Próxima troca: ${Utils.formatDate(m.nextExchangeDate)}</p>` : ''}
+                </div>
+                <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}">
+                  ${m.status === 'active' ? 'Ativa' : 'Inativa'}
+                </span>
               </div>
-              <span class="badge ${m.status === 'active' ? 'badge-success' : 'badge-secondary'}">
-                ${m.status === 'active' ? 'Ativa' : 'Inativa'}
-              </span>
-            </div>
-          `).join('');
+            `;
+          }).join('');
         } else {
           recentList.innerHTML = `
             <div class="empty-state">
@@ -1241,21 +1120,77 @@
         }
 
         Utils.hideLoading();
+        console.log('✅ Dashboard carregado com sucesso!');
       } catch (e) { 
-        console.error(e);
+        console.error('❌ Erro ao carregar dashboard:', e);
         document.getElementById('recent-manicures').innerHTML = 
-          '<div style="color: var(--color-danger); text-align: center; padding: 2rem;">Erro ao carregar dados. Tente novamente.</div>';
+          `<div style="color: var(--color-danger); text-align: center; padding: 2rem;">
+            ❌ Erro ao carregar dados<br>
+            <small style="font-size: 0.875rem; opacity: 0.8;">${e.message}</small>
+          </div>`;
         Utils.hideLoading();
       }
     }
 
-    // Load dashboard on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(loadDashboard, 500);
+    // ✅ USA onAuthStateChanged DIRETAMENTE
+    console.log('🔐 Verificando autenticação...');
+    
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // ✅ USUÁRIO AUTENTICADO
+        console.log('✅ Usuário autenticado:', user.email);
+        console.log('UID:', user.uid);
+        
+        currentUser = user;
+        document.getElementById('user-info').textContent = user.email;
+        
+        // Carrega o dashboard
+        await loadDashboard();
+        
+      } else {
+        // ❌ NÃO AUTENTICADO
+        console.log('⚠️ Usuário não autenticado - redirecionando...');
+        document.getElementById('user-info').textContent = 'Não autenticado';
+        
+        document.getElementById('recent-manicures').innerHTML = `
+          <div class="empty-state">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.3; color: var(--color-warning);">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M12 8v4"/>
+              <path d="M12 16h.01"/>
+            </svg>
+            <h3 style="color: var(--color-warning);">Acesso Restrito</h3>
+            <p>Você precisa estar autenticado para acessar esta página</p>
+            <button class="btn btn-primary" onclick="window.location.href='pages/login.html'">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <polyline points="10 17 15 12 10 7"/>
+                <line x1="15" y1="12" x2="3" y2="12"/>
+              </svg>
+              <span>Fazer Login</span>
+            </button>
+          </div>
+        `;
+        Utils.hideLoading();
+      }
     });
 
+    // Logout
+    document.getElementById('logout-btn').onclick = async () => {
+      try {
+        await signOut(auth);
+        window.location.href = 'pages/login.html';
+      } catch (e) {
+        console.error('Erro ao fazer logout:', e);
+      }
+    };
+
     // Refresh dashboard every 30 seconds
-    setInterval(loadDashboard, 30000);
+    setInterval(() => {
+      if (currentUser) {
+        loadDashboard();
+      }
+    }, 30000);
   </script>
 </body>
 </html>
