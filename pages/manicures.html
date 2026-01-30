@@ -333,8 +333,10 @@
 
       container.innerHTML = list.map(m => {
         const status = getStatus(m.nextExchangeDate);
+        // ✅ CODIFICA O ID PARA A URL
+        const encodedId = encodeURIComponent(m.id);
         return `
-          <a href="manicure-details.html?id=${encodeURIComponent(m.id)}" class="list-item">
+          <a href="manicure-details.html?id=${encodedId}" class="list-item">
             <div class="item-info">
               <h3>${m.name}</h3>
               <p>${m.phone || 'Sem telefone'} • Plano ${m.planType || '-'} dias</p>
@@ -361,19 +363,24 @@
       renderList(filtered);
     });
 
-    // CORREÇÃO: Verificar autenticação sem redirecionar automaticamente
+    // ✅ INICIALIZAÇÃO COM TRATAMENTO DE ERRO
     async function init() {
       try {
         console.log('🔐 Verificando autenticação...');
-        currentUser = await authManager.requireAuth();
-        document.getElementById('user-info').textContent = currentUser.email;
-        console.log('✅ Usuário autenticado:', currentUser.email);
         
-        // Carregar manicures se estiver autenticado
+        // Tenta autenticar
+        currentUser = await authManager.requireAuth();
+        
+        console.log('✅ Usuário autenticado:', currentUser.email);
+        document.getElementById('user-info').textContent = currentUser.email;
+        
+        // Se autenticou, carrega as manicures
         await loadManicures();
-      } catch (e) {
-        console.log('⚠️ Usuário não autenticado');
-        // Não redirecionar, apenas mostrar mensagem
+        
+      } catch (error) {
+        console.log('⚠️ Usuário não autenticado:', error.message);
+        
+        // Mostra tela de acesso restrito SEM redirecionar
         document.getElementById('user-info').textContent = 'Não autenticado';
         document.getElementById('manicures-list').innerHTML = `
           <div class="empty-state">
@@ -406,6 +413,7 @@
       }
     };
 
+    // Inicia a aplicação
     init();
   </script>
 </body>
