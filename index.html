@@ -615,30 +615,6 @@
       animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 
-    /* Diagnostic Panel */
-    .diagnostic-panel {
-      background: #1f2937;
-      color: #10b981;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      font-family: 'Courier New', monospace;
-      font-size: 0.75rem;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .diagnostic-panel h4 {
-      color: #fbbf24;
-      margin-bottom: 0.5rem;
-      font-size: 0.875rem;
-    }
-
-    .diagnostic-panel pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
     /* Tablet Styles */
     @media (min-width: 768px) {
       .stats-grid {
@@ -818,9 +794,6 @@
         </button>
       </div>
 
-      <!-- Diagnostic Panel (hidden by default) -->
-      <div id="diagnostic-panel" style="display: none;"></div>
-
       <!-- Stats Grid -->
       <div class="stats-grid">
         <div class="stat-card" style="--card-color: #d946ef; --icon-bg: rgba(217, 70, 239, 0.1);">
@@ -979,139 +952,20 @@
         document.getElementById('desktop-add-btn').style.display = 'none';
       }
     });
-
-    // Diagnostic logger
-    const diagnosticLog = [];
-    function addDiagnostic(message, type = 'info') {
-      const timestamp = new Date().toLocaleTimeString('pt-BR');
-      diagnosticLog.push({ timestamp, message, type });
-      console.log(`[${timestamp}] ${message}`);
-      updateDiagnosticPanel();
-    }
-
-    function updateDiagnosticPanel() {
-      const panel = document.getElementById('diagnostic-panel');
-      if (diagnosticLog.length > 0 && window.location.search.includes('debug=true')) {
-        panel.style.display = 'block';
-        panel.innerHTML = `
-          <div class="diagnostic-panel">
-            <h4>🔍 Diagnóstico do Sistema</h4>
-            <pre>${diagnosticLog.map(l => `[${l.timestamp}] ${l.message}`).join('\n')}</pre>
-          </div>
-        `;
-      }
-    }
   </script>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, get, child, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    console.log('🚀 Iniciando aplicação...');
+    
+    // ✅ USA EXATAMENTE A MESMA ABORDAGEM DO manicures.html QUE FUNCIONA
+    import { auth } from './config/firebase-config.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { dbManager } from './js/database.js';
 
-    addDiagnostic('✅ Imports do Firebase carregados');
+    console.log('✅ Imports carregados');
 
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDEEwNYA30Jb59CcVvhhsqF1B1hCQ410UM",
-      authDomain: "parceiro-be3e9.firebaseapp.com",
-      databaseURL: "https://parceiro-be3e9-default-rtdb.firebaseio.com",
-      projectId: "parceiro-be3e9",
-      storageBucket: "parceiro-be3e9.firebasestorage.app",
-      messagingSenderId: "619982778395",
-      appId: "1:619982778395:web:25c141958b7c06da02c8be"
-    };
-
-    addDiagnostic('🔧 Configuração do Firebase OK');
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const database = getDatabase(app);
-
-    addDiagnostic('✅ Firebase inicializado');
-
+    let allManicures = [];
     let currentUser = null;
-
-    // Database Manager
-    const dbManager = {
-      async getAllManicures() {
-        addDiagnostic('🔍 Buscando manicures no Firebase...');
-        try {
-          const dbRef = ref(database);
-          const snapshot = await get(child(dbRef, 'manicures'));
-          
-          addDiagnostic(`📸 Snapshot recebido - Existe: ${snapshot.exists()}`);
-          
-          const data = snapshot.val();
-          
-          if (!data) {
-            addDiagnostic('⚠️ Nenhum dado encontrado no caminho "manicures"');
-            addDiagnostic('💡 Isso pode indicar: 1) Banco vazio, 2) Problema de permissões, 3) Caminho incorreto');
-            return [];
-          }
-          
-          const keys = Object.keys(data);
-          addDiagnostic(`✅ ${keys.length} manicure(s) encontrada(s)`);
-          
-          const manicures = keys.map(key => ({ id: key, ...data[key] }));
-          return manicures;
-        } catch (error) {
-          addDiagnostic(`❌ ERRO ao buscar dados: ${error.message}`);
-          addDiagnostic(`❌ Código do erro: ${error.code || 'N/A'}`);
-          
-          if (error.code === 'PERMISSION_DENIED') {
-            addDiagnostic('🔒 ERRO DE PERMISSÃO - Verifique as regras do Firebase Database');
-          }
-          
-          throw error;
-        }
-      },
-
-      async testDatabaseConnection() {
-        addDiagnostic('🧪 Testando conexão com o Firebase...');
-        try {
-          const testRef = ref(database, '.info/connected');
-          const snapshot = await get(testRef);
-          const isConnected = snapshot.val();
-          
-          addDiagnostic(`📡 Status de conexão: ${isConnected ? 'CONECTADO ✅' : 'DESCONECTADO ❌'}`);
-          return isConnected;
-        } catch (error) {
-          addDiagnostic(`❌ Erro ao testar conexão: ${error.message}`);
-          return false;
-        }
-      },
-
-      async createSampleData() {
-        addDiagnostic('🔨 Tentando criar dados de exemplo...');
-        try {
-          const sampleManicure = {
-            name: 'Manicure Exemplo',
-            phone: '(11) 99999-9999',
-            planType: '15',
-            status: 'active',
-            startDate: new Date().toISOString().split('T')[0],
-            nextExchangeDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            notes: 'Dados de exemplo criados automaticamente',
-            createdAt: new Date().toISOString()
-          };
-
-          const newRef = ref(database, 'manicures/' + Date.now());
-          await set(newRef, sampleManicure);
-          
-          addDiagnostic('✅ Dados de exemplo criados com sucesso!');
-          return true;
-        } catch (error) {
-          addDiagnostic(`❌ Erro ao criar dados de exemplo: ${error.message}`);
-          
-          if (error.code === 'PERMISSION_DENIED') {
-            addDiagnostic('🔒 PERMISSÃO NEGADA - Você não tem permissão para escrever no banco');
-          }
-          
-          return false;
-        }
-      }
-    };
 
     // Utils
     const Utils = {
@@ -1146,34 +1000,52 @@
       }
     };
 
-    // Load dashboard data
+    // ✅ USA EXATAMENTE A MESMA LÓGICA DO manicures.html
     async function loadDashboard() {
-      addDiagnostic('═'.repeat(40));
-      addDiagnostic('🔄 INICIANDO CARREGAMENTO DO DASHBOARD');
-      addDiagnostic('═'.repeat(40));
+      console.log('═'.repeat(60));
+      console.log('🔄 INICIANDO CARREGAMENTO DO DASHBOARD');
+      console.log('═'.repeat(60));
       
       try {
         Utils.showLoading();
         
-        // Test connection first
-        await dbManager.testDatabaseConnection();
+        console.log('📞 Chamando dbManager.getAllManicures()...');
+        const data = await dbManager.getAllManicures();
         
-        const manicures = await dbManager.getAllManicures();
-        addDiagnostic(`📊 Total de manicures carregadas: ${manicures.length}`);
+        console.log('📦 Dados recebidos:', data);
+        
+        // ✅ MESMA LÓGICA DO manicures.html
+        if (!data) {
+          console.log('⚠️ Nenhuma manicure encontrada no banco');
+          allManicures = [];
+        } else {
+          allManicures = Object.keys(data).map(k => {
+            const manicure = { id: k, ...data[k] };
+            console.log('✅ Manicure carregada:', manicure.name, '| ID:', k);
+            return manicure;
+          });
+          console.log(`✅ Total de ${allManicures.length} manicures carregadas`);
+        }
         
         if (currentUser) {
+          console.log('👤 Atualizando info do usuário:', currentUser.email);
           document.getElementById('user-info').textContent = currentUser.email;
         }
 
-        const activeCount = manicures.filter(m => m.status === 'active').length;
-        const alerts = Utils.getAlerts(manicures);
+        console.log('📈 Calculando estatísticas...');
+        const activeCount = allManicures.filter(m => m.status === 'active').length;
+        console.log('✅ Manicures ativas:', activeCount);
+        
+        const alerts = Utils.getAlerts(allManicures);
+        console.log('⚠️ Alertas encontrados:', alerts.length);
 
-        document.getElementById('total-manicures').textContent = manicures.length;
+        console.log('🎨 Atualizando cards de estatísticas...');
+        document.getElementById('total-manicures').textContent = allManicures.length;
         document.getElementById('total-desc').textContent = `${activeCount} ativas`;
         document.getElementById('alerts-count').textContent = alerts.length;
         document.getElementById('active-plans').textContent = activeCount;
 
-        // Alerts section
+        console.log('📋 Renderizando seção de alertas...');
         if (alerts.length > 0) {
           document.getElementById('alerts-section').style.display = 'block';
           document.getElementById('alert-count-text').textContent = 
@@ -1191,15 +1063,19 @@
               </div>
             `;
           }).join('');
+          console.log('✅ Seção de alertas renderizada');
         } else {
           document.getElementById('alerts-section').style.display = 'none';
+          console.log('ℹ️ Nenhum alerta para exibir');
         }
 
-        // Recent manicures list
+        console.log('📋 Renderizando lista de manicures recentes...');
         const recentList = document.getElementById('recent-manicures');
         
-        if (manicures.length > 0) {
-          recentList.innerHTML = manicures.slice(0, 5).map(m => {
+        if (allManicures.length > 0) {
+          console.log(`🎨 Renderizando ${allManicures.length} manicures (mostrando até 5)...`);
+          const html = allManicures.slice(0, 5).map(m => {
+            console.log(`  - Renderizando: ${m.name} (ID: ${m.id})`);
             const encodedId = encodeURIComponent(m.id);
             return `
               <div class="list-item" onclick="window.location.href='pages/manicure-details.html?id=${encodedId}'">
@@ -1214,9 +1090,11 @@
               </div>
             `;
           }).join('');
-          addDiagnostic('✅ Lista renderizada com sucesso');
+          
+          recentList.innerHTML = html;
+          console.log('✅ Lista de manicures renderizada com sucesso!');
         } else {
-          addDiagnostic('ℹ️ Banco vazio - mostrando opção para criar dados de exemplo');
+          console.log('⚠️ Nenhuma manicure para exibir - mostrando empty state');
           recentList.innerHTML = `
             <div class="empty-state">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.2; margin-bottom: 1rem;">
@@ -1224,93 +1102,69 @@
                 <circle cx="9" cy="7" r="4"/>
               </svg>
               <h3>Nenhuma manicure cadastrada</h3>
-              <p>O banco de dados está vazio. Você pode:</p>
-              <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; max-width: 300px; margin-left: auto; margin-right: auto;">
-                <button class="btn btn-primary" onclick="window.location.href='pages/new-manicure.html'">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                    <line x1="12" y1="5" x2="12" y2="19"/>
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                  </svg>
-                  <span>Adicionar Manicure</span>
-                </button>
-                <button class="btn btn-secondary" id="create-sample-btn">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2v20M2 12h20"/>
-                  </svg>
-                  <span>Criar Dados de Exemplo</span>
-                </button>
-              </div>
+              <p>Comece adicionando sua primeira manicure ao sistema</p>
+              <button class="btn btn-primary" onclick="window.location.href='pages/new-manicure.html'">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                <span>Adicionar Manicure</span>
+              </button>
             </div>
           `;
-
-          // Add event listener for sample data button
-          document.getElementById('create-sample-btn').onclick = async () => {
-            Utils.showLoading();
-            const success = await dbManager.createSampleData();
-            if (success) {
-              await loadDashboard();
-            }
-            Utils.hideLoading();
-          };
         }
 
         Utils.hideLoading();
-        addDiagnostic('═'.repeat(40));
-        addDiagnostic('✅ DASHBOARD CARREGADO COM SUCESSO!');
-        addDiagnostic('═'.repeat(40));
+        console.log('═'.repeat(60));
+        console.log('✅ DASHBOARD CARREGADO COM SUCESSO!');
+        console.log('═'.repeat(60));
       } catch (e) { 
-        addDiagnostic('═'.repeat(40));
-        addDiagnostic('❌ ERRO CRÍTICO');
-        addDiagnostic('═'.repeat(40));
-        addDiagnostic(`Erro: ${e.message}`);
-        addDiagnostic(`Código: ${e.code || 'N/A'}`);
+        console.error('═'.repeat(60));
+        console.error('❌ ERRO CRÍTICO AO CARREGAR DASHBOARD');
+        console.error('═'.repeat(60));
+        console.error('❌ Erro:', e);
+        console.error('❌ Mensagem:', e.message);
+        console.error('❌ Stack:', e.stack);
+        console.error('═'.repeat(60));
         
         document.getElementById('recent-manicures').innerHTML = 
           `<div style="color: var(--color-danger); text-align: center; padding: 2rem;">
-            <h3 style="margin-bottom: 1rem;">❌ Erro ao carregar dados</h3>
-            <p style="font-size: 0.875rem; margin-bottom: 1rem;">${e.message}</p>
-            ${e.code === 'PERMISSION_DENIED' ? `
-              <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 8px; text-align: left; margin: 1rem auto; max-width: 500px;">
-                <h4 style="color: #92400e; margin-bottom: 0.5rem;">🔒 Problema de Permissões</h4>
-                <p style="color: #78350f; font-size: 0.875rem; margin-bottom: 0.75rem;">
-                  Seu usuário não tem permissão para acessar o banco de dados.
-                </p>
-                <p style="color: #78350f; font-size: 0.875rem; margin-bottom: 0.5rem;">
-                  <strong>Solução:</strong> Configure as regras do Firebase Database:
-                </p>
-                <ol style="color: #78350f; font-size: 0.8125rem; margin-left: 1.5rem;">
-                  <li>Acesse o Firebase Console</li>
-                  <li>Vá em "Realtime Database" → "Rules"</li>
-                  <li>Configure as regras para permitir acesso autenticado</li>
-                </ol>
-              </div>
-            ` : ''}
-            <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 1rem;">
-              Tentar Novamente
-            </button>
+            ❌ Erro ao carregar dados<br>
+            <small style="font-size: 0.875rem; opacity: 0.8;">${e.message}</small>
           </div>`;
         Utils.hideLoading();
       }
     }
 
-    // Authentication
-    addDiagnostic('═'.repeat(40));
-    addDiagnostic('🔐 VERIFICANDO AUTENTICAÇÃO');
-    addDiagnostic('═'.repeat(40));
+    // ✅ USA onAuthStateChanged DIRETAMENTE (igual ao manicures.html)
+    console.log('═'.repeat(60));
+    console.log('🔐 INICIANDO VERIFICAÇÃO DE AUTENTICAÇÃO');
+    console.log('═'.repeat(60));
     
     onAuthStateChanged(auth, async (user) => {
+      console.log('🔄 onAuthStateChanged disparado');
+      console.log('👤 Usuário recebido:', user);
+      
       if (user) {
-        addDiagnostic('✅ USUÁRIO AUTENTICADO');
-        addDiagnostic(`📧 Email: ${user.email}`);
-        addDiagnostic(`🆔 UID: ${user.uid}`);
+        // ✅ USUÁRIO AUTENTICADO
+        console.log('═'.repeat(60));
+        console.log('✅ USUÁRIO AUTENTICADO!');
+        console.log('═'.repeat(60));
+        console.log('📧 Email:', user.email);
+        console.log('🆔 UID:', user.uid);
+        console.log('═'.repeat(60));
         
         currentUser = user;
         document.getElementById('user-info').textContent = user.email;
         
+        console.log('📞 Chamando loadDashboard()...');
         await loadDashboard();
         
       } else {
-        addDiagnostic('⚠️ USUÁRIO NÃO AUTENTICADO');
+        // ❌ NÃO AUTENTICADO
+        console.log('═'.repeat(60));
+        console.log('⚠️ USUÁRIO NÃO AUTENTICADO');
+        console.log('═'.repeat(60));
         
         document.getElementById('user-info').textContent = 'Não autenticado';
         
@@ -1343,7 +1197,7 @@
         await signOut(auth);
         window.location.href = 'pages/login.html';
       } catch (e) {
-        addDiagnostic(`❌ Erro ao fazer logout: ${e.message}`);
+        console.error('Erro ao fazer logout:', e);
       }
     };
 
